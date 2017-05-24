@@ -1,0 +1,1230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head profile="http://www.w3.org/2006/03/hcard http://dublincore.org/documents/2008/08/04/dc-html/">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+
+  <title>BULK DNS Resource Records</title>
+
+  <style type="text/css" title="Xml2Rfc (sans serif)">
+  /*<![CDATA[*/
+	  a {
+	  text-decoration: none;
+	  }
+      /* info code from SantaKlauss at http://www.madaboutstyle.com/tooltip2.html */
+      a.info {
+          /* This is the key. */
+          position: relative;
+          z-index: 24;
+          text-decoration: none;
+      }
+      a.info:hover {
+          z-index: 25;
+          color: #FFF; background-color: #900;
+      }
+      a.info span { display: none; }
+      a.info:hover span.info {
+          /* The span will display just on :hover state. */
+          display: block;
+          position: absolute;
+          font-size: smaller;
+          top: 2em; left: -5em; width: 15em;
+          padding: 2px; border: 1px solid #333;
+          color: #900; background-color: #EEE;
+          text-align: left;
+      }
+	  a.smpl {
+	  color: black;
+	  }
+	  a:hover {
+	  text-decoration: underline;
+	  }
+	  a:active {
+	  text-decoration: underline;
+	  }
+	  address {
+	  margin-top: 1em;
+	  margin-left: 2em;
+	  font-style: normal;
+	  }
+	  body {
+	  color: black;
+	  font-family: verdana, helvetica, arial, sans-serif;
+	  font-size: 10pt;
+	  max-width: 55em;
+	  
+	  }
+	  cite {
+	  font-style: normal;
+	  }
+	  dd {
+	  margin-right: 2em;
+	  }
+	  dl {
+	  margin-left: 2em;
+	  }
+	
+	  ul.empty {
+	  list-style-type: none;
+	  }
+	  ul.empty li {
+	  margin-top: .5em;
+	  }
+	  dl p {
+	  margin-left: 0em;
+	  }
+	  dt {
+	  margin-top: .5em;
+	  }
+	  h1 {
+	  font-size: 14pt;
+	  line-height: 21pt;
+	  page-break-after: avoid;
+	  }
+	  h1.np {
+	  page-break-before: always;
+	  }
+	  h1 a {
+	  color: #333333;
+	  }
+	  h2 {
+	  font-size: 12pt;
+	  line-height: 15pt;
+	  page-break-after: avoid;
+	  }
+	  h3, h4, h5, h6 {
+	  font-size: 10pt;
+	  page-break-after: avoid;
+	  }
+	  h2 a, h3 a, h4 a, h5 a, h6 a {
+	  color: black;
+	  }
+	  img {
+	  margin-left: 3em;
+	  }
+	  li {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  ol {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  ol p {
+	  margin-left: 0em;
+	  }
+	  p {
+	  margin-left: 2em;
+	  margin-right: 2em;
+	  }
+	  pre {
+	  margin-left: 3em;
+	  background-color: lightyellow;
+	  padding: .25em;
+	  }
+	  pre.text2 {
+	  border-style: dotted;
+	  border-width: 1px;
+	  background-color: #f0f0f0;
+	  width: 69em;
+	  }
+	  pre.inline {
+	  background-color: white;
+	  padding: 0em;
+	  }
+	  pre.text {
+	  border-style: dotted;
+	  border-width: 1px;
+	  background-color: #f8f8f8;
+	  width: 69em;
+	  }
+	  pre.drawing {
+	  border-style: solid;
+	  border-width: 1px;
+	  background-color: #f8f8f8;
+	  padding: 2em;
+	  }
+	  table {
+	  margin-left: 2em;
+	  }
+	  table.tt {
+	  vertical-align: top;
+	  }
+	  table.full {
+	  border-style: outset;
+	  border-width: 1px;
+	  }
+	  table.headers {
+	  border-style: outset;
+	  border-width: 1px;
+	  }
+	  table.tt td {
+	  vertical-align: top;
+	  }
+	  table.full td {
+	  border-style: inset;
+	  border-width: 1px;
+	  }
+	  table.tt th {
+	  vertical-align: top;
+	  }
+	  table.full th {
+	  border-style: inset;
+	  border-width: 1px;
+	  }
+	  table.headers th {
+	  border-style: none none inset none;
+	  border-width: 1px;
+	  }
+	  table.left {
+	  margin-right: auto;
+	  }
+	  table.right {
+	  margin-left: auto;
+	  }
+	  table.center {
+	  margin-left: auto;
+	  margin-right: auto;
+	  }
+	  caption {
+	  caption-side: bottom;
+	  font-weight: bold;
+	  font-size: 9pt;
+	  margin-top: .5em;
+	  }
+	
+	  table.header {
+	  border-spacing: 1px;
+	  width: 95%;
+	  font-size: 10pt;
+	  color: white;
+	  }
+	  td.top {
+	  vertical-align: top;
+	  }
+	  td.topnowrap {
+	  vertical-align: top;
+	  white-space: nowrap; 
+	  }
+	  table.header td {
+	  background-color: gray;
+	  width: 50%;
+	  }
+	  table.header a {
+	  color: white;
+	  }
+	  td.reference {
+	  vertical-align: top;
+	  white-space: nowrap;
+	  padding-right: 1em;
+	  }
+	  thead {
+	  display:table-header-group;
+	  }
+	  ul.toc, ul.toc ul {
+	  list-style: none;
+	  margin-left: 1.5em;
+	  margin-right: 0em;
+	  padding-left: 0em;
+	  }
+	  ul.toc li {
+	  line-height: 150%;
+	  font-weight: bold;
+	  font-size: 10pt;
+	  margin-left: 0em;
+	  margin-right: 0em;
+	  }
+	  ul.toc li li {
+	  line-height: normal;
+	  font-weight: normal;
+	  font-size: 9pt;
+	  margin-left: 0em;
+	  margin-right: 0em;
+	  }
+	  li.excluded {
+	  font-size: 0pt;
+	  }
+	  ul p {
+	  margin-left: 0em;
+	  }
+	
+	  .comment {
+	  background-color: yellow;
+	  }
+	  .center {
+	  text-align: center;
+	  }
+	  .error {
+	  color: red;
+	  font-style: italic;
+	  font-weight: bold;
+	  }
+	  .figure {
+	  font-weight: bold;
+	  text-align: center;
+	  font-size: 9pt;
+	  }
+	  .filename {
+	  color: #333333;
+	  font-weight: bold;
+	  font-size: 12pt;
+	  line-height: 21pt;
+	  text-align: center;
+	  }
+	  .fn {
+	  font-weight: bold;
+	  }
+	  .hidden {
+	  display: none;
+	  }
+	  .left {
+	  text-align: left;
+	  }
+	  .right {
+	  text-align: right;
+	  }
+	  .title {
+	  color: #990000;
+	  font-size: 18pt;
+	  line-height: 18pt;
+	  font-weight: bold;
+	  text-align: center;
+	  margin-top: 36pt;
+	  }
+	  .vcardline {
+	  display: block;
+	  }
+	  .warning {
+	  font-size: 14pt;
+	  background-color: yellow;
+	  }
+	
+	
+	  @media print {
+	  .noprint {
+		display: none;
+	  }
+	
+	  a {
+		color: black;
+		text-decoration: none;
+	  }
+	
+	  table.header {
+		width: 90%;
+	  }
+	
+	  td.header {
+		width: 50%;
+		color: black;
+		background-color: white;
+		vertical-align: top;
+		font-size: 12pt;
+	  }
+	
+	  ul.toc a::after {
+		content: leader('.') target-counter(attr(href), page);
+	  }
+	
+	  ul.ind li li a {
+		content: target-counter(attr(href), page);
+	  }
+	
+	  .print2col {
+		column-count: 2;
+		-moz-column-count: 2;
+		column-fill: auto;
+	  }
+	  }
+	
+	  @page {
+	  @top-left {
+		   content: "Internet-Draft"; 
+	  } 
+	  @top-right {
+		   content: "December 2010"; 
+	  } 
+	  @top-center {
+		   content: "Abbreviated Title";
+	  } 
+	  @bottom-left {
+		   content: "Doe"; 
+	  } 
+	  @bottom-center {
+		   content: "Expires June 2011"; 
+	  } 
+	  @bottom-right {
+		   content: "[Page " counter(page) "]"; 
+	  } 
+	  }
+	
+	  @page:first { 
+		@top-left {
+		  content: normal;
+		}
+		@top-right {
+		  content: normal;
+		}
+		@top-center {
+		  content: normal;
+		}
+	  }
+  /*]]>*/
+  </style>
+
+  <link href="#rfc.toc" rel="Contents"/>
+<link href="#rfc.section.1" rel="Chapter" title="1 Introduction"/>
+<link href="#rfc.section.1.1" rel="Chapter" title="1.1 Background and Related Documents"/>
+<link href="#rfc.section.1.2" rel="Chapter" title="1.2 Reserved Words"/>
+<link href="#rfc.section.2" rel="Chapter" title="2 The BULK Resource Record"/>
+<link href="#rfc.section.2.1" rel="Chapter" title="2.1 BULK OPTIONAL Hidden Wildcards"/>
+<link href="#rfc.section.2.2" rel="Chapter" title="2.2 BULK RDATA Wire Format"/>
+<link href="#rfc.section.2.2.1" rel="Chapter" title="2.2.1 The Match Type Field"/>
+<link href="#rfc.section.2.2.2" rel="Chapter" title="2.2.2 The Domain Name Pattern Field"/>
+<link href="#rfc.section.2.2.3" rel="Chapter" title="2.2.3 The Replacement Pattern Field"/>
+<link href="#rfc.section.2.3" rel="Chapter" title="2.3 The BULK RR Presentation Format"/>
+<link href="#rfc.section.2.4" rel="Chapter" title="2.4 BULK RR Examples"/>
+<link href="#rfc.section.3" rel="Chapter" title="3 BULK Replacement"/>
+<link href="#rfc.section.3.1" rel="Chapter" title="3.1 Matching BULK &quot;owner&quot; field"/>
+<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Matching the BULK &quot;Match Type&quot; field"/>
+<link href="#rfc.section.3.3" rel="Chapter" title="3.3 Matching the BULK &quot;Domain Name Pattern&quot; field"/>
+<link href="#rfc.section.3.3.1" rel="Chapter" title="3.3.1 Automatic Domain Name Pattern matching"/>
+<link href="#rfc.section.3.3.2" rel="Chapter" title="3.3.2 Manual Domain Name Pattern matching"/>
+<link href="#rfc.section.3.4" rel="Chapter" title="3.4 Record Generation using the BULK &quot;Replacement Pattern&quot; field"/>
+<link href="#rfc.section.3.4.1" rel="Chapter" title="3.4.1 Replacement Pattern Backreferences"/>
+<link href="#rfc.section.3.4.2" rel="Chapter" title="3.4.2 Replacement Pattern examples"/>
+<link href="#rfc.section.4" rel="Chapter" title="4 The NPN Resource Record"/>
+<link href="#rfc.section.4.1" rel="Chapter" title="4.1 NPN RDATA Wire Format"/>
+<link href="#rfc.section.4.1.1" rel="Chapter" title="4.1.1 The Match Type field"/>
+<link href="#rfc.section.4.1.2" rel="Chapter" title="4.1.2 The Flags field"/>
+<link href="#rfc.section.4.1.3" rel="Chapter" title="4.1.3 The Owner Ignore field"/>
+<link href="#rfc.section.4.1.4" rel="Chapter" title="4.1.4 The Left Ignore field"/>
+<link href="#rfc.section.4.1.5" rel="Chapter" title="4.1.5 The Right Ignore field"/>
+<link href="#rfc.section.4.2" rel="Chapter" title="4.2 The NPN RR Presentation Format"/>
+<link href="#rfc.section.4.3" rel="Chapter" title="4.3 Normalization Processing of NPN RRs"/>
+<link href="#rfc.section.4.3.1" rel="Chapter" title="4.3.1 Pseudocode for NPN Normalization Processing"/>
+<link href="#rfc.section.4.3.2" rel="Chapter" title="4.3.2 NPN Normalization Processing examples"/>
+<link href="#rfc.section.5" rel="Chapter" title="5 Positive Side-Effects"/>
+<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Record Superimposition"/>
+<link href="#rfc.section.5.2" rel="Chapter" title="5.2 Pattern Based DNSSEC support"/>
+<link href="#rfc.section.6" rel="Chapter" title="6 Known Limitations"/>
+<link href="#rfc.section.6.1" rel="Chapter" title="6.1 Increased CPU utilization for NXDOMAIN RRs"/>
+<link href="#rfc.section.6.2" rel="Chapter" title="6.2 Pre-Adoption Nameserver Implications"/>
+<link href="#rfc.section.7" rel="Chapter" title="7 Security Considerations"/>
+<link href="#rfc.section.7.1" rel="Chapter" title="7.1 DNSSEC Signature Strategies"/>
+<link href="#rfc.section.7.1.1" rel="Chapter" title="7.1.1 On-the-fly (Live) Signatures"/>
+<link href="#rfc.section.7.1.2" rel="Chapter" title="7.1.2 Normalized (NPN Based) Signatures"/>
+<link href="#rfc.section.7.1.3" rel="Chapter" title="7.1.3 Non-DNSSEC Zone Support Only"/>
+<link href="#rfc.section.7.2" rel="Chapter" title="7.2 DNSSEC Verifier Details"/>
+<link href="#rfc.section.7.3" rel="Chapter" title="7.3 DDOS Attack Vectors and Mitigation"/>
+<link href="#rfc.section.7.4" rel="Chapter" title="7.4 Implications of Large Scale DNS Records"/>
+<link href="#rfc.section.8" rel="Chapter" title="8 IANA Considerations"/>
+<link href="#rfc.section.9" rel="Chapter" title="9 Acknowledgments"/>
+<link href="#rfc.references" rel="Chapter" title="10 Normative References"/>
+<link href="#rfc.authors" rel="Chapter"/>
+
+
+  <meta name="generator" content="xml2rfc version 2.5.2 - http://tools.ietf.org/tools/xml2rfc" />
+  <link rel="schema.dct" href="http://purl.org/dc/terms/" />
+
+  <meta name="dct.creator" content="Woodworth, J., Woodworth, J., Ballew, D., and S. Bindinganaveli Raghavan" />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-woodworth-bulk-rr-05" />
+  <meta name="dct.issued" scheme="ISO8601" content="2017-2-15" />
+  <meta name="dct.abstract" content="The BULK DNS resource record type defines a method of pattern based creation of DNS resource records to be used in place of NXDOMAIN errors which would normally be returned.  These records are currently restricted to registered DNS resource record types A, AAAA, PTR and CNAME.  The key benefit of the BULK resource record type is the simplification of maintaining &quot;generic&quot; record assignments which would otherwise be too many to manage or require scripts or proprietary methods as bind's $GENERATE." />
+  <meta name="description" content="The BULK DNS resource record type defines a method of pattern based creation of DNS resource records to be used in place of NXDOMAIN errors which would normally be returned.  These records are currently restricted to registered DNS resource record types A, AAAA, PTR and CNAME.  The key benefit of the BULK resource record type is the simplification of maintaining &quot;generic&quot; record assignments which would otherwise be too many to manage or require scripts or proprietary methods as bind's $GENERATE." />
+
+</head>
+
+<body>
+
+  <table class="header">
+    <tbody>
+    
+    	<tr>
+  <td class="left">DNSOP Working Group</td>
+  <td class="right">J. Woodworth</td>
+</tr>
+<tr>
+  <td class="left">Internet-Draft</td>
+  <td class="right">J. Woodworth</td>
+</tr>
+<tr>
+  <td class="left">Intended status: Standards Track</td>
+  <td class="right">D. Ballew</td>
+</tr>
+<tr>
+  <td class="left">Expires: August 19, 2017</td>
+  <td class="right">S. Bindinganaveli Raghavan</td>
+</tr>
+<tr>
+  <td class="left"></td>
+  <td class="right">CenturyLink, Inc.</td>
+</tr>
+<tr>
+  <td class="left"></td>
+  <td class="right">February 15, 2017</td>
+</tr>
+
+    	
+    </tbody>
+  </table>
+
+  <p class="title">BULK DNS Resource Records<br />
+  <span class="filename">draft-woodworth-bulk-rr-05</span></p>
+  
+  <h1 id="rfc.abstract">
+  <a href="#rfc.abstract">Abstract</a>
+</h1>
+<p>The BULK DNS resource record type defines a method of pattern based creation of DNS resource records to be used in place of NXDOMAIN errors which would normally be returned.  These records are currently restricted to registered DNS resource record types A, AAAA, PTR and CNAME.  The key benefit of the BULK resource record type is the simplification of maintaining "generic" record assignments which would otherwise be too many to manage or require scripts or proprietary methods as bind's $GENERATE.</p>
+<p>This document updates RFCs 2308, 4033, 4034 and 4035.</p>
+<h1 id="rfc.status">
+  <a href="#rfc.status">Status of This Memo</a>
+</h1>
+<p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
+<p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
+<p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
+<p>This Internet-Draft will expire on August 19, 2017.</p>
+<h1 id="rfc.copyrightnotice">
+  <a href="#rfc.copyrightnotice">Copyright Notice</a>
+</h1>
+<p>Copyright (c) 2017 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
+<p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (http://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
+
+  
+  <hr class="noprint" />
+  <h1 class="np" id="rfc.toc"><a href="#rfc.toc">Table of Contents</a></h1>
+  <ul class="toc">
+
+  	<li>1.   <a href="#rfc.section.1">Introduction</a></li>
+<ul><li>1.1.   <a href="#rfc.section.1.1">Background and Related Documents</a></li>
+<li>1.2.   <a href="#rfc.section.1.2">Reserved Words</a></li>
+</ul><li>2.   <a href="#rfc.section.2">The BULK Resource Record</a></li>
+<ul><li>2.1.   <a href="#rfc.section.2.1">BULK OPTIONAL Hidden Wildcards</a></li>
+<li>2.2.   <a href="#rfc.section.2.2">BULK RDATA Wire Format</a></li>
+<ul><li>2.2.1.   <a href="#rfc.section.2.2.1">The Match Type Field</a></li>
+<li>2.2.2.   <a href="#rfc.section.2.2.2">The Domain Name Pattern Field</a></li>
+<li>2.2.3.   <a href="#rfc.section.2.2.3">The Replacement Pattern Field</a></li>
+</ul><li>2.3.   <a href="#rfc.section.2.3">The BULK RR Presentation Format</a></li>
+<li>2.4.   <a href="#rfc.section.2.4">BULK RR Examples</a></li>
+</ul><li>3.   <a href="#rfc.section.3">BULK Replacement</a></li>
+<ul><li>3.1.   <a href="#rfc.section.3.1">Matching BULK "owner" field</a></li>
+<li>3.2.   <a href="#rfc.section.3.2">Matching the BULK "Match Type" field</a></li>
+<li>3.3.   <a href="#rfc.section.3.3">Matching the BULK "Domain Name Pattern" field</a></li>
+<ul><li>3.3.1.   <a href="#rfc.section.3.3.1">Automatic Domain Name Pattern matching</a></li>
+<li>3.3.2.   <a href="#rfc.section.3.3.2">Manual Domain Name Pattern matching</a></li>
+</ul><li>3.4.   <a href="#rfc.section.3.4">Record Generation using the BULK "Replacement Pattern" field</a></li>
+<ul><li>3.4.1.   <a href="#rfc.section.3.4.1">Replacement Pattern Backreferences</a></li>
+<li>3.4.2.   <a href="#rfc.section.3.4.2">Replacement Pattern examples</a></li>
+</ul></ul><li>4.   <a href="#rfc.section.4">The NPN Resource Record</a></li>
+<ul><li>4.1.   <a href="#rfc.section.4.1">NPN RDATA Wire Format</a></li>
+<ul><li>4.1.1.   <a href="#rfc.section.4.1.1">The Match Type field</a></li>
+<li>4.1.2.   <a href="#rfc.section.4.1.2">The Flags field</a></li>
+<li>4.1.3.   <a href="#rfc.section.4.1.3">The Owner Ignore field</a></li>
+<li>4.1.4.   <a href="#rfc.section.4.1.4">The Left Ignore field</a></li>
+<li>4.1.5.   <a href="#rfc.section.4.1.5">The Right Ignore field</a></li>
+</ul><li>4.2.   <a href="#rfc.section.4.2">The NPN RR Presentation Format</a></li>
+<li>4.3.   <a href="#rfc.section.4.3">Normalization Processing of NPN RRs</a></li>
+<ul><li>4.3.1.   <a href="#rfc.section.4.3.1">Pseudocode for NPN Normalization Processing</a></li>
+<li>4.3.2.   <a href="#rfc.section.4.3.2">NPN Normalization Processing examples</a></li>
+</ul></ul><li>5.   <a href="#rfc.section.5">Positive Side-Effects</a></li>
+<ul><li>5.1.   <a href="#rfc.section.5.1">Record Superimposition</a></li>
+<li>5.2.   <a href="#rfc.section.5.2">Pattern Based DNSSEC support</a></li>
+</ul><li>6.   <a href="#rfc.section.6">Known Limitations</a></li>
+<ul><li>6.1.   <a href="#rfc.section.6.1">Increased CPU utilization for NXDOMAIN RRs</a></li>
+<li>6.2.   <a href="#rfc.section.6.2">Pre-Adoption Nameserver Implications</a></li>
+</ul><li>7.   <a href="#rfc.section.7">Security Considerations</a></li>
+<ul><li>7.1.   <a href="#rfc.section.7.1">DNSSEC Signature Strategies</a></li>
+<ul><li>7.1.1.   <a href="#rfc.section.7.1.1">On-the-fly (Live) Signatures</a></li>
+<li>7.1.2.   <a href="#rfc.section.7.1.2">Normalized (NPN Based) Signatures</a></li>
+<li>7.1.3.   <a href="#rfc.section.7.1.3">Non-DNSSEC Zone Support Only</a></li>
+</ul><li>7.2.   <a href="#rfc.section.7.2">DNSSEC Verifier Details</a></li>
+<li>7.3.   <a href="#rfc.section.7.3">DDOS Attack Vectors and Mitigation</a></li>
+<li>7.4.   <a href="#rfc.section.7.4">Implications of Large Scale DNS Records</a></li>
+</ul><li>8.   <a href="#rfc.section.8">IANA Considerations</a></li>
+<li>9.   <a href="#rfc.section.9">Acknowledgments</a></li>
+<li>10.   <a href="#rfc.references">Normative References</a></li>
+<li><a href="#rfc.authors">Authors' Addresses</a></li>
+
+
+  </ul>
+
+  <h1 id="rfc.section.1"><a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a></h1>
+<p id="rfc.section.1.p.1">The BULK DNS Resource Record (BULK) defines a maskable pattern based method for real-time on-the-fly resource record generation. Specifically, it allows one to manage large blocks of DNS records based entirely on record owner data in the RR query and patterns (or templates) designed by knowledgeable zone administrators. Existing DNS resource records covered by this document are Address (A), IPv6 Address (AAAA), Pointer (PTR) and Canonical Name (CNAME). Although other RR types are not explicitly forbidden from use with BULK logic they fall outside of scope and will not be discussed in this document.  This document defines the purpose of this new resource record (BULK), its RDATA format, its presentation format (ASCII representation) as well as generated responses to matched DNS queries.</p>
+<p id="rfc.section.1.p.2">Two Key benefits of this record type are; a) the ability to transfer BULK RR intentions from primary to secondary nameservers with minimal bandwidth and memory requirements; and b) the ability to manage large volumes of pattern based records such as an IPv6 /64 CIDR or larger in a single entry.</p>
+<p id="rfc.section.1.p.3">Support options for DNSSEC related complications resulting from dynamically generated records are also provided in this document.  One such option is in the form of the Numeric Pattern Normalization (NPN) resource record type also described in this document.  NPN resource records provide a way of generating pattern based DNSSEC signatures and securely performing DNSSEC validation on such signatures.</p>
+<h1 id="rfc.section.1.1"><a href="#rfc.section.1.1">1.1.</a> <a href="#background-and-related-documents" id="background-and-related-documents">Background and Related Documents</a></h1>
+<p id="rfc.section.1.1.p.1">This document assumes the reader is familiar with the basic DNS concepts described in <a href="#RFC1034">[RFC1034]</a>, <a href="#RFC1035">[RFC1035]</a>, and the subsequent documents that update them, particularly <a href="#RFC2181">[RFC2181]</a> and <a href="#RFC2308">[RFC2308]</a>.</p>
+<p id="rfc.section.1.1.p.2">The reader is also assumed to be familiar with DNSSEC basics as described in <a href="#RFC4033">[RFC4033]</a>, <a href="#RFC4034">[RFC4034]</a> and <a href="#RFC4035">[RFC4035]</a> as well as the DNS cryptographic signature generation process described in <a href="#RFC4033">[RFC4033]</a>, <a href="#RFC4034">[RFC4034]</a>, <a href="#RFC4035">[RFC4035]</a>, <a href="#RFC2536">[RFC2536]</a>, <a href="#RFC2931">[RFC2931]</a> and <a href="#RFC3110">[RFC3110]</a>.</p>
+<h1 id="rfc.section.1.2"><a href="#rfc.section.1.2">1.2.</a> <a href="#reserved-words" id="reserved-words">Reserved Words</a></h1>
+<p id="rfc.section.1.2.p.1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <a href="#RFC2119">[RFC2119]</a>.</p>
+<h1 id="rfc.section.2"><a href="#rfc.section.2">2.</a> <a href="#the-bulk-resource-record" id="the-bulk-resource-record">The BULK Resource Record</a></h1>
+<p id="rfc.section.2.p.1">The BULK resource record consists of details which enable a DNS nameserver to generate RRs of other types based upon query received and patterns provided.  Unless otherwise stated the letters used in hexadecimal numbers (a-f) MUST be case insensitive and are assumed to be lowercase. All examples in this document using hexadecimal are provided in lowercase.</p>
+<p id="rfc.section.2.p.2">The Type value for the BULK RR type is XX.</p>
+<p id="rfc.section.2.p.3">The BULK RR is class independent.</p>
+<p id="rfc.section.2.p.4">The BULK RR has no special TTL requirements but some security guidelines are offered in a later section.</p>
+<h1 id="rfc.section.2.1"><a href="#rfc.section.2.1">2.1.</a> <a href="#bulk-optional-hidden-wildcards" id="bulk-optional-hidden-wildcards">BULK OPTIONAL Hidden Wildcards</a></h1>
+<p id="rfc.section.2.1.p.1">The BULK RR extends current wildcard substitution logic as defined in <a href="#RFC1034">[RFC1034]</a> by allowing a single hyphen "-" in the leftmost label to represent the intent of leveraging a modified wildcard matching mechanism.  If this condition exists wildcard logic SHALL be used for generated replacement records but not for the BULK resource records themselves.  This will become clearer in the "BULK Replacement" section of this document.  If an asterisk "*" (the standard wildcard character) is used default wildcard behavior MUST be used.</p>
+<h1 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a> <a href="#bulk-rdata-wire-format" id="bulk-rdata-wire-format">BULK RDATA Wire Format</a></h1>
+<p id="rfc.section.2.2.p.1">The RDATA for a BULK RR consists of a 2 octet Match Type Field, a Domain Name Pattern Field and a Replacement Pattern Field.</p>
+<pre>
+                     1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Match Type          |                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+       Domain Name Pattern     /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/                                                               /
+/                      Replacement Pattern                      /
+/                                                               /
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</pre>
+<h1 id="rfc.section.2.2.1"><a href="#rfc.section.2.2.1">2.2.1.</a> <a href="#the-match-type-field" id="the-match-type-field">The Match Type Field</a></h1>
+<p id="rfc.section.2.2.1.p.1">The Match Type field identifies the type of the RRset identified by this BULK record.  This field consists of two octets corresponding to an RR TYPE code as specified in <a href="#RFC1035">[RFC1035]</a>, Section 3.2.1.</p>
+<h1 id="rfc.section.2.2.2"><a href="#rfc.section.2.2.2">2.2.2.</a> <a href="#the-domain-name-pattern-field" id="the-domain-name-pattern-field">The Domain Name Pattern Field</a></h1>
+<p id="rfc.section.2.2.2.p.1">The Domain Name Pattern Field consists of a text string which may be evaluated by the sections below.  The character encoding for this field is <a href="#us-ascii">[us-ascii]</a> and may not contain whitespace unless enclosed within double-quote characters.  The value of a single hyphen "-" has special implications and will be discussed in greater detail below.</p>
+<p id="rfc.section.2.2.2.p.2">The following syntax specification uses the Augmented Backus-Naur Form (ABNF) notation as specified in <a href="#RFC5234">[RFC5234]</a>.</p>
+<pre>
+      DIGIT  = &lt;as defined in RFC 5234 Appendix B.1&gt;
+      HEXDIG = &lt;as defined in RFC 5234 Appendix B.1&gt;
+      DQUOTE = &lt;as defined in RFC 5234 Appendix B.1&gt;
+
+      pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
+
+      part                =   "\[" range "]" / string
+
+      range               =   number [ "-" number ]
+
+      number              =   1*DIGIT / 1*HEXDIG
+
+      string              =   1*( %x01-5A / %x5C / %x5E-7F )
+                                 ; Any [US-ASCII] character excluding
+                                 ; NUL and square bracket characters
+                                 ; "\[" or "]"
+</pre>
+<p id="rfc.section.2.2.2.p.3">Although allowed by <a href="#RFC2181">[RFC2181]</a>; the square bracket characters, "[" and "]", are reserved to enclose a range specification and MUST NOT appear anywhere outside of a range specification.</p>
+<h1 id="rfc.section.2.2.2.1"><a href="#rfc.section.2.2.2.1">2.2.2.1.</a> <a href="#single-hyphen" id="single-hyphen">Single hyphen</a></h1>
+<p id="rfc.section.2.2.2.1.p.1">If the domain name pattern field consists of a single hyphen it is not necessary to evaluate for numeric ranges or strings.  Implementors SHOULD simply set a flag indicating all ranges matching the query's label are true and backreferences (described in further detail in the "BULK Replacement" section) will be automatically set.</p>
+<h1 id="rfc.section.2.2.2.2"><a href="#rfc.section.2.2.2.2">2.2.2.2.</a> <a href="#numeric-ranges" id="numeric-ranges">Numeric ranges</a></h1>
+<p id="rfc.section.2.2.2.2.p.1">Numeric ranges include decimal or hexadecimal ranges depending on which record type was used in the query.  This logic will be described in further detail in the "Replacement Logic" section.</p>
+<p id="rfc.section.2.2.2.2.p.2">The numeric range pattern will be a range of allowed numbers lower and upper values separated by a single hyphen "-".  If upper and lower values are identical a single numeric value (without hyphen) will suffice.  To easily distinguish numeric range patterns from string values they MUST be enclosed within square brackets "[" and "]".</p>
+<h1 id="rfc.section.2.2.2.3"><a href="#rfc.section.2.2.2.3">2.2.2.3.</a> <a href="#string-values" id="string-values">String values</a></h1>
+<p id="rfc.section.2.2.2.3.p.1">All values found before or after Numeric ranges (excluding single-hyphen rule) are considered to be string values.  These values will be taken literally when evaluating for pattern matches in the "BULK Replacement" section below.</p>
+<h1 id="rfc.section.2.2.3"><a href="#rfc.section.2.2.3">2.2.3.</a> <a href="#the-replacement-pattern-field" id="the-replacement-pattern-field">The Replacement Pattern Field</a></h1>
+<p id="rfc.section.2.2.3.p.1">The Replacement Pattern field describes how the answer RRset SHOULD be generated for the matching query.  It can either be a single hyphen "-" or a string containing backreferences (described in further detail in the "BULK Replacement" section).  This field MUST be evaluated for proper syntax for resource records of its Match Type defined above.  A "read" evaluation MAY be performed when a zone is first committed to memory either while converting from Text to Wire format (from stored zone files) or when a RR transfer is received (raw Wire format).  Stage two "write" evaluations MUST be performed prior to returning generated replacement answers.  Since logic to perform a stage two evaluation is already a requirement for DNS nameservers it may be easier for implementors to perform just stage two evaluations.  Stage-two-only evaluation may be also preferred for performance purposes and is acceptable behavior.  Any stage two evaluation errors MUST be processed as if the record did not exist and if all BULK generated records for a query answer-set evaluate to errors the original condition of an NXDOMAIN error state MUST be restored.</p>
+<p id="rfc.section.2.2.3.p.2">The following syntax specification uses the Augmented Backus-Naur Form (ABNF) notation as specified in <a href="#RFC5234">[RFC5234]</a>.</p>
+<pre>
+      DIGIT  = &lt;as defined in RFC 5234 Appendix B.1&gt;
+      HEXDIG = &lt;as defined in RFC 5234 Appendix B.1&gt;
+      DQUOTE = &lt;as defined in RFC 5234 Appendix B.1&gt;
+
+      pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
+
+      part                =   backreference / string
+
+      backreference       =   "$" "{" substitution "}"
+
+      substitution        =   range 0*( "," range ) [ options ]
+
+      substitution        =/  "*" [ options ]
+
+      options             =   delimiter [ interval [ padding ] ]
+
+      delimiter           =   "|" 0*1( %x01-23 / %x25-7A / %7E-7F )
+                                 ; Any single [US-ASCII] character
+                                 ; excluding NUL, dollar sign "$",
+                                 ; pipe "|" and curly brace characters
+                                 ; "{" or "}"
+
+      interval            =   "|" *2DIGIT
+
+      padding             =   "|" *2DIGIT
+
+      range               =   number [ "-" number ]
+
+      number              =   1*DIGIT / 1*HEXDIG
+
+      string              =   1*( %x01-23 / %x25-7A / %x7C / %7E-7F )
+                                 ; Any [US-ASCII] character excluding
+                                 ; NUL, dollar sign "$" and curly brace
+                                 ; characters "{" or "}"
+</pre>
+<p id="rfc.section.2.2.3.p.3">The dollar sign, "$", and curly brace characters, "{" and "}", are reserved to enclose regular-expression-esque backreferences and MUST NOT appear anywhere outside of such a backreference specification.  This rigidity is necessary to simplify implementation of this document and may relax once adoption reaches an acceptable level and demand for such an exception exists.  The authors feel this limitation is a reasonable limitation for the flexibility offered by this document.</p>
+<h1 id="rfc.section.2.3"><a href="#rfc.section.2.3">2.3.</a> <a href="#the-bulk-rr-presentation-format" id="the-bulk-rr-presentation-format">The BULK RR Presentation Format</a></h1>
+<p id="rfc.section.2.3.p.1">The Match Type field is represented as an RR type mnemonic.  When the mnemonic is not known, the TYPE representation as described in <a href="#RFC3597">[RFC3597]</a>, Section 5, MUST be used.</p>
+<p id="rfc.section.2.3.p.2">The Domain Name Pattern and Replacement Pattern fields MUST be presented as the TXT RR type described in <a href="#RFC1035">[RFC1035]</a>, Section 3.3.14.</p>
+<h1 id="rfc.section.2.4"><a href="#rfc.section.2.4">2.4.</a> <a href="#bulk-rr-examples" id="bulk-rr-examples">BULK RR Examples</a></h1>
+<p id="rfc.section.2.4.p.1">EXAMPLE 1</p>
+<p id="rfc.section.2.4.p.2">The following BULK RR stores a block of A RRs for example.com.</p>
+<pre>
+*.example.com. 86400 IN BULK A (
+                                 pool-A-\[0-255]-\[0-255].example.com.
+                                 10.55.${1}.${2}
+                               )
+</pre>
+<p id="rfc.section.2.4.p.3">The first four fields specify the owner name, TTL, Class, and RR type (BULK).  Value "A" indicates that this BULK RR defines the A record type (Address).  Value "pool-A-[0-255]-[0-255].example.com." indicates the Domain Name Pattern.  Value "10.55.${1}.${2}" indicates the Replacement Pattern.  The owner in this example is a wildcard and matches any query ending with the string right of the asterisk.</p>
+<p id="rfc.section.2.4.p.4">EXAMPLE 2</p>
+<p id="rfc.section.2.4.p.5">The following BULK RR stores the reverse block of PTR records for the first example.</p>
+<pre>
+*.55.10.in-addr.arpa. 86400 IN BULK PTR (
+                                 \[0-255].\[0-255].55.10.in-addr.arpa.
+                                 pool-A-${1}-${2}.example.com.
+                               )
+</pre>
+<p id="rfc.section.2.4.p.6">The first four fields specify the owner name, TTL, Class, and RR type (BULK).  Value "PTR" indicates that this BULK RR defines the PTR record type (Pointer).  Value "[0-255].[0-255].55.10.in-addr.arpa." indicates the Domain Name Pattern.  Value "pool-A-${1}-${2}.example.com." indicates the Replacement Pattern.  The owner in this example is a wildcard and matches any query ending with the string right of the asterisk.</p>
+<p id="rfc.section.2.4.p.7">Additional examples can be found in the "BULK Replacement" section.</p>
+<h1 id="rfc.section.3"><a href="#rfc.section.3">3.</a> <a href="#bulk-replacement" id="bulk-replacement">BULK Replacement</a></h1>
+<p id="rfc.section.3.p.1">The BULK Record is designed to enable DNS zone maintainers to manage large blocks of DNS RRs which all conform to a common pattern. The Domain Name Pattern field provides both a tertiary filter (after owner and type) and a definition of all numeric pattern ranges.</p>
+<p id="rfc.section.3.p.2">When a query is first received by a DNS nameserver it begins its job of locating an answer-set.  In its simplest form this begins by locating the query owner (or wildcard suffix), class and type then returning any matching RR RDATA (or errors).</p>
+<p id="rfc.section.3.p.3">In the event no matches for the query are found the nameserver of authority will return an error type defined as NXDOMAIN.  In the case of a "BULK" enabled authoritative nameserver an additional step MUST be performed.  The nameserver MUST query its local RR database for any "BULK" RRs with a matching owner, class and compatible Match Type.  If any such RRs are found the query's owner MUST then be matched against the Domain Name Pattern and all matching BULK records MUST be placed into a temporary processing answer-set.  This temporary processing answer-set MUST then follow the Replacement Pattern for each matched record and provided no errors are found SHALL then write this new answer-set to the query's complete answer set.  Matching replacements will be of the type specified in the Match Type field of the corresponding BULK RR. Additional detail is provided in the following sections.</p>
+<h1 id="rfc.section.3.1"><a href="#rfc.section.3.1">3.1.</a> <a href="#matching-bulk-owner-field" id="matching-bulk-owner-field">Matching BULK "owner" field</a></h1>
+<p id="rfc.section.3.1.p.1">The owner field of all BULK records MUST be that of either a wildcard or hidden wildcard as defined in previous sections.  While a hidden wildcard will not be searched for BULK records it will be added to the database for use with the corresponding type field of each BULK RR.  This allows location of BULK records to be less conspicuous to the public while still leveraging logic already included in the nameserver thus minimizing the complexity of implementation.</p>
+<p id="rfc.section.3.1.p.2">A query SHALL pass the first filter stage (owner match) ONLY IF: (1) an NXDOMAIN is set as the query's current answer set AND (2) the query's owner ends with the BULK record's owner field past the leading hyphen "-" or asterisk "*".</p>
+<h1 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a> <a href="#matching-the-bulk-match-type-field" id="matching-the-bulk-match-type-field">Matching the BULK "Match Type" field</a></h1>
+<p id="rfc.section.3.2.p.1">The RR type of the received query must be compatible with that of the Match Type of owners matched in the section above.  That is to say a query for an "A" record will only match BULK records with matching owner and Match Types of "A" (or "CNAME").  All other BULK records matching the query's owner are incompatible and MUST be ignored as part of the selected answer set.</p>
+<h1 id="rfc.section.3.3"><a href="#rfc.section.3.3">3.3.</a> <a href="#matching-the-bulk-domain-name-pattern-field" id="matching-the-bulk-domain-name-pattern-field">Matching the BULK "Domain Name Pattern" field</a></h1>
+<p id="rfc.section.3.3.p.1">Assuming the RR owner and Match Type fields match the next step is to find compatible Domain Name Patterns.  The logic for this falls into two categories; automatic and manual which are described in greater detail in the following sections.</p>
+<h1 id="rfc.section.3.3.1"><a href="#rfc.section.3.3.1">3.3.1.</a> <a href="#automatic-domain-name-pattern-matching" id="automatic-domain-name-pattern-matching">Automatic Domain Name Pattern matching</a></h1>
+<p id="rfc.section.3.3.1.p.1">Automatic Domain Name Pattern matching is determined by use of a single hyphen "-" as the value for Domain Name Pattern field.  This assumes everything matches and all hexadecimal or decimal fields will be captured for use as backreferences in the Replacement Pattern (described below).  Automatic Domain Name Pattern matching is often preferred for large blocks such as the reverse IPv6 address space for the simplicity of record management.</p>
+<h1 id="rfc.section.3.3.2"><a href="#rfc.section.3.3.2">3.3.2.</a> <a href="#manual-domain-name-pattern-matching" id="manual-domain-name-pattern-matching">Manual Domain Name Pattern matching</a></h1>
+<p id="rfc.section.3.3.2.p.1">Manual Domain Name Pattern matching, while more complex is designed to be both simple to implement and simple to use.  Below is an example implementation for label matching using a combination of parsing by regular expression and matching of numeric ranges.</p>
+<p id="rfc.section.3.3.2.p.2">Domain Name Patterns evaluate to current zone ORIGIN as defined in <a href="#RFC1034">[RFC1034]</a>, Section 3.  In short this means all Manual Domain Name Patterns must be terminated with a period "." or are assumed relative to the RR's origin.</p>
+<p id="rfc.section.3.3.2.p.3">Numeric Ranges are either decimal or hexadecimal as determined by conditions of query.</p>
+<pre>
+  If query type is "A" ranges are set to decimal.
+  
+  If query type is "AAAA" ranges are set to hexadecimal.
+
+  If query type is PTR or CNAME the RR owner is used to determine
+  decimal or hexadecimal.
+
+     If RR owner ends in ".ip6.arpa." ranges are set to hexadecimal.
+
+     If RR owner does _not_ end in ".ip6.arpa." ranges are set to decimal.
+</pre>
+<p id="rfc.section.3.3.2.p.4">The square bracket characters, "[" and "]", are reserved to enclose a range specification and MUST NOT appear anywhere outside of a range specification.</p>
+<h1 id="rfc.section.3.3.2.1"><a href="#rfc.section.3.3.2.1">3.3.2.1.</a> <a href="#manual-domain-name-pattern-matching-examples" id="manual-domain-name-pattern-matching-examples">Manual Domain Name Pattern matching examples</a></h1>
+<p id="rfc.section.3.3.2.1.p.1">EXAMPLE 1 For this example the query is defined as a PTR record for "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating BULK RR as:</p>
+<pre>
+-.2.10.in-addr.arpa. 86400 IN BULK PTR (
+                                       \[0-255].\[0-10]
+                                       pool-A-${1}-${2}.example.com.
+                                       )
+</pre>
+<p id="rfc.section.3.3.2.1.p.2">STEP 1 Ensure "Domain Name Pattern" is Fully Qualified</p>
+<p id="rfc.section.3.3.2.1.p.3">[0-255].[0-10] == [0-255].[0-10].2.10.in-addr.arpa.</p>
+<p id="rfc.section.3.3.2.1.p.4">STEP 2 Determine whether range is decimal or hexadecimal</p>
+<p id="rfc.section.3.3.2.1.p.5">Query type == "PTR" AND RR owner != "*.ip6.arpa." so range is decimal.</p>
+<p id="rfc.section.3.3.2.1.p.6">STEP 3 Build regular expression based on fully qualified domain name pattern.</p>
+<pre>
+   \[0-255].\[0-10].2.10.in-addr.arpa. ==
+                  /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
+</pre>
+<p id="rfc.section.3.3.2.1.p.7">The above regular expression simply matches numeric ranges based on decimal or hexadecimal and length.  Numeric range validation occurs in the next step.</p>
+<p id="rfc.section.3.3.2.1.p.8">STEP 4 Compare captured numbers and validate ranges</p>
+<pre>
+   4.3.2.10.in-addr.arpa.
+               =~ /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
+</pre>
+<p id="rfc.section.3.3.2.1.p.9">"4" is captured and within range 0-255 (decimal) "3" is captured and within range 0-10 (decimal)</p>
+<p id="rfc.section.3.3.2.1.p.10">EXAMPLE 2</p>
+<p id="rfc.section.3.3.2.1.p.11">For this example the query is defined as a PTR record for "fc00::55" with an origin of "0.0.c.f.ip6.arpa." and the evaluating BULK RR as:</p>
+<pre>
+-.0.0.c.f.ip6.arpa. 86400 IN BULK PTR (
+                                       -
+                                       pool-${1-16|}-${17-28|}.example.com.
+                                       )
+</pre>
+<p id="rfc.section.3.3.2.1.p.12">STEP 1 Ensure "Domain Name Pattern" is Fully Qualified</p>
+<pre>
+   - == \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
+        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
+        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
+        \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa.
+</pre>
+<p id="rfc.section.3.3.2.1.p.13">NOTE: Data above is shown in multiple lines for clarity.</p>
+<p id="rfc.section.3.3.2.1.p.14">Since Hyphen invokes "Automatic Domain Name Pattern" matching, all fields are captured for future use as backreferences.</p>
+<p id="rfc.section.3.3.2.1.p.15">STEP 2 Determine whether range is decimal or hexadecimal</p>
+<p id="rfc.section.3.3.2.1.p.16">Query type == "PTR" AND RR owner == "*.ip6.arpa." so range is hexadecimal.</p>
+<p id="rfc.section.3.3.2.1.p.17">STEP 3 Build regular expression based on fully qualified domain name pattern.</p>
+<pre>
+\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
+\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
+\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
+\[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa. ==
+               /^(\[0-9a-f]{1}\.){28}\.0\.0\.c\.f\.ip6\.arpa\.$/
+</pre>
+<p id="rfc.section.3.3.2.1.p.18">NOTE: Data above is shown in multiple lines for clarity.</p>
+<p id="rfc.section.3.3.2.1.p.19">The above regular expression simply matches numeric ranges based on decimal or hexadecimal and length.  Numeric range validation occurs in the next step.</p>
+<p id="rfc.section.3.3.2.1.p.20">STEP 4 Compare captured numbers and validate ranges</p>
+<pre>
+5.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.                            ~~
+0.0.0.0.0.0.0.0.0.0.0.0.0.0.c.f.ip6.arpa.
+            =~ /^(\[0-9a-f]{1}\.){28}\.0\.0\.c\.f\.ip6\.arpa\.$/
+</pre>
+<p id="rfc.section.3.3.2.1.p.21">NOTE: Data above is shown in multiple lines for clarity.</p>
+<p id="rfc.section.3.3.2.1.p.22">"5" is captured and within range 0-f (hexadecimal) "5" is captured and within range 0-f (hexadecimal) &#8230; "0" is captured and within range 0-f (hexadecimal) "0" is captured and within range 0-f (hexadecimal)</p>
+<p id="rfc.section.3.3.2.1.p.23">EXAMPLE 3 For this example the query is defined as an "AAAA" record for "pool-A-ff-aa.example.com." with an origin of "example.com." and the evaluating BULK RR as:</p>
+<pre>
+-.example.com. 86400 IN BULK AAAA (
+                                   pool-A-\[0-ffff]-\[0-ffff]
+                                   fc00::${1}:${2}
+                                  )
+</pre>
+<p id="rfc.section.3.3.2.1.p.24">STEP 1 Ensure "Domain Name Pattern" is Fully Qualified</p>
+<p id="rfc.section.3.3.2.1.p.25">pool-A-[0-ffff]-[0-ffff] == pool-A-[0-ffff]-[0-ffff].example.com.</p>
+<p id="rfc.section.3.3.2.1.p.26">STEP 2 Determine whether range is decimal or hexadecimal</p>
+<p id="rfc.section.3.3.2.1.p.27">Query type == "AAAA" so range is hexadecimal.</p>
+<p id="rfc.section.3.3.2.1.p.28">STEP 3 Build regular expression based on fully qualified domain name pattern.</p>
+<pre>
+pool-A-\[0-ffff]-\[0-ffff].example.com. ==
+     /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
+</pre>
+<p id="rfc.section.3.3.2.1.p.29">The above regular expression simply matches numeric ranges based on decimal or hexadecimal and length.  Numeric range validation occurs in the next step.</p>
+<p id="rfc.section.3.3.2.1.p.30">STEP 4 Compare captured numbers and validate ranges</p>
+<pre>
+pool-A-ff-aa.example.com.
+  =~ /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
+</pre>
+<p id="rfc.section.3.3.2.1.p.31">"ff" is captured and within range 0-ffff (hexadecimal) "aa" is captured and within range 0-ffff (hexadecimal)</p>
+<h1 id="rfc.section.3.4"><a href="#rfc.section.3.4">3.4.</a> <a href="#record-generation-using-the-bulk-replacement-pattern-field" id="record-generation-using-the-bulk-replacement-pattern-field">Record Generation using the BULK "Replacement Pattern" field</a></h1>
+<p id="rfc.section.3.4.p.1">Once it has been determined a query meets all criteria for a BULK record generation the below rules are followed to process captured numeric data and Replacement Pattern into RRs to apply to the answer-set.</p>
+<h1 id="rfc.section.3.4.1"><a href="#rfc.section.3.4.1">3.4.1.</a> <a href="#replacement-pattern-backreferences" id="replacement-pattern-backreferences">Replacement Pattern Backreferences</a></h1>
+<p id="rfc.section.3.4.1.p.1">Before a record may be generated data must be captured in the Domain Name Pattern comparison step above.  Each provided numeric range is assigned to a temporary buffer to be used in this step.  To make the jobs' of zone administrators easier the order of these buffers will change based on the Match Type and owner so they will default to feel more natural or intuitive.  Captured patterns and backreferences are in the same vein as regular expressions and are intended to feel "familiar".  This is described in further detail (with examples) in the sections below.</p>
+<h1 id="rfc.section.3.4.1.1"><a href="#rfc.section.3.4.1.1">3.4.1.1.</a> <a href="#backreference-notation" id="backreference-notation">Backreference Notation</a></h1>
+<p id="rfc.section.3.4.1.1.p.1">BULK RRs use a dollar-sign "$" and curly braces "{" and "}" to enclose backreferences within the Replacement Pattern.  The following rules are used to determine the final replacement string.</p>
+<h1 id="rfc.section.3.4.1.1.1"><a href="#rfc.section.3.4.1.1.1">3.4.1.1.1.</a> <a href="#simple-numeric-backreference-replacement" id="simple-numeric-backreference-replacement">Simple numeric backreference replacement</a></h1>
+<p id="rfc.section.3.4.1.1.1.p.1">The simplest form of backreference notation is its numeric form.  In this form only the backreference number falls between the curly braces "{" and "}".  An example is "${1}" which would be replaced by the value in the first capture position.  Position is described in detail in a later section.</p>
+<p id="rfc.section.3.4.1.1.1.p.2">Numeric backreference replacement indices start with one "1" to maintain consistency with regular expression backreferences.</p>
+<h1 id="rfc.section.3.4.1.1.2"><a href="#rfc.section.3.4.1.1.2">3.4.1.1.2.</a> <a href="#star-backreference-replacement" id="star-backreference-replacement">Star backreference replacement</a></h1>
+<p id="rfc.section.3.4.1.1.2.p.1">The next form of backreference notation is its star (or asterisk "<em>") form.  In this form only an asterisk falls between the curly braces "{" and "}".  This form "${</em>}" would be replaced by all captured values in order of ascending position delimited by its default delimiter (described below).  Position is described in detail in a later section.</p>
+<h1 id="rfc.section.3.4.1.1.3"><a href="#rfc.section.3.4.1.1.3">3.4.1.1.3.</a> <a href="#numeric-range-backreference-replacement" id="numeric-range-backreference-replacement">Numeric range backreference replacement</a></h1>
+<p id="rfc.section.3.4.1.1.3.p.1">The next form of backreference notation is the numeric range form. In this form a range of numbers falls between the curly braces "{" and "}".  An example of this is "${1-4}" which would be replaced by all captured values within this range (1-4) in order of positions provided delimited its default delimiter (described below).  To reverse the order of positions in this example one could simply reverse the upper and lower values to look like "${4-1}".  Position is described in detail in a later section.</p>
+<h1 id="rfc.section.3.4.1.1.4"><a href="#rfc.section.3.4.1.1.4">3.4.1.1.4.</a> <a href="#numeric-set-backreference-replacement" id="numeric-set-backreference-replacement">Numeric set backreference replacement</a></h1>
+<p id="rfc.section.3.4.1.1.4.p.1">The next form of backreference notation is the numeric set form.  In this form a set of numbers falls between the curly braces "{" and "}" separated by commas.  An example of this is "${1,4}" which would be replaced by the first and fourth captured values in the order of position provided delimited its default delimiter (described below).  Position is described in detail in a later section.</p>
+<p id="rfc.section.3.4.1.1.4.p.2">This notation may be combined with the numeric range form allowing specific positions or position ranges to be used.  Examples would be "${3,2,1,4-8}" and "${8-12,1-4}".</p>
+<h1 id="rfc.section.3.4.1.1.5"><a href="#rfc.section.3.4.1.1.5">3.4.1.1.5.</a> <a href="#backreference-delimiter" id="backreference-delimiter">Backreference delimiter</a></h1>
+<p id="rfc.section.3.4.1.1.5.p.1">The above sections reference a default delimiter.  In an effort to provide an intuitive zone management experience the default delimiter will be based on the BULK RR's Match Type.  For Match Type "A" the default delimiter SHALL be a period ".", for Match Type "AAAA" the default delimiter SHALL be a colon ":" and for Match Types "PTR" and "CNAME" the default delimiter SHALL be a hyphen "-". In any case the default delimiter MAY be overridden by including it in the backreference braces after the set selectors and a backreference field separator character, the pipe "|".  An example would be "${<em>|-}" which would force a hyphen "-" delimiter.  An empty or null delimiter is allowed by not specifying a delimiter character, for example "${</em>|}", which would simply concatenate all captured values in order of capture position.  Position is described in detail in a later section.</p>
+<h1 id="rfc.section.3.4.1.1.6"><a href="#rfc.section.3.4.1.1.6">3.4.1.1.6.</a> <a href="#backreference-delimiter-interval" id="backreference-delimiter-interval">Backreference delimiter interval</a></h1>
+<p id="rfc.section.3.4.1.1.6.p.1">The default behavior of a backreference set is to combine each captured value specified with a delimiter between each.  To allow captured backreferences to be delimited at another interval a third backreference field is provided.  An example would be "${*|-|4}" which would concatenate all captured values but delimiting only every fourth value with hyphens "-".  This can be a handy feature in the IPv6 reverse namespace where every nibble is captured as a separate value and generated hostnames include sets of 4 nibbles.  An empty or null value MUST be interpreted as "1" or every captured value.</p>
+<h1 id="rfc.section.3.4.1.1.7"><a href="#rfc.section.3.4.1.1.7">3.4.1.1.7.</a> <a href="#backreference-padding-length" id="backreference-padding-length">Backreference padding length</a></h1>
+<p id="rfc.section.3.4.1.1.7.p.1">When generating BULK based records a common requirement is to convert from one numeric format to another, padding is among the most common of these.  The fourth and final backreference field determines what width to pad to.  An example would be "${<em>|||4}" which would set the width of all captured values to 4 by inserting leading zeros to fill the void.  The default is empty or null which MUST be interpreted as NO modification.  A width of zero "0" has a special interpretation referred to as "unpad" meaning all leading zeros MUST be removed.  If a value is provided captured values longer than this width MUST be truncated to fit the specified width.  In the case where a delimiter interval is provided captured values between the intervals will be concatenated and the padding or unpadding applied as a unit and not individually.  An example of this would be "${</em>||4|4}" which would combine each range of 4 captured values and pad them to a width of 4 characters by inserting leading zeros where necessary.</p>
+<h1 id="rfc.section.3.4.1.1.8"><a href="#rfc.section.3.4.1.1.8">3.4.1.1.8.</a> <a href="#backreference-position" id="backreference-position">Backreference Position</a></h1>
+<p id="rfc.section.3.4.1.1.8.p.1">Great effort has gone into providing zone maintainers an intuitive syntax.  As part of this effort, the captured values will reverse direction depending on several factors.</p>
+<p id="rfc.section.3.4.1.1.8.p.2">As a general rule of thumb, if it makes sense the numeric ranges are in reverse order from query to answer then they will be reversed. Otherwise they will be in the same order.</p>
+<p id="rfc.section.3.4.1.1.8.p.3">Take for example a simple reverse DNS lookup, from "10.2.3.4" to "pool-A-3-4.example.com.".  Since DNS zones are arranged according to management authority the records appear reversed numerically. In this example "10.2.3.4" becomes "4.3.2.10.in-addr.arpa.". One would intuitively expect this reversal to be reversed so positional indices of captured values would increment toward the right of the Replacement Pattern.  This expectation is especially important when using range based replacements.</p>
+<p id="rfc.section.3.4.1.1.8.p.4">Formally, the rules for position reversal are as follows:</p>
+<p id="rfc.section.3.4.1.1.8.p.5">Match Type RRs for "PTR" are reversed for zone owners ending in either ".in-addr.arpa." or "ip6.arpa.".  All other Match Type RRs for "PTR" are forward.</p>
+<p id="rfc.section.3.4.1.1.8.p.6">Match Type RRs for "A" (Address), "AAAA" (IPv6 Address) and "CNAME" (Canonical Name) are forward.</p>
+<h1 id="rfc.section.3.4.1.1.9"><a href="#rfc.section.3.4.1.1.9">3.4.1.1.9.</a> <a href="#backreference-position-negation" id="backreference-position-negation">Backreference Position Negation</a></h1>
+<p id="rfc.section.3.4.1.1.9.p.1">To allow simple reversal of any backreference notation a single exclamation point character "!" MAY be used as the first character of a backreference set.  Examples would be "${!*}" and "${!1-4,7}". In both of the examples the backreference positions SHALL be the exact mirror equivalent as those without the leading exclamation point "!".  This can be very important if the BULK generated replacements have values in positions opposite to what is required or expected.</p>
+<h1 id="rfc.section.3.4.2"><a href="#rfc.section.3.4.2">3.4.2.</a> <a href="#replacement-pattern-examples" id="replacement-pattern-examples">Replacement Pattern examples</a></h1>
+<p id="rfc.section.3.4.2.p.1">This section provides examples of several BULK RR Replacement Patterns.  Each example is intended to further understanding for implementors and DNS administrators alike.</p>
+<p id="rfc.section.3.4.2.p.2">EXAMPLE 1 For this example the query is defined as a PTR record for "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating BULK RR as:</p>
+<pre>
+    - 86400 IN BULK PTR - pool-${*}.example.com.
+</pre>
+<p id="rfc.section.3.4.2.p.3">This example contains several of the features described above.</p>
+<p id="rfc.section.3.4.2.p.4">First, the record owner is simply a single hyphen "-" denoting it is a "hidden wildcard" (wildcard for generated records but not for BULK).</p>
+<p id="rfc.section.3.4.2.p.5">Second, the Domain Name Pattern is also a single hyphen "-" denoting all queries matching the owner's wildcard pattern for the "PTR" Match Type are accepted and will be captured for use in the Replacement Pattern.</p>
+<p id="rfc.section.3.4.2.p.6">Third, the Replacement Pattern contains a single "star" backreference denoting all captured numeric (decimal) backreferences will be combined with its default delimiter of hyphen "-" (for PTR) and placed into the backreference's position in the answer-set.  Should this generate an invalid hostname the response will be NXDOMAIN unless other BULK records match and are successfully generated without error.</p>
+<p id="rfc.section.3.4.2.p.7">The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates matching backreferences for "4", "3", "2" and "10" then reverses their indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and "${4}" to "4" respectively.  When applied to the Replacement Pattern the answer becomes "pool-10-2-3-4.example.com.".</p>
+<p id="rfc.section.3.4.2.p.8">EXAMPLE 2 For this example the query is defined as a PTR record for "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating BULK RR as:</p>
+<pre>
+- 86400 IN BULK PTR - pool-${*|||3}.example.com.
+</pre>
+<p id="rfc.section.3.4.2.p.9">This example expands on EXAMPLE 1 with the differences outlined below.</p>
+<p id="rfc.section.3.4.2.p.10">The only change to the BULK RR is the Replacement Pattern includes additional fields, specifically null values for delimiter and interval and a padding width of 3.</p>
+<p id="rfc.section.3.4.2.p.11">The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates matching backreferences for "4", "3", "2" and "10" and reverses their indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and "${4}" to "4" respectively.  When applied to the Replacement Pattern the answer becomes "pool-010002003004.example.com.".</p>
+<p id="rfc.section.3.4.2.p.12">EXAMPLE 3 This example contains a classless IPv4 delegation on the /22 CIDR boundary as defined by <a href="#RFC2317">[RFC2317]</a>.  The network for this example is</p>
+<p id="rfc.section.3.4.2.p.13">"10.2.0/22" delegated to a nameserver "ns1.sub.example.com.". RRs for this example are defined as:</p>
+<p id="rfc.section.3.4.2.p.14">$ORIGIN 2.10.in-addr.arpa.  0-3 86400 IN      NS    ns1.sub.example.com.  -   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3</p>
+<p id="rfc.section.3.4.2.p.15">For this example, the query would come in for "25.2.2.10.in-addr.arpa.".  After matching the owner filter (ending in ".2.10.in-addr.arpa.") and the fully qualified domain name pattern of "[0-255].[0-3].2.10.in-addr.arpa." the answer-set would include a generated RR consisting of captured values "25" and "2" joined by the custom delimiter of period "." then joined by ".0-3" and made fully qualified.  The resulting RR would be a "CNAME" with RDATA of "25.2.0-3.2.10.in-addr.arpa.".  This record is now one delegated to "ns1.sub.example.com." as its authority and the answer-set is complete.</p>
+<h1 id="rfc.section.4"><a href="#rfc.section.4">4.</a> <a href="#the-npn-resource-record" id="the-npn-resource-record">The NPN Resource Record</a></h1>
+<p id="rfc.section.4.p.1">The NPN resource record provides pre-processing directives for Numeric Pattern Normalization (NPN) based RR signature generation.</p>
+<p id="rfc.section.4.p.2">The Type value for the NPN RR type is XX.</p>
+<p id="rfc.section.4.p.3">The NPN RR is class independent.</p>
+<p id="rfc.section.4.p.4">The NPN RR has no special TTL requirements.</p>
+<h1 id="rfc.section.4.1"><a href="#rfc.section.4.1">4.1.</a> <a href="#npn-rdata-wire-format" id="npn-rdata-wire-format">NPN RDATA Wire Format</a></h1>
+<p id="rfc.section.4.1.p.1">The RDATA for a NPN RR consists of a 2 octet Match Type field, a 1 octet Flags field, a 1 octet Owner Ignore field, a 1 octet Left Ignore field and a 1 octet Right Ignore field.</p>
+<pre>
+                     1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Match Type          |     Flags     |  Owner Ignore |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Left Ignore  |  Right Ignore |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</pre>
+<h1 id="rfc.section.4.1.1"><a href="#rfc.section.4.1.1">4.1.1.</a> <a href="#the-match-type-field-1" id="the-match-type-field-1">The Match Type field</a></h1>
+<p id="rfc.section.4.1.1.p.1">The Match Type field identifies the type of the RRset identified by this NPN record.</p>
+<h1 id="rfc.section.4.1.2"><a href="#rfc.section.4.1.2">4.1.2.</a> <a href="#the-flags-field" id="the-flags-field">The Flags field</a></h1>
+<p id="rfc.section.4.1.2.p.1">The Flags field defines additional processing parameters for data normalization.  This document defines only the Period-As-Number flag "." (position 5), the Hyphen-As-Number "-" (position 6) and the hexadecimal flag "X" (position 7).  All other flags are reserved for future use.</p>
+<pre>
+ 0 1 2 3 4 5 6 7
++-+-+-+-+-+-+-+-+
+|Reserved |.|-|X|
++-+-+-+-+-+-+-+-+
+</pre>
+<p id="rfc.section.4.1.2.p.2">Bits 0-4: Reserved for future These flags have no default value if set to false (0).  Bit    5: Period As Number (.) Flag This flag indicates the period (dot) will be processed as a number. This flag has no default value if set to false (0).  Bit    6: Hyphen As Number (-) Flag This flag indicates the hyphen (dash) will be processed as a number. This flag has no default value if set to false (0).  Bit    7: Hexadecimal (X) Flag This flag indicates the highest value for Normalization Processing is "f".  Normalization Processing will be described in a later section.  This flag has a default value of "9" if set to false (0).</p>
+<h1 id="rfc.section.4.1.3"><a href="#rfc.section.4.1.3">4.1.3.</a> <a href="#the-owner-ignore-field" id="the-owner-ignore-field">The Owner Ignore field</a></h1>
+<p id="rfc.section.4.1.3.p.1">The Owner Ignore field defines the length of characters as counted from the left-hand side of the owner which MUST be ignored by the normalization process.  This field offers additional security to pattern based signatures which may not be immediately apparent.  By restricting the leftmost characters defined by this value, ultimately the length of the generated portion of the accompanying BULK RR will be confined accordingly.  Normalization Processing will be described further in a later section.</p>
+<h1 id="rfc.section.4.1.4"><a href="#rfc.section.4.1.4">4.1.4.</a> <a href="#the-left-ignore-field" id="the-left-ignore-field">The Left Ignore field</a></h1>
+<p id="rfc.section.4.1.4.p.1">The Left Ignore field defines the length of characters as counted from the left-hand side of the generated RDATA which MUST be ignored by the normalization process.  Normalization Processing will be described further in a later section.</p>
+<h1 id="rfc.section.4.1.5"><a href="#rfc.section.4.1.5">4.1.5.</a> <a href="#the-right-ignore-field" id="the-right-ignore-field">The Right Ignore field</a></h1>
+<p id="rfc.section.4.1.5.p.1">The Right Ignore field defines the length of characters as counted from the right-hand side of the generated RDATA which MUST be ignored by the normalization process.  Normalization Processing will be described further in a later section.</p>
+<h1 id="rfc.section.4.2"><a href="#rfc.section.4.2">4.2.</a> <a href="#the-npn-rr-presentation-format" id="the-npn-rr-presentation-format">The NPN RR Presentation Format</a></h1>
+<p id="rfc.section.4.2.p.1">The Match Type field is represented as an RR type mnemonic.  When the mnemonic is not known, the TYPE representation as described in <a href="#RFC3597">[RFC3597]</a>, Section 5, MUST be used.</p>
+<p id="rfc.section.4.2.p.2">The Flags field MUST be presented as a string of characters representing each flag bit.  This document defines only the period ".", hyphen "-" and hexadecimal "X" flags.  Flags MAY appear in any order.  For example; all three flags could appear as "-9." or ".f-" (without the quotes).  If all bits are zero all default values (if defined) would be presented ("9" as currently defined).</p>
+<p id="rfc.section.4.2.p.3">All Ignore fields MUST be presented as an unsigned decimal integers and fall within the 0-255 range available to a single octet.</p>
+<h1 id="rfc.section.4.3"><a href="#rfc.section.4.3">4.3.</a> <a href="#normalization-processing-of-npn-rrs" id="normalization-processing-of-npn-rrs">Normalization Processing of NPN RRs</a></h1>
+<p id="rfc.section.4.3.p.1">This document provides a minor yet significant modification to DNSSEC regarding how RRsets will be signed or verified.  Specifically the Signature Field of <a href="#RFC4034">[RFC4034]</a>, Section 3.1.8.  Prior to processing into canonical form, signed zones may contain associated RRs where; owner, class and type of a non NPN RR directly corresponds with an NPN RR matching owner, class and Match Type.  If this condition exists the NPN RR's RDATA defines details for processing the associated RDATA into a "Normalized" format.  Normalized data is based on pre-canonical formatting and zero padded for "A" and "AAAA" RR types for acceptable precision during the process.  This concept will become clearer in the NPN pseudocode and examples provided in the sections to follow.</p>
+<p id="rfc.section.4.3.p.2">The rules for this transformation are simple:</p>
+<p id="rfc.section.4.3.p.3">For RR's Owner field, characters from the beginning to the index of the Owner Ignore value or the final string of characters belonging to the zone's ORIGIN MUST NOT be modified by this algorithm.  While the Owner Ignore value is not used for BULK records but is included with the expectation other pattern-based resource records may emerge and leverage NPN records for their DNSSEC support requirements.</p>
+<p id="rfc.section.4.3.p.4">For RR's RDATA field, character from beginning to the index of Left Ignore value or characters with index of Right Ignore value to the end MUST NOT be modified by this algorithm.</p>
+<p id="rfc.section.4.3.p.5">In the remaining portion of both Owner and RDATA strings of numeric data, defined as character "0" through "f" or "0" through "9" depending on whether or not the Hexadecimal flag is set or not, MUST be consolidated to a single character and set to the highest value defined by the Hexadecimal flag.  Examples may be found in the following section.  If period-as-number or hyphen-as-number flags are set whichever are used ("." or "-") would be treated as part of the number and consolidated where appropriate.</p>
+<p id="rfc.section.4.3.p.6">Once the normalization has been performed the signature will continue processing into canonical form using the normalized RRs in the place of original ones.</p>
+<p id="rfc.section.4.3.p.7">One thing to keep in mind when calculating values for the Ignore fields is the Domain Name Pattern and Replacement Pattern fields are considered relative unless terminated by a period.  When processing NPN records the fully-qualified Patterns will be used for determining which characters should be ignored.</p>
+<p id="rfc.section.4.3.p.8">NPN RRs MAY be included in the "Additional" section to provide a hint for NPN processing required for verification path.</p>
+<p id="rfc.section.4.3.p.9">It is important to note, properly sizing the Ignore fields is critical to minimizing the risk of spoofed signatures.  Never intentionally set all Ignore values to zero in order to make validation easier as it places the validity of zone data at risk. Only accompany RRs which are pattern derived (such as BULK) with NPN records as doing so may unnecessarily reduce the confidence level of generated signatures.</p>
+<h1 id="rfc.section.4.3.1"><a href="#rfc.section.4.3.1">4.3.1.</a> <a href="#pseudocode-for-npn-normalization-processing" id="pseudocode-for-npn-normalization-processing">Pseudocode for NPN Normalization Processing</a></h1>
+<p id="rfc.section.4.3.1.p.1">This section provides a simple demonstration of process flow for NPN rdata normalization and DNSSEC signatures.</p>
+<p id="rfc.section.4.3.1.p.2">The pseudocode provided below assumes all associated RRs are valid members of a DNSSEC compatible RRset (including BULK generated ones).</p>
+<pre>
+   for rr in rrset
+       if (has_NPN&lt;rr.owner, rr.class, rr.type&gt;)
+           rr.rdata_normal = NPN_normalize&lt;rr.rdata&gt;
+           add_to_sigrrset&lt;NPN.owner, rr.class, rr.type,
+               rr.rdata_normal&gt;
+           next
+       else
+           add_to_sigrrset&lt;rr.owner, rr.class, rr.type, rr.rdata&gt;
+           next
+
+   process_canonical_form&lt;sigrrset&gt;
+
+   dnssec_sign&lt;sigrrset&gt;
+</pre>
+<p id="rfc.section.4.3.1.p.3">Similar logic MUST be used for determining DNSSEC validity of RRsets in verification (validation) nameservers for signatures generated based on NPN normalization.</p>
+<h1 id="rfc.section.4.3.2"><a href="#rfc.section.4.3.2">4.3.2.</a> <a href="#npn-normalization-processing-examples" id="npn-normalization-processing-examples">NPN Normalization Processing examples</a></h1>
+<p id="rfc.section.4.3.2.p.1">EXAMPLE 1 For this example the query is defined as a PTR record for "10.2.3.44" with an origin of "2.10.in-addr.arpa." and the evaluating BULK and NPN RR as:</p>
+<pre>
+   -.2.10.in-addr.arpa. 86400 IN BULK PTR (
+                                       \[0-255].\[0-10]
+                                       pool-A-${1}-${2}.example.com.
+                                       )
+   *.2.10.in-addr.arpa. 86400 IN NPN  PTR 9 0 7 13
+</pre>
+<p id="rfc.section.4.3.2.p.2">As shown previously in BULK RR examples the query would enter the nameserver with an owner of "44.3.2.10.in-addr.arpa." and a "PTR" RR with the RDATA of "pool-A-3-44.example.com." would be generated.</p>
+<p id="rfc.section.4.3.2.p.3">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "3-44" as illustrated below.</p>
+<pre>
+                              1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 
+          0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
+                        v---------
+            p o o l - A - 3 - 4 4 . e x a m p l e . c o m .
+                         ---------^
+        2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1                  
+        6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+</pre>
+<p id="rfc.section.4.3.2.p.4">Everything to the left of "3-44" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "9" as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become "pool-A-9-9.example.com." and its signature would be based on this "normalized" RDATA field.  This new "normalized" string would be used as an RDATA for the wildcard label of "*.2.10.in-addr.arpa." now encompassing all possible permutations of the "pool-A-${1}-${2}.example.com." pattern.</p>
+<p id="rfc.section.4.3.2.p.5">Since the verification (validation) nameserver would use the identical NPN record for processing and comparison, all RRs generated by the BULK record can now be verified with a single wildcard signature.</p>
+<p id="rfc.section.4.3.2.p.6">EXAMPLE 2</p>
+<p id="rfc.section.4.3.2.p.7">This example contains a classless IPv4 delegation on the /22 CIDR boundary as defined by <a href="#RFC2317">[RFC2317]</a>.  The network for this example is "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs for this example are defined as:</p>
+<p id="rfc.section.4.3.2.p.8">$ORIGIN 2.10.in-addr.arpa.  0-3 86400 IN      NS    ns1.sub.example.com.  -   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3 *   86400 IN NPN  CNAME 9 0 0 23</p>
+<p id="rfc.section.4.3.2.p.9">For this example, a query of "10.2.2.65" would enter the nameserver as "65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of "65.2.0-3.2.10.in-addr.arpa." would be generated.</p>
+<p id="rfc.section.4.3.2.p.10">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "65.2" as illustrated below.</p>
+<pre>
+                           1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2
+       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+       v---------
+         6 5 . 2 . 0 - 3 . 2 . 1 0 . i n - a d d r . a r p a .
+        ---------^
+     2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1                  
+     9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+</pre>
+<p id="rfc.section.4.3.2.p.11">Everything to the left of "65.2" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "9" as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become "9.9.0-3.2.10.in-addr.arpa." and its signature would be based on this "normalized" RDATA field.  This new "normalized" string would be used as an RDATA for the wildcard label of "<em>.2.10.in-addr.arpa." now encompassing all possible permutations of the "${</em>|.}.0-3.2.10.in-addr.arpa." pattern.</p>
+<p id="rfc.section.4.3.2.p.12">As in example 1, the verification (validation) nameserver would use the same NPN record for comparison.</p>
+<p id="rfc.section.4.3.2.p.13">EXAMPLE 3 This example provides reverse logic for example 1 by providing an IPv4 "A" record for a requested hostname.  For this example the query is defined as an "A" record for "pool-A-3-44.example.com." with an origin of "example.com.".  RRs for this example are defined as:</p>
+<pre>
+-.example.com. 86400 IN BULK A (
+                                   pool-A-\[0-10]-\[0-255]
+                                   10.2.${*}
+                                  )
+*.example.com. 86400 IN NPN  A 9 0 8 0
+</pre>
+<p id="rfc.section.4.3.2.p.14">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "003.044" as illustrated below.</p>
+<pre>
+                                    1 1 1 1 1 1 1 1 1
+                0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8
+                                v--------------
+                  0 1 0 . 0 0 2 . 0 0 3 . 0 4 4
+                                 ---------------^
+            1 1 1 1 1 1 1 1 1
+            8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+</pre>
+<p id="rfc.section.4.3.2.p.15">This example illustrates a key point about NPN records; since they are pre-canonical they MUST operate on a strict subset of WIRE formatted data.  For "A" and "AAAA" records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "010.002.003.044" (shown above) prior to processing.  After processing, wire format would become "0x0A02032C" (shown in hexadecimal).  This format would be too imprecise for normalization so padded decimal is used.</p>
+<p id="rfc.section.4.3.2.p.16">Everything to the left of "003.044" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "9" as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become "10.2.9.9" and its signature would be based on this "normalized" RDATA field. This new "normalized" "A" RR would be used as an RDATA for the wildcard label of "<em>.example.com." now encompassing all possible permutations of the "10.2.${</em>}" pattern.</p>
+<p id="rfc.section.4.3.2.p.17">EXAMPLE 4 This example provides similar logic for an IPv6 AAAA record.  For this example the query is defined as an "AAAA" record for "pool-A-ff-aa.example.com." with an origin of "example.com.".  RRs for this example are defined as:</p>
+<pre>
+-.example.com. 86400 IN BULK AAAA (
+                                   pool-A-\[0-ffff]-\[0-ffff]
+                                   fc00::${1}:${2}
+                                  )
+*.example.com. 86400 IN NPN  AAAA X 0 30 0
+</pre>
+<p id="rfc.section.4.3.2.p.18">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "00ff:00aa" as illustrated below.</p>
+<pre>
+                      1 1 1 1 1 1 1 1 1 1 2 2
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+
+    f c 0 0 : 0 0 0 0 : 0 0 0 0 : 0 0 0 0 : -/-/
+
+  4 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 1
+  0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9
+   /-/-/- . . . . . . . . . . . . . . . . . . . . . . . . -/-/-/
+                          2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4
+                          1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+                                            v------------------
+                     /-/- 0 0 0 0 : 0 0 0 0 : 0 0 f f : 0 0 a a
+                                             -------------------^
+                        2 1 1 1 1 1 1 1 1 1 1 
+                        0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+</pre>
+<p id="rfc.section.4.3.2.p.19">This example reinforces the point on pre-canonical processing of NPN records; they MUST operate on a strict subset of WIRE formatted data. For "A" and "AAAA" records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "fc00:0000:0000:0000:0000:0000:00ff:00aa" (shown above) prior to processing.  After processing, wire format would become "0xFC000000000000000000000000FF00AA" (shown in hexadecimal). This format is slightly misleading as it is truly only 16 bytes of WIRE data and would be too imprecise for normalization so padded hexadecimal is used.</p>
+<p id="rfc.section.4.3.2.p.20">Everything to the left of "00ff:00aa" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "f" as indicated by the NPN record's hexadecimal flag "X" and each run replaced by the single character "f".  The final Normalized RDATA would therefore become "fc00::f:f" and its signature would be based on this "normalized" RDATA field. This new "normalized" "AAAA" RR would be used as an RDATA for the wildcard label of "*.example.com." now encompassing all possible permutations of the "fc00::${1}:${2}" pattern.</p>
+<h1 id="rfc.section.5"><a href="#rfc.section.5">5.</a> <a href="#positive-side-effects" id="positive-side-effects">Positive Side-Effects</a></h1>
+<p id="rfc.section.5.p.1">This section highlights positive side effects of some architectural decisions regarding the BULK RR design.</p>
+<h1 id="rfc.section.5.1"><a href="#rfc.section.5.1">5.1.</a> <a href="#record-superimposition" id="record-superimposition">Record Superimposition</a></h1>
+<p id="rfc.section.5.1.p.1">The main side-effect of the BULK RR design is superimposition.  RRs created by the BULK generation process generally rely on the logic of wildcard assignment.  This logic only provides answers where no others exist.  This means in the reverse DNS world (network assignment) HUGE blocks of addresses can be assigned a single BULK record and where delegated to another customer or SWIP will be automatically overridden.</p>
+<p id="rfc.section.5.1.p.2">When compared with bind's $GENERATE statement, if a singleton record such as CNAME appears within a $GENERATE range, either the CNAME or $GENERATE becomes invalid.  While a BULK record range would automatically notch out the CNAME without user intervention or creating a potential management problem for the future when two $GENERATES create a hole where the CNAME no longer exists.  BULK RRs would again automatically reassign the missing record to one of its own.</p>
+<h1 id="rfc.section.5.2"><a href="#rfc.section.5.2">5.2.</a> <a href="#pattern-based-dnssec-support" id="pattern-based-dnssec-support">Pattern Based DNSSEC support</a></h1>
+<p id="rfc.section.5.2.p.1">The NPN resource record can be used to support other dynamic RR types which do not currently exist.</p>
+<h1 id="rfc.section.6"><a href="#rfc.section.6">6.</a> <a href="#known-limitations" id="known-limitations">Known Limitations</a></h1>
+<p id="rfc.section.6.p.1">This section defines known limitations of the BULK resource type.</p>
+<h1 id="rfc.section.6.1"><a href="#rfc.section.6.1">6.1.</a> <a href="#increased-cpu-utilization-for-nxdomain-rrs" id="increased-cpu-utilization-for-nxdomain-rrs">Increased CPU utilization for NXDOMAIN RRs</a></h1>
+<p id="rfc.section.6.1.p.1">Nameserver requirements to support BULK RRs will minimally increase CPU utilization requirements compared to most RR types.  However, since the inception of DNSSEC more is expected of DNS servers at a system resource level and it is the authors' belief the benefit outweighs the sacrifice.</p>
+<p id="rfc.section.6.1.p.2">A quick comparison of BULK versus bind's $GENERATE expansion reveals much more memory would be sacrificed with $GENERATES to save the CPU cycles required to support BULK records.  Additionally, $GENERATES cannot be transferred (i.e. AXFR) without expansion and an IPv6 CIDR even as small as /96 would be simply impossible.  BULK on the other hand can easily support IPv6 CIDRs of /64 and much larger with very little effort.</p>
+<h1 id="rfc.section.6.2"><a href="#rfc.section.6.2">6.2.</a> <a href="#pre-adoption-nameserver-implications" id="pre-adoption-nameserver-implications">Pre-Adoption Nameserver Implications</a></h1>
+<p id="rfc.section.6.2.p.1">While there is an added demand on authoritative nameservers, there are no new requirements to recursive (caching) resolvers for non-DNSSEC record handling.  Even authoritative nameservers are able to transfer to and from supporting nameservers with no requirement (although would be unable to return BULK generated records without support).</p>
+<p id="rfc.section.6.2.p.2">Prior to widespread adoption on the authoritative side all generated records would be invisible if served on nameservers lacking support. Since generated records are generally NOT service impacting records this should be understood but not of great concern.</p>
+<p id="rfc.section.6.2.p.3">Once adoption has reached an appreciable level on the producer (authoritative) side only DNSSEC requirements remain for the consumer (resolver) side.  This behavior is fully expected.</p>
+<h1 id="rfc.section.7"><a href="#rfc.section.7">7.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a></h1>
+<p id="rfc.section.7.p.1">Two known security considerations exist for the BULK resource record, DNSSEC and DDOS attack vectors.  Both are addressed in the following sections.</p>
+<h1 id="rfc.section.7.1"><a href="#rfc.section.7.1">7.1.</a> <a href="#dnssec-signature-strategies" id="dnssec-signature-strategies">DNSSEC Signature Strategies</a></h1>
+<p id="rfc.section.7.1.p.1">DNSSEC was designed to provide verification (validation) for DNS resource records.  In a nutshell this requires each (owner, class, type) tuple to have its own signature.  This essentially defeats the purpose of providing large generated blocks of RRs in a single RR as each generated RR would require its own legitimate RRSIG record.</p>
+<p id="rfc.section.7.1.p.2">In the following sections several options are discussed to address this issue.  Of the options, on-the-fly provides the most secure solution and NPN provides the most flexible.</p>
+<h1 id="rfc.section.7.1.1"><a href="#rfc.section.7.1.1">7.1.1.</a> <a href="#on-the-fly-live-signatures" id="on-the-fly-live-signatures">On-the-fly (Live) Signatures</a></h1>
+<p id="rfc.section.7.1.1.p.1">This solution requires authoritative nameservers to sign generated records <em>as_they_are_generated</em>.  Not all authoritative nameserver implementations offer on-the-fly (realtime) signatures so this solution would either require all implementations to support on-the-fly signing or be ignored by implementations which can not or will not comply.</p>
+<p id="rfc.section.7.1.1.p.2">No changes to recursive (resolving) nameservers is required to support this solution.</p>
+<h1 id="rfc.section.7.1.2"><a href="#rfc.section.7.1.2">7.1.2.</a> <a href="#normalized-npn-based-signatures" id="normalized-npn-based-signatures">Normalized (NPN Based) Signatures</a></h1>
+<p id="rfc.section.7.1.2.p.1">This solution provides the most flexible solution as nameservers without on-the-fly signing capabilities can still support signatures for BULK records.  The down side to this solution is it requires DNSSEC aware recursive (resolving) nameserver support.  Unless a recursive nameserver can verify the signature it is <em>unverifiable</em>.</p>
+<p id="rfc.section.7.1.2.p.2">It has been pointed out due to this limitation creation of DNSSEC signed BULK RRs requiring NPN support SHOULD be formally discouraged until such time a respectable percentage (&gt;80) of DNSSEC verification (validation) nameservers "in-the-wild" possess NPN processing capabilities.  Until that time, on-the-fly signing and unsigned BULK records offer the intended capabilities of this document while requiring zero new features to support RR resolution. The authors would like to encourage opening this door for pattern based technologies such as NPN records as a solution to BULK RRs as well as other pattern based RRs to come. Given enough time, enough nameservers will be patched and upgraded for unrelated reasons and by means of simple attrition can supply a level of "inertia" and eventually widespread adoption can be assumed.</p>
+<p id="rfc.section.7.1.2.p.3">NPN records are likely to be a topic of great debate as to their own security limitations.  It is, however, the authors' belief; while any logic which limits the input of digital signatures, lessens the validity of such signatures, the limitation is minimal and the gain is significant.  The main reason for this is as a general rule, RRs used in a generic manner such as conventional $GENERATE RRs or scripted mass pattern generated RRs have a lesser importance than other RRs in managed zones.  These therefore inherently pose less risk by means of attack and have a much less reward by defeating security measures.</p>
+<p id="rfc.section.7.1.2.p.4">This being said, care must still be taken to set the Ignore fields appropriately to minimize exposure and only use NPN RRs to secure pattern-based records such as BULK.</p>
+<h1 id="rfc.section.7.1.3"><a href="#rfc.section.7.1.3">7.1.3.</a> <a href="#non-dnssec-zone-support-only" id="non-dnssec-zone-support-only">Non-DNSSEC Zone Support Only</a></h1>
+<p id="rfc.section.7.1.3.p.1">As a final option zones which wish to remain entirely without DNSSEC support may serve such zones without either of the above solutions and records generated based on BULK RRs will require zero support from recursive (resolving) nameservers.</p>
+<h1 id="rfc.section.7.2"><a href="#rfc.section.7.2">7.2.</a> <a href="#dnssec-verifier-details" id="dnssec-verifier-details">DNSSEC Verifier Details</a></h1>
+<p id="rfc.section.7.2.p.1">Verification of DNSSEC signed BULK generated RRs may be performed against on-the-fly signatures with zero modification to their behavior.  However, verification against NPN records would require changes to the logic to incorporate processing RDATA generated by BULK logic as described above so the results will be compatible.</p>
+<h1 id="rfc.section.7.3"><a href="#rfc.section.7.3">7.3.</a> <a href="#ddos-attack-vectors-and-mitigation" id="ddos-attack-vectors-and-mitigation">DDOS Attack Vectors and Mitigation</a></h1>
+<p id="rfc.section.7.3.p.1">As an additional defense against Distributed Denial Of Service (DDOS) attacks against recursive (resolving) nameservers it is highly recommended shorter TTLs be used for BULK RRs than others.  While disabling caching with a zero TTL is not recommended (as this would only result in a shift of the attack target) a balance will need to be found.  While this document uses 24 hours (86400) in its examples values between 300 to 900 are likely more appropriate and is RECOMMENDED.  What is ultimately deemed appropriate may differ from zone to zone and administrator to administrator.</p>
+<h1 id="rfc.section.7.4"><a href="#rfc.section.7.4">7.4.</a> <a href="#implications-of-large-scale-dns-records" id="implications-of-large-scale-dns-records">Implications of Large Scale DNS Records</a></h1>
+<p id="rfc.section.7.4.p.1">The production of such large scale "records in the wild" may have some unintended side-effects.  These side-effects could be of concern or add unexpected complications to DNS based security offerings or forensic and anti-spam measures.  While outside the scope of this document, implementors of technology relying on DNS resource records for critical decision making must take into consideration how the existence of such a volume of records might impact their technology.</p>
+<p id="rfc.section.7.4.p.2">Solutions to the "magnitude" problem for BULK generated RRs are expected be similar if not identical to that of existing wildcard records, the core difference being the resultant RDATA will be unique for each requested Domain Name within its scope.</p>
+<p id="rfc.section.7.4.p.3">The authors of this document are confident that by careful consideration, <em>negative_side-effects</em> produced by implementing the features described in this document <em>can_be_eliminated</em> from any such service or product.</p>
+<h1 id="rfc.section.8"><a href="#rfc.section.8">8.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a></h1>
+<p id="rfc.section.8.p.1">IANA is requested to assign numbers for two DNS resource record types identified in this document; BULK and NPN.</p>
+<h1 id="rfc.section.9"><a href="#rfc.section.9">9.</a> <a href="#acknowledgments" id="acknowledgments">Acknowledgments</a></h1>
+<p id="rfc.section.9.p.1">This document was created as an extension to the DNS infrastructure. As such, many people over the years have contributed to its creation and the authors are appreciative to each of them even if not thanked or identified individually.</p>
+<p id="rfc.section.9.p.2">A special thanks is extended for the kindness, wisdom and technical advice of:</p>
+<p id="rfc.section.9.p.3">Robert Whelton (CenturyLink, Inc.)</p>
+<h1 id="rfc.references"><a href="#rfc.references">10.</a> Normative References</h1>
+<table>
+  <tbody>
+    <tr>
+      <td class="reference">
+        <b id="RFC1034">[RFC1034]</b>
+      </td>
+      <td class="top"><a>Mockapetris, P.</a>, "<a href="http://tools.ietf.org/html/rfc1034">Domain names - concepts and facilities</a>", STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC1035">[RFC1035]</b>
+      </td>
+      <td class="top"><a>Mockapetris, P.</a>, "<a href="http://tools.ietf.org/html/rfc1035">Domain names - implementation and specification</a>", STD 13, RFC 1035, DOI 10.17487/RFC1035, November 1987.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2119">[RFC2119]</b>
+      </td>
+      <td class="top"><a>Bradner, S.</a>, "<a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>", BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2181">[RFC2181]</b>
+      </td>
+      <td class="top"><a>Elz, R.</a> and <a>R. Bush</a>, "<a href="http://tools.ietf.org/html/rfc2181">Clarifications to the DNS Specification</a>", RFC 2181, DOI 10.17487/RFC2181, July 1997.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2308">[RFC2308]</b>
+      </td>
+      <td class="top"><a>Andrews, M.</a>, "<a href="http://tools.ietf.org/html/rfc2308">Negative Caching of DNS Queries (DNS NCACHE)</a>", RFC 2308, DOI 10.17487/RFC2308, March 1998.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2317">[RFC2317]</b>
+      </td>
+      <td class="top"><a>Eidnes, H.</a>, <a>de Groot, G.</a> and <a>P. Vixie</a>, "<a href="http://tools.ietf.org/html/rfc2317">Classless IN-ADDR.ARPA delegation</a>", BCP 20, RFC 2317, DOI 10.17487/RFC2317, March 1998.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2536">[RFC2536]</b>
+      </td>
+      <td class="top"><a>Eastlake 3rd, D.</a>, "<a href="http://tools.ietf.org/html/rfc2536">DSA KEYs and SIGs in the Domain Name System (DNS)</a>", RFC 2536, DOI 10.17487/RFC2536, March 1999.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC2931">[RFC2931]</b>
+      </td>
+      <td class="top"><a>Eastlake 3rd, D.</a>, "<a href="http://tools.ietf.org/html/rfc2931">DNS Request and Transaction Signatures ( SIG(0)s )</a>", RFC 2931, DOI 10.17487/RFC2931, September 2000.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC3110">[RFC3110]</b>
+      </td>
+      <td class="top"><a>Eastlake 3rd, D.</a>, "<a href="http://tools.ietf.org/html/rfc3110">RSA/SHA-1 SIGs and RSA KEYs in the Domain Name System (DNS)</a>", RFC 3110, DOI 10.17487/RFC3110, May 2001.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC3597">[RFC3597]</b>
+      </td>
+      <td class="top"><a>Gustafsson, A.</a>, "<a href="http://tools.ietf.org/html/rfc3597">Handling of Unknown DNS Resource Record (RR) Types</a>", RFC 3597, DOI 10.17487/RFC3597, September 2003.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4033">[RFC4033]</b>
+      </td>
+      <td class="top"><a>Arends, R.</a>, <a>Austein, R.</a>, <a>Larson, M.</a>, <a>Massey, D.</a> and <a>S. Rose</a>, "<a href="http://tools.ietf.org/html/rfc4033">DNS Security Introduction and Requirements</a>", RFC 4033, DOI 10.17487/RFC4033, March 2005.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4034">[RFC4034]</b>
+      </td>
+      <td class="top"><a>Arends, R.</a>, <a>Austein, R.</a>, <a>Larson, M.</a>, <a>Massey, D.</a> and <a>S. Rose</a>, "<a href="http://tools.ietf.org/html/rfc4034">Resource Records for the DNS Security Extensions</a>", RFC 4034, DOI 10.17487/RFC4034, March 2005.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC4035">[RFC4035]</b>
+      </td>
+      <td class="top"><a>Arends, R.</a>, <a>Austein, R.</a>, <a>Larson, M.</a>, <a>Massey, D.</a> and <a>S. Rose</a>, "<a href="http://tools.ietf.org/html/rfc4035">Protocol Modifications for the DNS Security Extensions</a>", RFC 4035, DOI 10.17487/RFC4035, March 2005.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="RFC5234">[RFC5234]</b>
+      </td>
+      <td class="top"><a>Crocker, D.</a> and <a>P. Overell</a>, "<a href="http://tools.ietf.org/html/rfc5234">Augmented BNF for Syntax Specifications: ABNF</a>", STD 68, RFC 5234, DOI 10.17487/RFC5234, January 2008.</td>
+    </tr>
+    <tr>
+      <td class="reference">
+        <b id="us-ascii">[us-ascii]</b>
+      </td>
+      <td class="top"><a>American National Standards Institute</a>, "<a>Coded Character Set -- 7-bit American Standard Code for Information Interchange</a>", ANSI X3.4, 1986.</td>
+    </tr>
+  </tbody>
+</table>
+<h1 id="rfc.authors">
+  <a href="#rfc.authors">Authors' Addresses</a>
+</h1>
+<div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">John Woodworth</span> 
+	  <span class="n hidden">
+		<span class="family-name">Woodworth</span>
+	  </span>
+	</span>
+	<span class="org vcardline">CenturyLink, Inc.</span>
+	<span class="adr">
+	  <span class="vcardline">4250 North Fairfax Dr</span>
+
+	  <span class="vcardline">
+		<span class="locality">Arlington</span>,  
+		<span class="region"></span>
+		<span class="code">VA 22203</span>
+	  </span>
+	  <span class="country-name vcardline">USA</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:John.Woodworth@CenturyLink.com">John.Woodworth@CenturyLink.com</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">John Woodworth</span> 
+	  <span class="n hidden">
+		<span class="family-name">Woodworth</span>
+	  </span>
+	</span>
+	<span class="org vcardline">CenturyLink, Inc.</span>
+	<span class="adr">
+	  <span class="vcardline">4250 North Fairfax Dr</span>
+
+	  <span class="vcardline">
+		<span class="locality">Arlington</span>,  
+		<span class="region"></span>
+		<span class="code">VA 22203</span>
+	  </span>
+	  <span class="country-name vcardline">USA</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:John.Woodworth@CenturyLink.com">John.Woodworth@CenturyLink.com</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Dean Ballew</span> 
+	  <span class="n hidden">
+		<span class="family-name">Ballew</span>
+	  </span>
+	</span>
+	<span class="org vcardline">CenturyLink, Inc.</span>
+	<span class="adr">
+	  <span class="vcardline">2355 Dulles Corner Blvd, Ste 200 300</span>
+
+	  <span class="vcardline">
+		<span class="locality">Herndon</span>,  
+		<span class="region"></span>
+		<span class="code">VA 20171</span>
+	  </span>
+	  <span class="country-name vcardline">USA</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:Dean.Ballew@CenturyLink.com">Dean.Ballew@CenturyLink.com</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Shashwath Bindinganaveli Raghavan</span> 
+	  <span class="n hidden">
+		<span class="family-name">Bindinganaveli Raghavan</span>
+	  </span>
+	</span>
+	<span class="org vcardline">CenturyLink, Inc.</span>
+	<span class="adr">
+	  <span class="vcardline">2355 Dulles Corner Blvd, Ste 200 300</span>
+
+	  <span class="vcardline">
+		<span class="locality">Herndon</span>,  
+		<span class="region"></span>
+		<span class="code">VA 20171</span>
+	  </span>
+	  <span class="country-name vcardline">USA</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:Shashwath.Bindinganaveliraghavan@CenturyLink.com">Shashwath.Bindinganaveliraghavan@CenturyLink.com</a></span>
+
+  </address>
+</div>
+
+</body>
+</html>
