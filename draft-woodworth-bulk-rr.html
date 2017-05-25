@@ -428,7 +428,7 @@
   <meta name="generator" content="xml2rfc version 2.5.2 - http://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
-  <meta name="dct.creator" content="Woodworth, J., Woodworth, J., Ballew, D., and S. Bindinganaveli Raghavan" />
+  <meta name="dct.creator" content="Woodworth, J., Ballew, D., and S. Bindinganaveli Raghavan" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-woodworth-bulk-rr-05" />
   <meta name="dct.issued" scheme="ISO8601" content="2017-2-15" />
   <meta name="dct.abstract" content="The BULK DNS resource record type defines a method of pattern based creation of DNS resource records to be used in place of NXDOMAIN errors which would normally be returned.  These records are currently restricted to registered DNS resource record types A, AAAA, PTR and CNAME.  The key benefit of the BULK resource record type is the simplification of maintaining &quot;generic&quot; record assignments which would otherwise be too many to manage or require scripts or proprietary methods as bind's $GENERATE." />
@@ -447,18 +447,14 @@
 </tr>
 <tr>
   <td class="left">Internet-Draft</td>
-  <td class="right">J. Woodworth</td>
-</tr>
-<tr>
-  <td class="left">Intended status: Standards Track</td>
   <td class="right">D. Ballew</td>
 </tr>
 <tr>
-  <td class="left">Expires: August 19, 2017</td>
+  <td class="left">Intended status: Standards Track</td>
   <td class="right">S. Bindinganaveli Raghavan</td>
 </tr>
 <tr>
-  <td class="left"></td>
+  <td class="left">Expires: August 19, 2017</td>
   <td class="right">CenturyLink, Inc.</td>
 </tr>
 <tr>
@@ -615,40 +611,40 @@
 <p id="rfc.section.2.2.3.p.1">The Replacement Pattern field describes how the answer RRset SHOULD be generated for the matching query.  It can either be a single hyphen "-" or a string containing backreferences (described in further detail in the "BULK Replacement" section).  This field MUST be evaluated for proper syntax for resource records of its Match Type defined above.  A "read" evaluation MAY be performed when a zone is first committed to memory either while converting from Text to Wire format (from stored zone files) or when a RR transfer is received (raw Wire format).  Stage two "write" evaluations MUST be performed prior to returning generated replacement answers.  Since logic to perform a stage two evaluation is already a requirement for DNS nameservers it may be easier for implementors to perform just stage two evaluations.  Stage-two-only evaluation may be also preferred for performance purposes and is acceptable behavior.  Any stage two evaluation errors MUST be processed as if the record did not exist and if all BULK generated records for a query answer-set evaluate to errors the original condition of an NXDOMAIN error state MUST be restored.</p>
 <p id="rfc.section.2.2.3.p.2">The following syntax specification uses the Augmented Backus-Naur Form (ABNF) notation as specified in <a href="#RFC5234">[RFC5234]</a>.</p>
 <pre>
-      DIGIT  = &lt;as defined in RFC 5234 Appendix B.1&gt;
-      HEXDIG = &lt;as defined in RFC 5234 Appendix B.1&gt;
-      DQUOTE = &lt;as defined in RFC 5234 Appendix B.1&gt;
+    DIGIT  = &lt;as defined in RFC 5234 Appendix B.1&gt;
+    HEXDIG = &lt;as defined in RFC 5234 Appendix B.1&gt;
+    DQUOTE = &lt;as defined in RFC 5234 Appendix B.1&gt;
 
-      pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
+    pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
 
-      part                =   backreference / string
+    part                =   backreference / string
 
-      backreference       =   "$" "{" substitution "}"
+    backreference       =   "$" "{" substitution "}"
 
-      substitution        =   range 0*( "," range ) [ options ]
+    substitution        =   range 0*( "," range ) [ options ]
 
-      substitution        =/  "*" [ options ]
+    substitution        =/  "*" [ options ]
 
-      options             =   delimiter [ interval [ padding ] ]
+    options             =   delimiter [ interval [ padding ] ]
 
-      delimiter           =   "|" 0*1( %x01-23 / %x25-7A / %7E-7F )
-                                 ; Any single [US-ASCII] character
-                                 ; excluding NUL, dollar sign "$",
-                                 ; pipe "|" and curly brace characters
-                                 ; "{" or "}"
+    delimiter           =   "|" 0*1( %x01-23 / %x25-7A / %7E-7F )
+                               ; Any single [US-ASCII] character
+                               ; excluding NUL, dollar sign "$",
+                               ; pipe "|" and curly brace characters
+                               ; "{" or "}"
 
-      interval            =   "|" *2DIGIT
+    interval            =   "|" *2DIGIT
 
-      padding             =   "|" *2DIGIT
+    padding             =   "|" *2DIGIT
 
-      range               =   number [ "-" number ]
+    range               =   number [ "-" number ]
 
-      number              =   1*DIGIT / 1*HEXDIG
+    number              =   1*DIGIT / 1*HEXDIG
 
-      string              =   1*( %x01-23 / %x25-7A / %x7C / %7E-7F )
-                                 ; Any [US-ASCII] character excluding
-                                 ; NUL, dollar sign "$" and curly brace
-                                 ; characters "{" or "}"
+    string              =   1*( %x01-23 / %x25-7A / %x7C / %7E-7F )
+                               ; Any [US-ASCII] character excluding
+                               ; NUL, dollar sign "$" and curly brace
+                               ; characters "{" or "}"
 </pre>
 <p id="rfc.section.2.2.3.p.3">The dollar sign, "$", and curly brace characters, "{" and "}", are reserved to enclose regular-expression-esque backreferences and MUST NOT appear anywhere outside of such a backreference specification.  This rigidity is necessary to simplify implementation of this document and may relax once adoption reaches an acceptable level and demand for such an exception exists.  The authors feel this limitation is a reasonable limitation for the flexibility offered by this document.</p>
 <h1 id="rfc.section.2.3"><a href="#rfc.section.2.3">2.3.</a> <a href="#the-bulk-rr-presentation-format" id="the-bulk-rr-presentation-format">The BULK RR Presentation Format</a></h1>
@@ -659,18 +655,18 @@
 <p id="rfc.section.2.4.p.2">The following BULK RR stores a block of A RRs for example.com.</p>
 <pre>
 *.example.com. 86400 IN BULK A (
-                                 pool-A-\[0-255]-\[0-255].example.com.
-                                 10.55.${1}.${2}
-                               )
+                         pool-A-\[0-255]-\[0-255].example.com.
+                         10.55.${1}.${2}
+                     )
 </pre>
 <p id="rfc.section.2.4.p.3">The first four fields specify the owner name, TTL, Class, and RR type (BULK).  Value "A" indicates that this BULK RR defines the A record type (Address).  Value "pool-A-[0-255]-[0-255].example.com." indicates the Domain Name Pattern.  Value "10.55.${1}.${2}" indicates the Replacement Pattern.  The owner in this example is a wildcard and matches any query ending with the string right of the asterisk.</p>
 <p id="rfc.section.2.4.p.4">EXAMPLE 2</p>
 <p id="rfc.section.2.4.p.5">The following BULK RR stores the reverse block of PTR records for the first example.</p>
 <pre>
 *.55.10.in-addr.arpa. 86400 IN BULK PTR (
-                                 \[0-255].\[0-255].55.10.in-addr.arpa.
-                                 pool-A-${1}-${2}.example.com.
-                               )
+                             \[0-255].\[0-255].55.10.in-addr.arpa.
+                             pool-A-${1}-${2}.example.com.
+                         )
 </pre>
 <p id="rfc.section.2.4.p.6">The first four fields specify the owner name, TTL, Class, and RR type (BULK).  Value "PTR" indicates that this BULK RR defines the PTR record type (Pointer).  Value "[0-255].[0-255].55.10.in-addr.arpa." indicates the Domain Name Pattern.  Value "pool-A-${1}-${2}.example.com." indicates the Replacement Pattern.  The owner in this example is a wildcard and matches any query ending with the string right of the asterisk.</p>
 <p id="rfc.section.2.4.p.7">Additional examples can be found in the "BULK Replacement" section.</p>
@@ -691,19 +687,16 @@
 <p id="rfc.section.3.3.2.p.1">Manual Domain Name Pattern matching, while more complex is designed to be both simple to implement and simple to use.  Below is an example implementation for label matching using a combination of parsing by regular expression and matching of numeric ranges.</p>
 <p id="rfc.section.3.3.2.p.2">Domain Name Patterns evaluate to current zone ORIGIN as defined in <a href="#RFC1034">[RFC1034]</a>, Section 3.  In short this means all Manual Domain Name Patterns must be terminated with a period "." or are assumed relative to the RR's origin.</p>
 <p id="rfc.section.3.3.2.p.3">Numeric Ranges are either decimal or hexadecimal as determined by conditions of query.</p>
-<pre>
-  If query type is "A" ranges are set to decimal.
-  
-  If query type is "AAAA" ranges are set to hexadecimal.
+<p/>
 
-  If query type is PTR or CNAME the RR owner is used to determine
-  decimal or hexadecimal.
-
-     If RR owner ends in ".ip6.arpa." ranges are set to hexadecimal.
-
-     If RR owner does _not_ end in ".ip6.arpa." ranges are set to decimal.
-</pre>
-<p id="rfc.section.3.3.2.p.4">The square bracket characters, "[" and "]", are reserved to enclose a range specification and MUST NOT appear anywhere outside of a range specification.</p>
+<ul>
+  <li>If query type is "A" ranges are set to decimal.</li>
+  <li>If query type is "AAAA" ranges are set to hexadecimal.</li>
+  <li>If query type is PTR or CNAME the RR owner is used to determine decimal or hexadecimal.</li>
+</ul>
+<p id="rfc.section.3.3.2.p.5">** If RR owner ends in ".ip6.arpa.", ranges are set to hexadecimal.</p>
+<p id="rfc.section.3.3.2.p.6">** If RR owner does not end in ".ip6.arpa.", ranges are set to decimal.</p>
+<p id="rfc.section.3.3.2.p.7">The square bracket characters, "[" and "]", are reserved to enclose a range specification and MUST NOT appear anywhere outside of a range specification.</p>
 <h1 id="rfc.section.3.3.2.1"><a href="#rfc.section.3.3.2.1">3.3.2.1.</a> <a href="#manual-domain-name-pattern-matching-examples" id="manual-domain-name-pattern-matching-examples">Manual Domain Name Pattern matching examples</a></h1>
 <p id="rfc.section.3.3.2.1.p.1">EXAMPLE 1 For this example the query is defined as a PTR record for "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating BULK RR as:</p>
 <pre>
@@ -719,28 +712,28 @@
 <p id="rfc.section.3.3.2.1.p.6">STEP 3 Build regular expression based on fully qualified domain name pattern.</p>
 <pre>
    \[0-255].\[0-10].2.10.in-addr.arpa. ==
-                  /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
+        /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
 </pre>
 <p id="rfc.section.3.3.2.1.p.7">The above regular expression simply matches numeric ranges based on decimal or hexadecimal and length.  Numeric range validation occurs in the next step.</p>
 <p id="rfc.section.3.3.2.1.p.8">STEP 4 Compare captured numbers and validate ranges</p>
 <pre>
-   4.3.2.10.in-addr.arpa.
-               =~ /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
+   4.3.2.10.in-addr.arpa. =~
+        /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
 </pre>
 <p id="rfc.section.3.3.2.1.p.9">"4" is captured and within range 0-255 (decimal) "3" is captured and within range 0-10 (decimal)</p>
 <p id="rfc.section.3.3.2.1.p.10">EXAMPLE 2</p>
 <p id="rfc.section.3.3.2.1.p.11">For this example the query is defined as a PTR record for "fc00::55" with an origin of "0.0.c.f.ip6.arpa." and the evaluating BULK RR as:</p>
 <pre>
 -.0.0.c.f.ip6.arpa. 86400 IN BULK PTR (
-                                       -
-                                       pool-${1-16|}-${17-28|}.example.com.
-                                       )
+                              -
+                              pool-${1-16|}-${17-28|}.example.com.
+                          )
 </pre>
 <p id="rfc.section.3.3.2.1.p.12">STEP 1 Ensure "Domain Name Pattern" is Fully Qualified</p>
 <pre>
-   - == \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
-        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
-        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
+   - == \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
+        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
+        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
         \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa.
 </pre>
 <p id="rfc.section.3.3.2.1.p.13">NOTE: Data above is shown in multiple lines for clarity.</p>
@@ -749,9 +742,9 @@
 <p id="rfc.section.3.3.2.1.p.16">Query type == "PTR" AND RR owner == "*.ip6.arpa." so range is hexadecimal.</p>
 <p id="rfc.section.3.3.2.1.p.17">STEP 3 Build regular expression based on fully qualified domain name pattern.</p>
 <pre>
-\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
-\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
-\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
+\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
+\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
+\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
 \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa. ==
                /^(\[0-9a-f]{1}\.){28}\.0\.0\.c\.f\.ip6\.arpa\.$/
 </pre>
@@ -779,13 +772,13 @@
 <p id="rfc.section.3.3.2.1.p.28">STEP 3 Build regular expression based on fully qualified domain name pattern.</p>
 <pre>
 pool-A-\[0-ffff]-\[0-ffff].example.com. ==
-     /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
+     /^pool-A(-(\[0-9a-fA-F]{1,4})){2}\.example\.com\.$/
 </pre>
 <p id="rfc.section.3.3.2.1.p.29">The above regular expression simply matches numeric ranges based on decimal or hexadecimal and length.  Numeric range validation occurs in the next step.</p>
 <p id="rfc.section.3.3.2.1.p.30">STEP 4 Compare captured numbers and validate ranges</p>
 <pre>
-pool-A-ff-aa.example.com.
-  =~ /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
+pool-A-ff-aa.example.com. =~
+  /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
 </pre>
 <p id="rfc.section.3.3.2.1.p.31">"ff" is captured and within range 0-ffff (hexadecimal) "aa" is captured and within range 0-ffff (hexadecimal)</p>
 <h1 id="rfc.section.3.4"><a href="#rfc.section.3.4">3.4.</a> <a href="#record-generation-using-the-bulk-replacement-pattern-field" id="record-generation-using-the-bulk-replacement-pattern-field">Record Generation using the BULK "Replacement Pattern" field</a></h1>
@@ -1146,29 +1139,7 @@ pool-A-ff-aa.example.com.
 	</span>
 	<span class="org vcardline">CenturyLink, Inc.</span>
 	<span class="adr">
-	  <span class="vcardline">4250 North Fairfax Dr</span>
-
-	  <span class="vcardline">
-		<span class="locality">Arlington</span>,  
-		<span class="region"></span>
-		<span class="code">VA 22203</span>
-	  </span>
-	  <span class="country-name vcardline">USA</span>
-	</span>
-	<span class="vcardline">EMail: <a href="mailto:John.Woodworth@CenturyLink.com">John.Woodworth@CenturyLink.com</a></span>
-
-  </address>
-</div><div class="avoidbreak">
-  <address class="vcard">
-	<span class="vcardline">
-	  <span class="fn">John Woodworth</span> 
-	  <span class="n hidden">
-		<span class="family-name">Woodworth</span>
-	  </span>
-	</span>
-	<span class="org vcardline">CenturyLink, Inc.</span>
-	<span class="adr">
-	  <span class="vcardline">4250 North Fairfax Dr</span>
+	  <span class="vcardline">4250 N Fairfax Dr</span>
 
 	  <span class="vcardline">
 		<span class="locality">Arlington</span>,  

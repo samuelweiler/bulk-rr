@@ -5,10 +5,9 @@
 
 
 DNSOP Working Group                                         J. Woodworth
-Internet-Draft                                              J. Woodworth
-Intended status: Standards Track                               D. Ballew
-Expires: August 19, 2017                      S. Bindinganaveli Raghavan
-                                                       CenturyLink, Inc.
+Internet-Draft                                                 D. Ballew
+Intended status: Standards Track              S. Bindinganaveli Raghavan
+Expires: August 19, 2017                               CenturyLink, Inc.
                                                        February 15, 2017
 
 
@@ -353,10 +352,10 @@ Table of Contents
 
    The following BULK RR stores a block of A RRs for example.com.
 
-  *.example.com. 86400 IN BULK A (
-                                   pool-A-\[0-255]-\[0-255].example.com.
-                                   10.55.${1}.${2}
-                                 )
+   *.example.com. 86400 IN BULK A (
+                            pool-A-\[0-255]-\[0-255].example.com.
+                            10.55.${1}.${2}
+                        )
 
    The first four fields specify the owner name, TTL, Class, and RR type
    (BULK).  Value "A" indicates that this BULK RR defines the A record
@@ -370,10 +369,10 @@ Table of Contents
    The following BULK RR stores the reverse block of PTR records for the
    first example.
 
-  *.55.10.in-addr.arpa. 86400 IN BULK PTR (
-                                   \[0-255].\[0-255].55.10.in-addr.arpa.
-                                   pool-A-${1}-${2}.example.com.
-                                 )
+   *.55.10.in-addr.arpa. 86400 IN BULK PTR (
+                                \[0-255].\[0-255].55.10.in-addr.arpa.
+                                pool-A-${1}-${2}.example.com.
+                            )
 
    The first four fields specify the owner name, TTL, Class, and RR type
    (BULK).  Value "PTR" indicates that this BULK RR defines the PTR
@@ -468,16 +467,17 @@ Table of Contents
    Numeric Ranges are either decimal or hexadecimal as determined by
    conditions of query.
 
-  If query type is "A" ranges are set to decimal.
+   o  If query type is "A" ranges are set to decimal.
 
-  If query type is "AAAA" ranges are set to hexadecimal.
+   o  If query type is "AAAA" ranges are set to hexadecimal.
 
-  If query type is PTR or CNAME the RR owner is used to determine
-  decimal or hexadecimal.
+   o  If query type is PTR or CNAME the RR owner is used to determine
+      decimal or hexadecimal.
 
-     If RR owner ends in ".ip6.arpa." ranges are set to hexadecimal.
+   ** If RR owner ends in ".ip6.arpa.", ranges are set to hexadecimal.
 
-     If RR owner does _not_ end in ".ip6.arpa." ranges are set to decimal.
+   ** If RR owner does not end in ".ip6.arpa.", ranges are set to
+   decimal.
 
    The square bracket characters, "[" and "]", are reserved to enclose a
    range specification and MUST NOT appear anywhere outside of a range
@@ -506,8 +506,8 @@ Table of Contents
    STEP 3 Build regular expression based on fully qualified domain name
    pattern.
 
-   \[0-255].\[0-10].2.10.in-addr.arpa. ==
-                  /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
+      \[0-255].\[0-10].2.10.in-addr.arpa. ==
+           /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
 
    The above regular expression simply matches numeric ranges based on
    decimal or hexadecimal and length.  Numeric range validation occurs
@@ -515,8 +515,8 @@ Table of Contents
 
    STEP 4 Compare captured numbers and validate ranges
 
-   4.3.2.10.in-addr.arpa.
-               =~ /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
+      4.3.2.10.in-addr.arpa. =~
+           /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
 
    "4" is captured and within range 0-255 (decimal) "3" is captured and
    within range 0-10 (decimal)
@@ -526,17 +526,17 @@ Table of Contents
    For this example the query is defined as a PTR record for "fc00::55"
    with an origin of "0.0.c.f.ip6.arpa." and the evaluating BULK RR as:
 
--.0.0.c.f.ip6.arpa. 86400 IN BULK PTR (
-                                       -
-                                       pool-${1-16|}-${17-28|}.example.com.
-                                       )
+   -.0.0.c.f.ip6.arpa. 86400 IN BULK PTR (
+                                 -
+                                 pool-${1-16|}-${17-28|}.example.com.
+                             )
 
    STEP 1 Ensure "Domain Name Pattern" is Fully Qualified
 
-   - == \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
-        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
-        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
-        \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa.
+      - == \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
+           \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
+           \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
+           \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa.
 
    NOTE: Data above is shown in multiple lines for clarity.
 
@@ -551,11 +551,11 @@ Table of Contents
    STEP 3 Build regular expression based on fully qualified domain name
    pattern.
 
-  \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
-  \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
-  \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
-  \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa. ==
-                 /^(\[0-9a-f]{1}\.){28}\.0\.0\.c\.f\.ip6\.arpa\.$/
+   \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
+   \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
+   \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
+   \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa. ==
+                  /^(\[0-9a-f]{1}\.){28}\.0\.0\.c\.f\.ip6\.arpa\.$/
 
    NOTE: Data above is shown in multiple lines for clarity.
 
@@ -596,8 +596,8 @@ Table of Contents
    STEP 3 Build regular expression based on fully qualified domain name
    pattern.
 
- pool-A-\[0-ffff]-\[0-ffff].example.com. ==
-      /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
+   pool-A-\[0-ffff]-\[0-ffff].example.com. ==
+        /^pool-A(-(\[0-9a-fA-F]{1,4})){2}\.example\.com\.$/
 
    The above regular expression simply matches numeric ranges based on
    decimal or hexadecimal and length.  Numeric range validation occurs
@@ -605,8 +605,8 @@ Table of Contents
 
    STEP 4 Compare captured numbers and validate ranges
 
- pool-A-ff-aa.example.com.
-   =~ /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
+   pool-A-ff-aa.example.com. =~
+     /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
 
    "ff" is captured and within range 0-ffff (hexadecimal) "aa" is
    captured and within range 0-ffff (hexadecimal)
@@ -1469,16 +1469,7 @@ Authors' Addresses
 
    John Woodworth
    CenturyLink, Inc.
-   4250 North Fairfax Dr
-   Arlington  VA 22203
-   USA
-
-   Email: John.Woodworth@CenturyLink.com
-
-
-   John Woodworth
-   CenturyLink, Inc.
-   4250 North Fairfax Dr
+   4250 N Fairfax Dr
    Arlington  VA 22203
    USA
 

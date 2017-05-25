@@ -21,17 +21,7 @@ author:
     ins: J. Woodworth
     name: John Woodworth
     org: CenturyLink, Inc.
-    street: 4250 North Fairfax Dr
-    city: Arlington
-    code: VA 22203
-    country: USA
-    email: John.Woodworth@CenturyLink.com
-
-  -
-    ins: J. Woodworth
-    name: John Woodworth
-    org: CenturyLink, Inc.
-    street: 4250 North Fairfax Dr
+    street: 4250 N Fairfax Dr
     city: Arlington
     code: VA 22203
     country: USA
@@ -282,40 +272,40 @@ The following syntax specification uses the Augmented Backus-Naur Form
 (ABNF) notation as specified in {{RFC5234}}.
 
 ~~~~
-      DIGIT  = <as defined in RFC 5234 Appendix B.1>
-      HEXDIG = <as defined in RFC 5234 Appendix B.1>
-      DQUOTE = <as defined in RFC 5234 Appendix B.1>
+    DIGIT  = <as defined in RFC 5234 Appendix B.1>
+    HEXDIG = <as defined in RFC 5234 Appendix B.1>
+    DQUOTE = <as defined in RFC 5234 Appendix B.1>
 
-      pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
+    pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
 
-      part                =   backreference / string
+    part                =   backreference / string
 
-      backreference       =   "$" "{" substitution "}"
+    backreference       =   "$" "{" substitution "}"
 
-      substitution        =   range 0*( "," range ) [ options ]
+    substitution        =   range 0*( "," range ) [ options ]
 
-      substitution        =/  "*" [ options ]
+    substitution        =/  "*" [ options ]
 
-      options             =   delimiter [ interval [ padding ] ]
+    options             =   delimiter [ interval [ padding ] ]
 
-      delimiter           =   "|" 0*1( %x01-23 / %x25-7A / %7E-7F )
-                                 ; Any single [US-ASCII] character
-                                 ; excluding NUL, dollar sign "$",
-                                 ; pipe "|" and curly brace characters
-                                 ; "{" or "}"
+    delimiter           =   "|" 0*1( %x01-23 / %x25-7A / %7E-7F )
+                               ; Any single [US-ASCII] character
+                               ; excluding NUL, dollar sign "$",
+                               ; pipe "|" and curly brace characters
+                               ; "{" or "}"
 
-      interval            =   "|" *2DIGIT
+    interval            =   "|" *2DIGIT
 
-      padding             =   "|" *2DIGIT
+    padding             =   "|" *2DIGIT
 
-      range               =   number [ "-" number ]
+    range               =   number [ "-" number ]
 
-      number              =   1*DIGIT / 1*HEXDIG
+    number              =   1*DIGIT / 1*HEXDIG
 
-      string              =   1*( %x01-23 / %x25-7A / %x7C / %7E-7F )
-                                 ; Any [US-ASCII] character excluding
-                                 ; NUL, dollar sign "$" and curly brace
-                                 ; characters "{" or "}"
+    string              =   1*( %x01-23 / %x25-7A / %x7C / %7E-7F )
+                               ; Any [US-ASCII] character excluding
+                               ; NUL, dollar sign "$" and curly brace
+                               ; characters "{" or "}"
 ~~~~
 
 The dollar sign, "$", and curly brace characters, "{" and "}", are
@@ -343,9 +333,9 @@ The following BULK RR stores a block of A RRs for example.com.
 
 ~~~~
 *.example.com. 86400 IN BULK A (
-                                 pool-A-\[0-255]-\[0-255].example.com.
-                                 10.55.${1}.${2}
-                               )
+                         pool-A-\[0-255]-\[0-255].example.com.
+                         10.55.${1}.${2}
+                     )
 ~~~~
 
 The first four fields specify the owner name, TTL, Class, and RR type
@@ -362,9 +352,9 @@ first example.
 
 ~~~~
 *.55.10.in-addr.arpa. 86400 IN BULK PTR (
-                                 \[0-255].\[0-255].55.10.in-addr.arpa.
-                                 pool-A-${1}-${2}.example.com.
-                               )
+                             \[0-255].\[0-255].55.10.in-addr.arpa.
+                             pool-A-${1}-${2}.example.com.
+                         )
 ~~~~
 
 The first four fields specify the owner name, TTL, Class, and RR type
@@ -460,16 +450,16 @@ to the RR's origin.
 Numeric Ranges are either decimal or hexadecimal as determined by
 conditions of query.
    
-      If query type is "A" ranges are set to decimal.
+* If query type is "A" ranges are set to decimal.
       
-      If query type is "AAAA" ranges are set to hexadecimal.
+* If query type is "AAAA" ranges are set to hexadecimal.
 
-      If query type is PTR or CNAME the RR owner is used to determine
-      decimal or hexadecimal.
+* If query type is PTR or CNAME the RR owner is used to determine
+decimal or hexadecimal.
 
-         If RR owner ends in ".ip6.arpa." ranges are set to hexadecimal.
+** If RR owner ends in ".ip6.arpa.", ranges are set to hexadecimal.
 
-         If RR owner does _not_ end in ".ip6.arpa." ranges are set to decimal.
+** If RR owner does not end in ".ip6.arpa.", ranges are set to decimal.
 
 The square bracket characters, "\[" and "]", are reserved to enclose a
 range specification and MUST NOT appear anywhere outside of a range
@@ -503,7 +493,7 @@ STEP 3
 
 ~~~~
    \[0-255].\[0-10].2.10.in-addr.arpa. ==
-                  /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
+        /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
 ~~~~
 
 The above regular expression simply matches numeric ranges based on
@@ -514,8 +504,8 @@ STEP 4
     Compare captured numbers and validate ranges
 
 ~~~~
-   4.3.2.10.in-addr.arpa.
-               =~ /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
+   4.3.2.10.in-addr.arpa. =~
+        /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
 ~~~~
 
 "4" is captured and within range 0-255 (decimal)
@@ -528,18 +518,18 @@ with an origin of "0.0.c.f.ip6.arpa." and the evaluating BULK RR as:
 
 ~~~~
 -.0.0.c.f.ip6.arpa. 86400 IN BULK PTR (
-                                       -
-                                       pool-${1-16|}-${17-28|}.example.com.
-                                       )
+                              -
+                              pool-${1-16|}-${17-28|}.example.com.
+                          )
 ~~~~
 
 STEP 1
    Ensure "Domain Name Pattern" is Fully Qualified
 
 ~~~~
-   - == \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
-        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
-        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].       ~~
+   - == \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
+        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
+        \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
         \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa.
 ~~~~
 
@@ -557,16 +547,18 @@ STEP 3
    Build regular expression based on fully qualified domain name pattern.
 
 ~~~~
-\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
-\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
-\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].            ~~
+\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
+\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
+\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
 \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa. ==
                /^(\[0-9a-f]{1}\.){28}\.0\.0\.c\.f\.ip6\.arpa\.$/
 ~~~~
 
 NOTE: Data above is shown in multiple lines for clarity.
 
-The above regular expression simply matches numeric ranges based on decimal or hexadecimal and length.  Numeric range validation occurs in the next step.
+The above regular expression simply matches numeric ranges based on
+decimal or hexadecimal and length.  Numeric range validation occurs in
+the next step.
 
 STEP 4
     Compare captured numbers and validate ranges
@@ -610,17 +602,19 @@ STEP 3
 
 ~~~~
 pool-A-\[0-ffff]-\[0-ffff].example.com. ==
-     /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
+     /^pool-A(-(\[0-9a-fA-F]{1,4})){2}\.example\.com\.$/
 ~~~~
 
-The above regular expression simply matches numeric ranges based on decimal or hexadecimal and length.  Numeric range validation occurs in the next step.
+The above regular expression simply matches numeric ranges based on
+decimal or hexadecimal and length.  Numeric range validation occurs in
+the next step.
 
 STEP 4
     Compare captured numbers and validate ranges
 
 ~~~~
-pool-A-ff-aa.example.com.
-  =~ /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
+pool-A-ff-aa.example.com. =~
+  /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
 ~~~~
 
 "ff" is captured and within range 0-ffff (hexadecimal)
