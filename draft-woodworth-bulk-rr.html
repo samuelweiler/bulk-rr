@@ -451,11 +451,15 @@
 </tr>
 <tr>
   <td class="left">Intended status: Standards Track</td>
-  <td class="right">S. Bindinganaveli Raghavan</td>
+  <td class="right">CenturyLink, Inc.</td>
 </tr>
 <tr>
   <td class="left">Expires: August 19, 2017</td>
-  <td class="right">CenturyLink, Inc.</td>
+  <td class="right">S. Bindinganaveli Raghavan</td>
+</tr>
+<tr>
+  <td class="left"></td>
+  <td class="right">Hughes Network Systems</td>
 </tr>
 <tr>
   <td class="left"></td>
@@ -601,14 +605,14 @@
 </pre>
 <p id="rfc.section.2.2.2.p.3">Although allowed by <a href="#RFC2181">[RFC2181]</a>; the square bracket characters, "[" and "]", are reserved to enclose a range specification and MUST NOT appear anywhere outside of a range specification.</p>
 <h1 id="rfc.section.2.2.2.1"><a href="#rfc.section.2.2.2.1">2.2.2.1.</a> <a href="#single-hyphen" id="single-hyphen">Single hyphen</a></h1>
-<p id="rfc.section.2.2.2.1.p.1">If the domain name pattern field consists of a single hyphen it is not necessary to evaluate for numeric ranges or strings.  Implementors SHOULD simply set a flag indicating all ranges matching the query's label are true and backreferences (described in further detail in the "BULK Replacement" section) will be automatically set.</p>
+<p id="rfc.section.2.2.2.1.p.1">If the domain name pattern field consists of a single hyphen it is not necessary to evaluate for numeric ranges or strings.  Implementers SHOULD simply set a flag indicating all ranges matching the query's label are true and backreferences (described in further detail in the "BULK Replacement" section) will be automatically set.</p>
 <h1 id="rfc.section.2.2.2.2"><a href="#rfc.section.2.2.2.2">2.2.2.2.</a> <a href="#numeric-ranges" id="numeric-ranges">Numeric ranges</a></h1>
 <p id="rfc.section.2.2.2.2.p.1">Numeric ranges include decimal or hexadecimal ranges depending on which record type was used in the query.  This logic will be described in further detail in the "Replacement Logic" section.</p>
 <p id="rfc.section.2.2.2.2.p.2">The numeric range pattern will be a range of allowed numbers lower and upper values separated by a single hyphen "-".  If upper and lower values are identical a single numeric value (without hyphen) will suffice.  To easily distinguish numeric range patterns from string values they MUST be enclosed within square brackets "[" and "]".</p>
 <h1 id="rfc.section.2.2.2.3"><a href="#rfc.section.2.2.2.3">2.2.2.3.</a> <a href="#string-values" id="string-values">String values</a></h1>
 <p id="rfc.section.2.2.2.3.p.1">All values found before or after Numeric ranges (excluding single-hyphen rule) are considered to be string values.  These values will be taken literally when evaluating for pattern matches in the "BULK Replacement" section below.</p>
 <h1 id="rfc.section.2.2.3"><a href="#rfc.section.2.2.3">2.2.3.</a> <a href="#the-replacement-pattern-field" id="the-replacement-pattern-field">The Replacement Pattern Field</a></h1>
-<p id="rfc.section.2.2.3.p.1">The Replacement Pattern field describes how the answer RRset SHOULD be generated for the matching query.  It can either be a single hyphen "-" or a string containing backreferences (described in further detail in the "BULK Replacement" section).  This field MUST be evaluated for proper syntax for resource records of its Match Type defined above.  A "read" evaluation MAY be performed when a zone is first committed to memory either while converting from Text to Wire format (from stored zone files) or when a RR transfer is received (raw Wire format).  Stage two "write" evaluations MUST be performed prior to returning generated replacement answers.  Since logic to perform a stage two evaluation is already a requirement for DNS nameservers it may be easier for implementors to perform just stage two evaluations.  Stage-two-only evaluation may be also preferred for performance purposes and is acceptable behavior.  Any stage two evaluation errors MUST be processed as if the record did not exist and if all BULK generated records for a query answer-set evaluate to errors the original condition of an NXDOMAIN error state MUST be restored.</p>
+<p id="rfc.section.2.2.3.p.1">The Replacement Pattern field describes how the answer RRset SHOULD be generated for the matching query.  It can either be a single hyphen "-" or a string containing backreferences (described in further detail in the "BULK Replacement" section).  This field MUST be evaluated for proper syntax for resource records of its Match Type defined above.  A "read" evaluation MAY be performed when a zone is first committed to memory either while converting from Text to Wire format (from stored zone files) or when a RR transfer is received (raw Wire format).  Stage two "write" evaluations MUST be performed prior to returning generated replacement answers.  Since logic to perform a stage two evaluation is already a requirement for DNS nameservers it may be easier for implementers to perform just stage two evaluations.  Stage-two-only evaluation may be also preferred for performance purposes and is acceptable behavior.  Any stage two evaluation errors MUST be processed as if the record did not exist and if all BULK generated records for a query answer-set evaluate to errors the original condition of an NXDOMAIN error state MUST be restored.</p>
 <p id="rfc.section.2.2.3.p.2">The following syntax specification uses the Augmented Backus-Naur Form (ABNF) notation as specified in <a href="#RFC5234">[RFC5234]</a>.</p>
 <pre>
     DIGIT  = &lt;as defined in RFC 5234 Appendix B.1&gt;
@@ -655,7 +659,7 @@
 <p id="rfc.section.2.4.p.2">The following BULK RR stores a block of A RRs for example.com.</p>
 <pre>
 *.example.com. 86400 IN BULK A (
-                         pool-A-\[0-255]-\[0-255].example.com.
+                         pool-A-[0-255]-[0-255].example.com.
                          10.55.${1}.${2}
                      )
 </pre>
@@ -757,30 +761,36 @@
             =~ /^(\[0-9a-f]{1}\.){28}\.0\.0\.c\.f\.ip6\.arpa\.$/
 </pre>
 <p id="rfc.section.3.3.2.1.p.21">NOTE: Data above is shown in multiple lines for clarity.</p>
-<p id="rfc.section.3.3.2.1.p.22">"5" is captured and within range 0-f (hexadecimal) "5" is captured and within range 0-f (hexadecimal) &#8230; "0" is captured and within range 0-f (hexadecimal) "0" is captured and within range 0-f (hexadecimal)</p>
-<p id="rfc.section.3.3.2.1.p.23">EXAMPLE 3 For this example the query is defined as an "AAAA" record for "pool-A-ff-aa.example.com." with an origin of "example.com." and the evaluating BULK RR as:</p>
+<pre>
+"5" is captured and within range 0-f (hexadecimal)
+"5" is captured and within range 0-f (hexadecimal)
+...
+"0" is captured and within range 0-f (hexadecimal)
+"0" is captured and within range 0-f (hexadecimal)
+</pre>
+<p id="rfc.section.3.3.2.1.p.22">EXAMPLE 3 For this example the query is defined as an "AAAA" record for "pool-A-ff-aa.example.com." with an origin of "example.com." and the evaluating BULK RR as:</p>
 <pre>
 -.example.com. 86400 IN BULK AAAA (
                                    pool-A-\[0-ffff]-\[0-ffff]
                                    fc00::${1}:${2}
                                   )
 </pre>
-<p id="rfc.section.3.3.2.1.p.24">STEP 1 Ensure "Domain Name Pattern" is Fully Qualified</p>
-<p id="rfc.section.3.3.2.1.p.25">pool-A-[0-ffff]-[0-ffff] == pool-A-[0-ffff]-[0-ffff].example.com.</p>
-<p id="rfc.section.3.3.2.1.p.26">STEP 2 Determine whether range is decimal or hexadecimal</p>
-<p id="rfc.section.3.3.2.1.p.27">Query type == "AAAA" so range is hexadecimal.</p>
-<p id="rfc.section.3.3.2.1.p.28">STEP 3 Build regular expression based on fully qualified domain name pattern.</p>
+<p id="rfc.section.3.3.2.1.p.23">STEP 1 Ensure "Domain Name Pattern" is Fully Qualified</p>
+<p id="rfc.section.3.3.2.1.p.24">pool-A-[0-ffff]-[0-ffff] == pool-A-[0-ffff]-[0-ffff].example.com.</p>
+<p id="rfc.section.3.3.2.1.p.25">STEP 2 Determine whether range is decimal or hexadecimal</p>
+<p id="rfc.section.3.3.2.1.p.26">Query type == "AAAA" so range is hexadecimal.</p>
+<p id="rfc.section.3.3.2.1.p.27">STEP 3 Build regular expression based on fully qualified domain name pattern.</p>
 <pre>
 pool-A-\[0-ffff]-\[0-ffff].example.com. ==
      /^pool-A(-(\[0-9a-fA-F]{1,4})){2}\.example\.com\.$/
 </pre>
-<p id="rfc.section.3.3.2.1.p.29">The above regular expression simply matches numeric ranges based on decimal or hexadecimal and length.  Numeric range validation occurs in the next step.</p>
-<p id="rfc.section.3.3.2.1.p.30">STEP 4 Compare captured numbers and validate ranges</p>
+<p id="rfc.section.3.3.2.1.p.28">The above regular expression simply matches numeric ranges based on decimal or hexadecimal and length.  Numeric range validation occurs in the next step.</p>
+<p id="rfc.section.3.3.2.1.p.29">STEP 4 Compare captured numbers and validate ranges</p>
 <pre>
 pool-A-ff-aa.example.com. =~
   /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
 </pre>
-<p id="rfc.section.3.3.2.1.p.31">"ff" is captured and within range 0-ffff (hexadecimal) "aa" is captured and within range 0-ffff (hexadecimal)</p>
+<p id="rfc.section.3.3.2.1.p.30">"ff" is captured and within range 0-ffff (hexadecimal) "aa" is captured and within range 0-ffff (hexadecimal)</p>
 <h1 id="rfc.section.3.4"><a href="#rfc.section.3.4">3.4.</a> <a href="#record-generation-using-the-bulk-replacement-pattern-field" id="record-generation-using-the-bulk-replacement-pattern-field">Record Generation using the BULK "Replacement Pattern" field</a></h1>
 <p id="rfc.section.3.4.p.1">Once it has been determined a query meets all criteria for a BULK record generation the below rules are followed to process captured numeric data and Replacement Pattern into RRs to apply to the answer-set.</p>
 <h1 id="rfc.section.3.4.1"><a href="#rfc.section.3.4.1">3.4.1.</a> <a href="#replacement-pattern-backreferences" id="replacement-pattern-backreferences">Replacement Pattern Backreferences</a></h1>
@@ -813,7 +823,7 @@ pool-A-ff-aa.example.com. =~
 <h1 id="rfc.section.3.4.1.1.9"><a href="#rfc.section.3.4.1.1.9">3.4.1.1.9.</a> <a href="#backreference-position-negation" id="backreference-position-negation">Backreference Position Negation</a></h1>
 <p id="rfc.section.3.4.1.1.9.p.1">To allow simple reversal of any backreference notation a single exclamation point character "!" MAY be used as the first character of a backreference set.  Examples would be "${!*}" and "${!1-4,7}". In both of the examples the backreference positions SHALL be the exact mirror equivalent as those without the leading exclamation point "!".  This can be very important if the BULK generated replacements have values in positions opposite to what is required or expected.</p>
 <h1 id="rfc.section.3.4.2"><a href="#rfc.section.3.4.2">3.4.2.</a> <a href="#replacement-pattern-examples" id="replacement-pattern-examples">Replacement Pattern examples</a></h1>
-<p id="rfc.section.3.4.2.p.1">This section provides examples of several BULK RR Replacement Patterns.  Each example is intended to further understanding for implementors and DNS administrators alike.</p>
+<p id="rfc.section.3.4.2.p.1">This section provides examples of several BULK RR Replacement Patterns.  Each example is intended to further understanding for implementers and DNS administrators alike.</p>
 <p id="rfc.section.3.4.2.p.2">EXAMPLE 1 For this example the query is defined as a PTR record for "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating BULK RR as:</p>
 <pre>
     - 86400 IN BULK PTR - pool-${*}.example.com.
@@ -832,8 +842,12 @@ pool-A-ff-aa.example.com. =~
 <p id="rfc.section.3.4.2.p.11">The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates matching backreferences for "4", "3", "2" and "10" and reverses their indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and "${4}" to "4" respectively.  When applied to the Replacement Pattern the answer becomes "pool-010002003004.example.com.".</p>
 <p id="rfc.section.3.4.2.p.12">EXAMPLE 3 This example contains a classless IPv4 delegation on the /22 CIDR boundary as defined by <a href="#RFC2317">[RFC2317]</a>.  The network for this example is</p>
 <p id="rfc.section.3.4.2.p.13">"10.2.0/22" delegated to a nameserver "ns1.sub.example.com.". RRs for this example are defined as:</p>
-<p id="rfc.section.3.4.2.p.14">$ORIGIN 2.10.in-addr.arpa.  0-3 86400 IN      NS    ns1.sub.example.com.  -   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3</p>
-<p id="rfc.section.3.4.2.p.15">For this example, the query would come in for "25.2.2.10.in-addr.arpa.".  After matching the owner filter (ending in ".2.10.in-addr.arpa.") and the fully qualified domain name pattern of "[0-255].[0-3].2.10.in-addr.arpa." the answer-set would include a generated RR consisting of captured values "25" and "2" joined by the custom delimiter of period "." then joined by ".0-3" and made fully qualified.  The resulting RR would be a "CNAME" with RDATA of "25.2.0-3.2.10.in-addr.arpa.".  This record is now one delegated to "ns1.sub.example.com." as its authority and the answer-set is complete.</p>
+<pre>
+$ORIGIN 2.10.in-addr.arpa.
+0-3 86400 IN      NS    ns1.sub.example.com.
+-   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
+</pre>
+<p id="rfc.section.3.4.2.p.14">For this example, the query would come in for "25.2.2.10.in-addr.arpa.".  After matching the owner filter (ending in ".2.10.in-addr.arpa.") and the fully qualified domain name pattern of "[0-255].[0-3].2.10.in-addr.arpa." the answer-set would include a generated RR consisting of captured values "25" and "2" joined by the custom delimiter of period "." then joined by ".0-3" and made fully qualified.  The resulting RR would be a "CNAME" with RDATA of "25.2.0-3.2.10.in-addr.arpa.".  This record is now one delegated to "ns1.sub.example.com." as its authority and the answer-set is complete.</p>
 <h1 id="rfc.section.4"><a href="#rfc.section.4">4.</a> <a href="#the-npn-resource-record" id="the-npn-resource-record">The NPN Resource Record</a></h1>
 <p id="rfc.section.4.p.1">The NPN resource record provides pre-processing directives for Numeric Pattern Normalization (NPN) based RR signature generation.</p>
 <p id="rfc.section.4.p.2">The Type value for the NPN RR type is XX.</p>
@@ -860,7 +874,20 @@ pool-A-ff-aa.example.com. =~
 |Reserved |.|-|X|
 +-+-+-+-+-+-+-+-+
 </pre>
-<p id="rfc.section.4.1.2.p.2">Bits 0-4: Reserved for future These flags have no default value if set to false (0).  Bit    5: Period As Number (.) Flag This flag indicates the period (dot) will be processed as a number. This flag has no default value if set to false (0).  Bit    6: Hyphen As Number (-) Flag This flag indicates the hyphen (dash) will be processed as a number. This flag has no default value if set to false (0).  Bit    7: Hexadecimal (X) Flag This flag indicates the highest value for Normalization Processing is "f".  Normalization Processing will be described in a later section.  This flag has a default value of "9" if set to false (0).</p>
+<pre>
+Bits 0-4: Reserved for future
+   These flags have no default value if set to false (0).
+Bit    5: Period As Number (.) Flag
+   This flag indicates the period (dot) will be processed as a
+   number. This flag has no default value if set to false (0).
+Bit    6: Hyphen As Number (-) Flag
+   This flag indicates the hyphen (dash) will be processed as a
+   number. This flag has no default value if set to false (0).
+Bit    7: Hexadecimal (X) Flag
+   This flag indicates the highest value for Normalization Processing
+   is "f".  Normalization Processing will be described in a later
+   section.  This flag has a default value of 9 if set to false (0).
+</pre>
 <h1 id="rfc.section.4.1.3"><a href="#rfc.section.4.1.3">4.1.3.</a> <a href="#the-owner-ignore-field" id="the-owner-ignore-field">The Owner Ignore field</a></h1>
 <p id="rfc.section.4.1.3.p.1">The Owner Ignore field defines the length of characters as counted from the left-hand side of the owner which MUST be ignored by the normalization process.  This field offers additional security to pattern based signatures which may not be immediately apparent.  By restricting the leftmost characters defined by this value, ultimately the length of the generated portion of the accompanying BULK RR will be confined accordingly.  Normalization Processing will be described further in a later section.</p>
 <h1 id="rfc.section.4.1.4"><a href="#rfc.section.4.1.4">4.1.4.</a> <a href="#the-left-ignore-field" id="the-left-ignore-field">The Left Ignore field</a></h1>
@@ -924,9 +951,14 @@ pool-A-ff-aa.example.com. =~
 <p id="rfc.section.4.3.2.p.5">Since the verification (validation) nameserver would use the identical NPN record for processing and comparison, all RRs generated by the BULK record can now be verified with a single wildcard signature.</p>
 <p id="rfc.section.4.3.2.p.6">EXAMPLE 2</p>
 <p id="rfc.section.4.3.2.p.7">This example contains a classless IPv4 delegation on the /22 CIDR boundary as defined by <a href="#RFC2317">[RFC2317]</a>.  The network for this example is "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs for this example are defined as:</p>
-<p id="rfc.section.4.3.2.p.8">$ORIGIN 2.10.in-addr.arpa.  0-3 86400 IN      NS    ns1.sub.example.com.  -   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3 *   86400 IN NPN  CNAME 9 0 0 23</p>
-<p id="rfc.section.4.3.2.p.9">For this example, a query of "10.2.2.65" would enter the nameserver as "65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of "65.2.0-3.2.10.in-addr.arpa." would be generated.</p>
-<p id="rfc.section.4.3.2.p.10">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "65.2" as illustrated below.</p>
+<pre>
+$ORIGIN 2.10.in-addr.arpa.
+0-3 86400 IN      NS    ns1.sub.example.com.
+-   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
+*   86400 IN NPN  CNAME 9 0 0 23
+</pre>
+<p id="rfc.section.4.3.2.p.8">For this example, a query of "10.2.2.65" would enter the nameserver as "65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of "65.2.0-3.2.10.in-addr.arpa." would be generated.</p>
+<p id="rfc.section.4.3.2.p.9">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "65.2" as illustrated below.</p>
 <pre>
                            1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2
        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
@@ -936,9 +968,9 @@ pool-A-ff-aa.example.com. =~
      2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1                  
      9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
 </pre>
-<p id="rfc.section.4.3.2.p.11">Everything to the left of "65.2" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "9" as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become "9.9.0-3.2.10.in-addr.arpa." and its signature would be based on this "normalized" RDATA field.  This new "normalized" string would be used as an RDATA for the wildcard label of "<em>.2.10.in-addr.arpa." now encompassing all possible permutations of the "${</em>|.}.0-3.2.10.in-addr.arpa." pattern.</p>
-<p id="rfc.section.4.3.2.p.12">As in example 1, the verification (validation) nameserver would use the same NPN record for comparison.</p>
-<p id="rfc.section.4.3.2.p.13">EXAMPLE 3 This example provides reverse logic for example 1 by providing an IPv4 "A" record for a requested hostname.  For this example the query is defined as an "A" record for "pool-A-3-44.example.com." with an origin of "example.com.".  RRs for this example are defined as:</p>
+<p id="rfc.section.4.3.2.p.10">Everything to the left of "65.2" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "9" as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become "9.9.0-3.2.10.in-addr.arpa." and its signature would be based on this "normalized" RDATA field.  This new "normalized" string would be used as an RDATA for the wildcard label of "*.2.10.in-addr.arpa." now encompassing all possible permutations of the "${*|.}.0-3.2.10.in-addr.arpa." pattern.</p>
+<p id="rfc.section.4.3.2.p.11">As in example 1, the verification (validation) nameserver would use the same NPN record for comparison.</p>
+<p id="rfc.section.4.3.2.p.12">EXAMPLE 3 This example provides reverse logic for example 1 by providing an IPv4 "A" record for a requested hostname.  For this example the query is defined as an "A" record for "pool-A-3-44.example.com." with an origin of "example.com.".  RRs for this example are defined as:</p>
 <pre>
 -.example.com. 86400 IN BULK A (
                                    pool-A-\[0-10]-\[0-255]
@@ -946,7 +978,7 @@ pool-A-ff-aa.example.com. =~
                                   )
 *.example.com. 86400 IN NPN  A 9 0 8 0
 </pre>
-<p id="rfc.section.4.3.2.p.14">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "003.044" as illustrated below.</p>
+<p id="rfc.section.4.3.2.p.13">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "003.044" as illustrated below.</p>
 <pre>
                                     1 1 1 1 1 1 1 1 1
                 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8
@@ -956,9 +988,9 @@ pool-A-ff-aa.example.com. =~
             1 1 1 1 1 1 1 1 1
             8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
 </pre>
-<p id="rfc.section.4.3.2.p.15">This example illustrates a key point about NPN records; since they are pre-canonical they MUST operate on a strict subset of WIRE formatted data.  For "A" and "AAAA" records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "010.002.003.044" (shown above) prior to processing.  After processing, wire format would become "0x0A02032C" (shown in hexadecimal).  This format would be too imprecise for normalization so padded decimal is used.</p>
-<p id="rfc.section.4.3.2.p.16">Everything to the left of "003.044" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "9" as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become "10.2.9.9" and its signature would be based on this "normalized" RDATA field. This new "normalized" "A" RR would be used as an RDATA for the wildcard label of "<em>.example.com." now encompassing all possible permutations of the "10.2.${</em>}" pattern.</p>
-<p id="rfc.section.4.3.2.p.17">EXAMPLE 4 This example provides similar logic for an IPv6 AAAA record.  For this example the query is defined as an "AAAA" record for "pool-A-ff-aa.example.com." with an origin of "example.com.".  RRs for this example are defined as:</p>
+<p id="rfc.section.4.3.2.p.14">This example illustrates a key point about NPN records; since they are pre-canonical they MUST operate on a strict subset of WIRE formatted data.  For "A" and "AAAA" records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "010.002.003.044" (shown above) prior to processing.  After processing, wire format would become "0x0A02032C" (shown in hexadecimal).  This format would be too imprecise for normalization so padded decimal is used.</p>
+<p id="rfc.section.4.3.2.p.15">Everything to the left of "003.044" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "9" as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become "10.2.9.9" and its signature would be based on this "normalized" RDATA field. This new "normalized" "A" RR would be used as an RDATA for the wildcard label of "<em>.example.com." now encompassing all possible permutations of the "10.2.${</em>}" pattern.</p>
+<p id="rfc.section.4.3.2.p.16">EXAMPLE 4 This example provides similar logic for an IPv6 AAAA record.  For this example the query is defined as an "AAAA" record for "pool-A-ff-aa.example.com." with an origin of "example.com.".  RRs for this example are defined as:</p>
 <pre>
 -.example.com. 86400 IN BULK AAAA (
                                    pool-A-\[0-ffff]-\[0-ffff]
@@ -966,7 +998,7 @@ pool-A-ff-aa.example.com. =~
                                   )
 *.example.com. 86400 IN NPN  AAAA X 0 30 0
 </pre>
-<p id="rfc.section.4.3.2.p.18">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "00ff:00aa" as illustrated below.</p>
+<p id="rfc.section.4.3.2.p.17">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "00ff:00aa" as illustrated below.</p>
 <pre>
                       1 1 1 1 1 1 1 1 1 1 2 2
   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -984,8 +1016,8 @@ pool-A-ff-aa.example.com. =~
                         2 1 1 1 1 1 1 1 1 1 1 
                         0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
 </pre>
-<p id="rfc.section.4.3.2.p.19">This example reinforces the point on pre-canonical processing of NPN records; they MUST operate on a strict subset of WIRE formatted data. For "A" and "AAAA" records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "fc00:0000:0000:0000:0000:0000:00ff:00aa" (shown above) prior to processing.  After processing, wire format would become "0xFC000000000000000000000000FF00AA" (shown in hexadecimal). This format is slightly misleading as it is truly only 16 bytes of WIRE data and would be too imprecise for normalization so padded hexadecimal is used.</p>
-<p id="rfc.section.4.3.2.p.20">Everything to the left of "00ff:00aa" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "f" as indicated by the NPN record's hexadecimal flag "X" and each run replaced by the single character "f".  The final Normalized RDATA would therefore become "fc00::f:f" and its signature would be based on this "normalized" RDATA field. This new "normalized" "AAAA" RR would be used as an RDATA for the wildcard label of "*.example.com." now encompassing all possible permutations of the "fc00::${1}:${2}" pattern.</p>
+<p id="rfc.section.4.3.2.p.18">This example reinforces the point on pre-canonical processing of NPN records; they MUST operate on a strict subset of WIRE formatted data. For "A" and "AAAA" records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "fc00:0000:0000:0000:0000:0000:00ff:00aa" (shown above) prior to processing.  After processing, wire format would become "0xFC000000000000000000000000FF00AA" (shown in hexadecimal). This format is slightly misleading as it is truly only 16 bytes of WIRE data and would be too imprecise for normalization so padded hexadecimal is used.</p>
+<p id="rfc.section.4.3.2.p.19">Everything to the left of "00ff:00aa" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "f" as indicated by the NPN record's hexadecimal flag "X" and each run replaced by the single character "f".  The final Normalized RDATA would therefore become "fc00::f:f" and its signature would be based on this "normalized" RDATA field. This new "normalized" "AAAA" RR would be used as an RDATA for the wildcard label of "*.example.com." now encompassing all possible permutations of the "fc00::${1}:${2}" pattern.</p>
 <h1 id="rfc.section.5"><a href="#rfc.section.5">5.</a> <a href="#positive-side-effects" id="positive-side-effects">Positive Side-Effects</a></h1>
 <p id="rfc.section.5.p.1">This section highlights positive side effects of some architectural decisions regarding the BULK RR design.</p>
 <h1 id="rfc.section.5.1"><a href="#rfc.section.5.1">5.1.</a> <a href="#record-superimposition" id="record-superimposition">Record Superimposition</a></h1>
@@ -1022,7 +1054,7 @@ pool-A-ff-aa.example.com. =~
 <h1 id="rfc.section.7.3"><a href="#rfc.section.7.3">7.3.</a> <a href="#ddos-attack-vectors-and-mitigation" id="ddos-attack-vectors-and-mitigation">DDOS Attack Vectors and Mitigation</a></h1>
 <p id="rfc.section.7.3.p.1">As an additional defense against Distributed Denial Of Service (DDOS) attacks against recursive (resolving) nameservers it is highly recommended shorter TTLs be used for BULK RRs than others.  While disabling caching with a zero TTL is not recommended (as this would only result in a shift of the attack target) a balance will need to be found.  While this document uses 24 hours (86400) in its examples values between 300 to 900 are likely more appropriate and is RECOMMENDED.  What is ultimately deemed appropriate may differ from zone to zone and administrator to administrator.</p>
 <h1 id="rfc.section.7.4"><a href="#rfc.section.7.4">7.4.</a> <a href="#implications-of-large-scale-dns-records" id="implications-of-large-scale-dns-records">Implications of Large Scale DNS Records</a></h1>
-<p id="rfc.section.7.4.p.1">The production of such large scale "records in the wild" may have some unintended side-effects.  These side-effects could be of concern or add unexpected complications to DNS based security offerings or forensic and anti-spam measures.  While outside the scope of this document, implementors of technology relying on DNS resource records for critical decision making must take into consideration how the existence of such a volume of records might impact their technology.</p>
+<p id="rfc.section.7.4.p.1">The production of such large scale "records in the wild" may have some unintended side-effects.  These side-effects could be of concern or add unexpected complications to DNS based security offerings or forensic and anti-spam measures.  While outside the scope of this document, implementers of technology relying on DNS resource records for critical decision making must take into consideration how the existence of such a volume of records might impact their technology.</p>
 <p id="rfc.section.7.4.p.2">Solutions to the "magnitude" problem for BULK generated RRs are expected be similar if not identical to that of existing wildcard records, the core difference being the resultant RDATA will be unique for each requested Domain Name within its scope.</p>
 <p id="rfc.section.7.4.p.3">The authors of this document are confident that by careful consideration, <em>negative_side-effects</em> produced by implementing the features described in this document <em>can_be_eliminated</em> from any such service or product.</p>
 <h1 id="rfc.section.8"><a href="#rfc.section.8">8.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a></h1>
@@ -1181,18 +1213,17 @@ pool-A-ff-aa.example.com. =~
 		<span class="family-name">Bindinganaveli Raghavan</span>
 	  </span>
 	</span>
-	<span class="org vcardline">CenturyLink, Inc.</span>
+	<span class="org vcardline">Hughes Network Systems</span>
 	<span class="adr">
-	  <span class="vcardline">2355 Dulles Corner Blvd, Ste 200 300</span>
-
+	  
 	  <span class="vcardline">
-		<span class="locality">Herndon</span>,  
+		<span class="locality"></span> 
 		<span class="region"></span>
-		<span class="code">VA 20171</span>
+		<span class="code"></span>
 	  </span>
-	  <span class="country-name vcardline">USA</span>
+	  <span class="country-name vcardline"></span>
 	</span>
-	<span class="vcardline">EMail: <a href="mailto:Shashwath.Bindinganaveliraghavan@CenturyLink.com">Shashwath.Bindinganaveliraghavan@CenturyLink.com</a></span>
+	<span class="vcardline">EMail: <a href="mailto:shash.raghu@gmail.com">shash.raghu@gmail.com</a></span>
 
   </address>
 </div>

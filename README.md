@@ -6,8 +6,9 @@
 
 DNSOP Working Group                                         J. Woodworth
 Internet-Draft                                                 D. Ballew
-Intended status: Standards Track              S. Bindinganaveli Raghavan
-Expires: August 19, 2017                               CenturyLink, Inc.
+Intended status: Standards Track                       CenturyLink, Inc.
+Expires: August 19, 2017                      S. Bindinganaveli Raghavan
+                                                  Hughes Network Systems
                                                        February 15, 2017
 
 
@@ -245,7 +246,7 @@ Table of Contents
 
    If the domain name pattern field consists of a single hyphen it is
    not necessary to evaluate for numeric ranges or strings.
-   Implementors SHOULD simply set a flag indicating all ranges matching
+   Implementers SHOULD simply set a flag indicating all ranges matching
    the query's label are true and backreferences (described in further
    detail in the "BULK Replacement" section) will be automatically set.
 
@@ -282,7 +283,7 @@ Table of Contents
    (raw Wire format).  Stage two "write" evaluations MUST be performed
    prior to returning generated replacement answers.  Since logic to
    perform a stage two evaluation is already a requirement for DNS
-   nameservers it may be easier for implementors to perform just stage
+   nameservers it may be easier for implementers to perform just stage
    two evaluations.  Stage-two-only evaluation may be also preferred for
    performance purposes and is acceptable behavior.  Any stage two
    evaluation errors MUST be processed as if the record did not exist
@@ -353,7 +354,7 @@ Table of Contents
    The following BULK RR stores a block of A RRs for example.com.
 
    *.example.com. 86400 IN BULK A (
-                            pool-A-\[0-255]-\[0-255].example.com.
+                            pool-A-[0-255]-[0-255].example.com.
                             10.55.${1}.${2}
                         )
 
@@ -571,10 +572,11 @@ Table of Contents
 
    NOTE: Data above is shown in multiple lines for clarity.
 
-   "5" is captured and within range 0-f (hexadecimal) "5" is captured
-   and within range 0-f (hexadecimal) ... "0" is captured and within
-   range 0-f (hexadecimal) "0" is captured and within range 0-f
-   (hexadecimal)
+   "5" is captured and within range 0-f (hexadecimal)
+   "5" is captured and within range 0-f (hexadecimal)
+   ...
+   "0" is captured and within range 0-f (hexadecimal)
+   "0" is captured and within range 0-f (hexadecimal)
 
    EXAMPLE 3 For this example the query is defined as an "AAAA" record
    for "pool-A-ff-aa.example.com." with an origin of "example.com." and
@@ -770,7 +772,7 @@ Table of Contents
 
    This section provides examples of several BULK RR Replacement
    Patterns.  Each example is intended to further understanding for
-   implementors and DNS administrators alike.
+   implementers and DNS administrators alike.
 
    EXAMPLE 1 For this example the query is defined as a PTR record for
    "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating
@@ -829,8 +831,9 @@ Table of Contents
    "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs
    for this example are defined as:
 
-   $ORIGIN 2.10.in-addr.arpa.  0-3 86400 IN NS ns1.sub.example.com.  -
-   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
+   $ORIGIN 2.10.in-addr.arpa.
+   0-3 86400 IN      NS    ns1.sub.example.com.
+   -   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
 
    For this example, the query would come in for "25.2.2.10.in-
    addr.arpa.".  After matching the owner filter (ending in ".2.10.in-
@@ -886,16 +889,18 @@ Table of Contents
    |Reserved |.|-|X|
    +-+-+-+-+-+-+-+-+
 
-   Bits 0-4: Reserved for future These flags have no default value if
-   set to false (0).  Bit 5: Period As Number (.) Flag This flag
-   indicates the period (dot) will be processed as a number.  This flag
-   has no default value if set to false (0).  Bit 6: Hyphen As Number
-   (-) Flag This flag indicates the hyphen (dash) will be processed as a
-   number.  This flag has no default value if set to false (0).  Bit 7:
-   Hexadecimal (X) Flag This flag indicates the highest value for
-   Normalization Processing is "f".  Normalization Processing will be
-   described in a later section.  This flag has a default value of "9"
-   if set to false (0).
+   Bits 0-4: Reserved for future
+      These flags have no default value if set to false (0).
+   Bit    5: Period As Number (.) Flag
+      This flag indicates the period (dot) will be processed as a
+      number. This flag has no default value if set to false (0).
+   Bit    6: Hyphen As Number (-) Flag
+      This flag indicates the hyphen (dash) will be processed as a
+      number. This flag has no default value if set to false (0).
+   Bit    7: Hexadecimal (X) Flag
+      This flag indicates the highest value for Normalization Processing
+      is "f".  Normalization Processing will be described in a later
+      section.  This flag has a default value of 9 if set to false (0).
 
 4.1.3.  The Owner Ignore field
 
@@ -1072,9 +1077,10 @@ Table of Contents
    "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs
    for this example are defined as:
 
-   $ORIGIN 2.10.in-addr.arpa.  0-3 86400 IN NS ns1.sub.example.com.  -
-   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3 * 86400 IN NPN CNAME 9 0
-   0 23
+   $ORIGIN 2.10.in-addr.arpa.
+   0-3 86400 IN      NS    ns1.sub.example.com.
+   -   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
+   *   86400 IN NPN  CNAME 9 0 0 23
 
    For this example, a query of "10.2.2.65" would enter the nameserver
    as "65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of
@@ -1098,8 +1104,8 @@ Table of Contents
    "9".  The final Normalized RDATA would therefore become "9.9.0-
    3.2.10.in-addr.arpa." and its signature would be based on this
    "normalized" RDATA field.  This new "normalized" string would be used
-   as an RDATA for the wildcard label of "_.2.10.in-addr.arpa." now
-   encompassing all possible permutations of the "${_|.}.0-3.2.10.in-
+   as an RDATA for the wildcard label of "*.2.10.in-addr.arpa." now
+   encompassing all possible permutations of the "${*|.}.0-3.2.10.in-
    addr.arpa." pattern.
 
    As in example 1, the verification (validation) nameserver would use
@@ -1365,7 +1371,7 @@ Table of Contents
    some unintended side-effects.  These side-effects could be of concern
    or add unexpected complications to DNS based security offerings or
    forensic and anti-spam measures.  While outside the scope of this
-   document, implementors of technology relying on DNS resource records
+   document, implementers of technology relying on DNS resource records
    for critical decision making must take into consideration how the
    existence of such a volume of records might impact their technology.
 
@@ -1486,11 +1492,8 @@ Authors' Addresses
 
 
    Shashwath Bindinganaveli Raghavan
-   CenturyLink, Inc.
-   2355 Dulles Corner Blvd, Ste 200 300
-   Herndon  VA 20171
-   USA
+   Hughes Network Systems
 
-   Email: Shashwath.Bindinganaveliraghavan@CenturyLink.com
+   Email: shash.raghu@gmail.com
 
 ```

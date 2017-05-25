@@ -4,8 +4,9 @@
 
 DNSOP Working Group                                         J. Woodworth
 Internet-Draft                                                 D. Ballew
-Intended status: Standards Track              S. Bindinganaveli Raghavan
-Expires: August 19, 2017                               CenturyLink, Inc.
+Intended status: Standards Track                       CenturyLink, Inc.
+Expires: August 19, 2017                      S. Bindinganaveli Raghavan
+                                                  Hughes Network Systems
                                                        February 15, 2017
 
 
@@ -49,7 +50,6 @@ Copyright Notice
 
    This document is subject to BCP 78 and the IETF Trust's Legal
    Provisions Relating to IETF Documents
-   (http://trustee.ietf.org/license-info) in effect on the date of
 
 
 
@@ -58,6 +58,7 @@ Woodworth, et al.        Expires August 19, 2017                [Page 1]
 Internet-Draft                   BULK RR                   February 2017
 
 
+   (http://trustee.ietf.org/license-info) in effect on the date of
    publication of this document.  Please review these documents
    carefully, as they describe your rights and restrictions with respect
    to this document.  Code Components extracted from this document must
@@ -105,7 +106,6 @@ Table of Contents
    6.  Known Limitations . . . . . . . . . . . . . . . . . . . . . .  26
      6.1.  Increased CPU utilization for NXDOMAIN RRs  . . . . . . .  26
      6.2.  Pre-Adoption Nameserver Implications  . . . . . . . . . .  27
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  27
 
 
 
@@ -114,14 +114,15 @@ Woodworth, et al.        Expires August 19, 2017                [Page 2]
 Internet-Draft                   BULK RR                   February 2017
 
 
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  27
      7.1.  DNSSEC Signature Strategies . . . . . . . . . . . . . . .  27
-       7.1.1.  On-the-fly (Live) Signatures  . . . . . . . . . . . .  27
+       7.1.1.  On-the-fly (Live) Signatures  . . . . . . . . . . . .  28
        7.1.2.  Normalized (NPN Based) Signatures . . . . . . . . . .  28
-       7.1.3.  Non-DNSSEC Zone Support Only  . . . . . . . . . . . .  28
+       7.1.3.  Non-DNSSEC Zone Support Only  . . . . . . . . . . . .  29
      7.2.  DNSSEC Verifier Details . . . . . . . . . . . . . . . . .  29
      7.3.  DDOS Attack Vectors and Mitigation  . . . . . . . . . . .  29
      7.4.  Implications of Large Scale DNS Records . . . . . . . . .  29
-   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  29
+   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  30
    9.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  30
    10. Normative References  . . . . . . . . . . . . . . . . . . . .  30
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  31
@@ -161,7 +162,6 @@ Internet-Draft                   BULK RR                   February 2017
    This document assumes the reader is familiar with the basic DNS
    concepts described in [RFC1034], [RFC1035], and the subsequent
    documents that update them, particularly [RFC2181] and [RFC2308].
-
 
 
 
@@ -290,7 +290,7 @@ Internet-Draft                   BULK RR                   February 2017
 
    If the domain name pattern field consists of a single hyphen it is
    not necessary to evaluate for numeric ranges or strings.
-   Implementors SHOULD simply set a flag indicating all ranges matching
+   Implementers SHOULD simply set a flag indicating all ranges matching
    the query's label are true and backreferences (described in further
    detail in the "BULK Replacement" section) will be automatically set.
 
@@ -327,7 +327,7 @@ Internet-Draft                   BULK RR                   February 2017
    (raw Wire format).  Stage two "write" evaluations MUST be performed
    prior to returning generated replacement answers.  Since logic to
    perform a stage two evaluation is already a requirement for DNS
-   nameservers it may be easier for implementors to perform just stage
+   nameservers it may be easier for implementers to perform just stage
    two evaluations.  Stage-two-only evaluation may be also preferred for
    performance purposes and is acceptable behavior.  Any stage two
 
@@ -414,7 +414,7 @@ Internet-Draft                   BULK RR                   February 2017
    The following BULK RR stores a block of A RRs for example.com.
 
    *.example.com. 86400 IN BULK A (
-                            pool-A-\[0-255]-\[0-255].example.com.
+                            pool-A-[0-255]-[0-255].example.com.
                             10.55.${1}.${2}
                         )
 
@@ -674,10 +674,11 @@ Woodworth, et al.        Expires August 19, 2017               [Page 12]
 Internet-Draft                   BULK RR                   February 2017
 
 
-   "5" is captured and within range 0-f (hexadecimal) "5" is captured
-   and within range 0-f (hexadecimal) ... "0" is captured and within
-   range 0-f (hexadecimal) "0" is captured and within range 0-f
-   (hexadecimal)
+   "5" is captured and within range 0-f (hexadecimal)
+   "5" is captured and within range 0-f (hexadecimal)
+   ...
+   "0" is captured and within range 0-f (hexadecimal)
+   "0" is captured and within range 0-f (hexadecimal)
 
    EXAMPLE 3 For this example the query is defined as an "AAAA" record
    for "pool-A-ff-aa.example.com." with an origin of "example.com." and
@@ -720,7 +721,6 @@ Internet-Draft                   BULK RR                   February 2017
    record generation the below rules are followed to process captured
    numeric data and Replacement Pattern into RRs to apply to the answer-
    set.
-
 
 
 
@@ -905,7 +905,7 @@ Internet-Draft                   BULK RR                   February 2017
 
    This section provides examples of several BULK RR Replacement
    Patterns.  Each example is intended to further understanding for
-   implementors and DNS administrators alike.
+   implementers and DNS administrators alike.
 
    EXAMPLE 1 For this example the query is defined as a PTR record for
    "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating
@@ -971,8 +971,9 @@ Internet-Draft                   BULK RR                   February 2017
    "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs
    for this example are defined as:
 
-   $ORIGIN 2.10.in-addr.arpa.  0-3 86400 IN NS ns1.sub.example.com.  -
-   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
+   $ORIGIN 2.10.in-addr.arpa.
+   0-3 86400 IN      NS    ns1.sub.example.com.
+   -   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
 
    For this example, the query would come in for "25.2.2.10.in-
    addr.arpa.".  After matching the owner filter (ending in ".2.10.in-
@@ -1001,7 +1002,6 @@ Internet-Draft                   BULK RR                   February 2017
    The RDATA for a NPN RR consists of a 2 octet Match Type field, a 1
    octet Flags field, a 1 octet Owner Ignore field, a 1 octet Left
    Ignore field and a 1 octet Right Ignore field.
-
 
 
 
@@ -1036,16 +1036,18 @@ Internet-Draft                   BULK RR                   February 2017
    |Reserved |.|-|X|
    +-+-+-+-+-+-+-+-+
 
-   Bits 0-4: Reserved for future These flags have no default value if
-   set to false (0).  Bit 5: Period As Number (.) Flag This flag
-   indicates the period (dot) will be processed as a number.  This flag
-   has no default value if set to false (0).  Bit 6: Hyphen As Number
-   (-) Flag This flag indicates the hyphen (dash) will be processed as a
-   number.  This flag has no default value if set to false (0).  Bit 7:
-   Hexadecimal (X) Flag This flag indicates the highest value for
-   Normalization Processing is "f".  Normalization Processing will be
-   described in a later section.  This flag has a default value of "9"
-   if set to false (0).
+   Bits 0-4: Reserved for future
+      These flags have no default value if set to false (0).
+   Bit    5: Period As Number (.) Flag
+      This flag indicates the period (dot) will be processed as a
+      number. This flag has no default value if set to false (0).
+   Bit    6: Hyphen As Number (-) Flag
+      This flag indicates the hyphen (dash) will be processed as a
+      number. This flag has no default value if set to false (0).
+   Bit    7: Hexadecimal (X) Flag
+      This flag indicates the highest value for Normalization Processing
+      is "f".  Normalization Processing will be described in a later
+      section.  This flag has a default value of 9 if set to false (0).
 
 4.1.3.  The Owner Ignore field
 
@@ -1055,8 +1057,6 @@ Internet-Draft                   BULK RR                   February 2017
    pattern based signatures which may not be immediately apparent.  By
    restricting the leftmost characters defined by this value, ultimately
    the length of the generated portion of the accompanying BULK RR will
-   be confined accordingly.  Normalization Processing will be described
-   further in a later section.
 
 
 
@@ -1065,6 +1065,9 @@ Woodworth, et al.        Expires August 19, 2017               [Page 19]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+   be confined accordingly.  Normalization Processing will be described
+   further in a later section.
 
 4.1.4.  The Left Ignore field
 
@@ -1111,9 +1114,6 @@ Internet-Draft                   BULK RR                   February 2017
    will become clearer in the NPN pseudocode and examples provided in
    the sections to follow.
 
-   The rules for this transformation are simple:
-
-
 
 
 
@@ -1121,6 +1121,8 @@ Woodworth, et al.        Expires August 19, 2017               [Page 20]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+   The rules for this transformation are simple:
 
    For RR's Owner field, characters from the beginning to the index of
    the Owner Ignore value or the final string of characters belonging to
@@ -1168,8 +1170,6 @@ Internet-Draft                   BULK RR                   February 2017
    This section provides a simple demonstration of process flow for NPN
    rdata normalization and DNSSEC signatures.
 
-   The pseudocode provided below assumes all associated RRs are valid
-   members of a DNSSEC compatible RRset (including BULK generated ones).
 
 
 
@@ -1177,6 +1177,9 @@ Woodworth, et al.        Expires August 19, 2017               [Page 21]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+   The pseudocode provided below assumes all associated RRs are valid
+   members of a DNSSEC compatible RRset (including BULK generated ones).
 
       for rr in rrset
           if (has_NPN<rr.owner, rr.class, rr.type>)
@@ -1223,9 +1226,6 @@ Internet-Draft                   BULK RR                   February 2017
            2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
            6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
 
-   Everything to the left of "3-44" will remain intact as will
-   everything to its right.  The remaining characters will be processed
-   for numbers between "0" and "9" as indicated by the NPN record's
 
 
 
@@ -1234,6 +1234,9 @@ Woodworth, et al.        Expires August 19, 2017               [Page 22]
 Internet-Draft                   BULK RR                   February 2017
 
 
+   Everything to the left of "3-44" will remain intact as will
+   everything to its right.  The remaining characters will be processed
+   for numbers between "0" and "9" as indicated by the NPN record's
    hexadecimal flag "9" and each run replaced by the single character
    "9".  The final Normalized RDATA would therefore become "pool-
    A-9-9.example.com." and its signature would be based on this
@@ -1254,9 +1257,10 @@ Internet-Draft                   BULK RR                   February 2017
    "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs
    for this example are defined as:
 
-   $ORIGIN 2.10.in-addr.arpa.  0-3 86400 IN NS ns1.sub.example.com.  -
-   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3 * 86400 IN NPN CNAME 9 0
-   0 23
+   $ORIGIN 2.10.in-addr.arpa.
+   0-3 86400 IN      NS    ns1.sub.example.com.
+   -   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
+   *   86400 IN NPN  CNAME 9 0 0 23
 
    For this example, a query of "10.2.2.65" would enter the nameserver
    as "65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of
@@ -1278,10 +1282,6 @@ Internet-Draft                   BULK RR                   February 2017
    for numbers between "0" and "9" as indicated by the NPN record's
    hexadecimal flag "9" and each run replaced by the single character
    "9".  The final Normalized RDATA would therefore become "9.9.0-
-   3.2.10.in-addr.arpa." and its signature would be based on this
-   "normalized" RDATA field.  This new "normalized" string would be used
-   as an RDATA for the wildcard label of "_.2.10.in-addr.arpa." now
-
 
 
 
@@ -1290,7 +1290,10 @@ Woodworth, et al.        Expires August 19, 2017               [Page 23]
 Internet-Draft                   BULK RR                   February 2017
 
 
-   encompassing all possible permutations of the "${_|.}.0-3.2.10.in-
+   3.2.10.in-addr.arpa." and its signature would be based on this
+   "normalized" RDATA field.  This new "normalized" string would be used
+   as an RDATA for the wildcard label of "*.2.10.in-addr.arpa." now
+   encompassing all possible permutations of the "${*|.}.0-3.2.10.in-
    addr.arpa." pattern.
 
    As in example 1, the verification (validation) nameserver would use
@@ -1335,9 +1338,6 @@ Internet-Draft                   BULK RR                   February 2017
    "9".  The final Normalized RDATA would therefore become "10.2.9.9"
    and its signature would be based on this "normalized" RDATA field.
    This new "normalized" "A" RR would be used as an RDATA for the
-   wildcard label of "_.example.com." now encompassing all possible
-   permutations of the "10.2.${_}" pattern.
-
 
 
 
@@ -1345,6 +1345,9 @@ Woodworth, et al.        Expires August 19, 2017               [Page 24]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+   wildcard label of "_.example.com." now encompassing all possible
+   permutations of the "10.2.${_}" pattern.
 
    EXAMPLE 4 This example provides similar logic for an IPv6 AAAA
    record.  For this example the query is defined as an "AAAA" record
@@ -1391,9 +1394,6 @@ Internet-Draft                   BULK RR                   February 2017
    everything to its right.  The remaining characters will be processed
    for numbers between "0" and "f" as indicated by the NPN record's
    hexadecimal flag "X" and each run replaced by the single character
-   "f".  The final Normalized RDATA would therefore become "fc00::f:f"
-   and its signature would be based on this "normalized" RDATA field.
-   This new "normalized" "AAAA" RR would be used as an RDATA for the
 
 
 
@@ -1402,6 +1402,9 @@ Woodworth, et al.        Expires August 19, 2017               [Page 25]
 Internet-Draft                   BULK RR                   February 2017
 
 
+   "f".  The final Normalized RDATA would therefore become "fc00::f:f"
+   and its signature would be based on this "normalized" RDATA field.
+   This new "normalized" "AAAA" RR would be used as an RDATA for the
    wildcard label of "*.example.com." now encompassing all possible
    permutations of the "fc00::${1}:${2}" pattern.
 
@@ -1446,10 +1449,7 @@ Internet-Draft                   BULK RR                   February 2017
    system resource level and it is the authors' belief the benefit
    outweighs the sacrifice.
 
-   A quick comparison of BULK versus bind's $GENERATE expansion reveals
-   much more memory would be sacrificed with $GENERATES to save the CPU
-   cycles required to support BULK records.  Additionally, $GENERATES
-   cannot be transferred (i.e.  AXFR) without expansion and an IPv6 CIDR
+
 
 
 
@@ -1458,6 +1458,10 @@ Woodworth, et al.        Expires August 19, 2017               [Page 26]
 Internet-Draft                   BULK RR                   February 2017
 
 
+   A quick comparison of BULK versus bind's $GENERATE expansion reveals
+   much more memory would be sacrificed with $GENERATES to save the CPU
+   cycles required to support BULK records.  Additionally, $GENERATES
+   cannot be transferred (i.e.  AXFR) without expansion and an IPv6 CIDR
    even as small as /96 would be simply impossible.  BULK on the other
    hand can easily support IPv6 CIDRs of /64 and much larger with very
    little effort.
@@ -1498,6 +1502,18 @@ Internet-Draft                   BULK RR                   February 2017
    this issue.  Of the options, on-the-fly provides the most secure
    solution and NPN provides the most flexible.
 
+
+
+
+
+
+
+
+Woodworth, et al.        Expires August 19, 2017               [Page 27]
+
+Internet-Draft                   BULK RR                   February 2017
+
+
 7.1.1.  On-the-fly (Live) Signatures
 
    This solution requires authoritative nameservers to sign generated
@@ -1506,13 +1522,6 @@ Internet-Draft                   BULK RR                   February 2017
    solution would either require all implementations to support on-the-
    fly signing or be ignored by implementations which can not or will
    not comply.
-
-
-
-Woodworth, et al.        Expires August 19, 2017               [Page 27]
-
-Internet-Draft                   BULK RR                   February 2017
-
 
    No changes to recursive (resolving) nameservers is required to
    support this solution.
@@ -1554,21 +1563,19 @@ Internet-Draft                   BULK RR                   February 2017
    appropriately to minimize exposure and only use NPN RRs to secure
    pattern-based records such as BULK.
 
-7.1.3.  Non-DNSSEC Zone Support Only
-
-   As a final option zones which wish to remain entirely without DNSSEC
-   support may serve such zones without either of the above solutions
-   and records generated based on BULK RRs will require zero support
-   from recursive (resolving) nameservers.
-
-
-
 
 
 Woodworth, et al.        Expires August 19, 2017               [Page 28]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+7.1.3.  Non-DNSSEC Zone Support Only
+
+   As a final option zones which wish to remain entirely without DNSSEC
+   support may serve such zones without either of the above solutions
+   and records generated based on BULK RRs will require zero support
+   from recursive (resolving) nameservers.
 
 7.2.  DNSSEC Verifier Details
 
@@ -1596,7 +1603,7 @@ Internet-Draft                   BULK RR                   February 2017
    some unintended side-effects.  These side-effects could be of concern
    or add unexpected complications to DNS based security offerings or
    forensic and anti-spam measures.  While outside the scope of this
-   document, implementors of technology relying on DNS resource records
+   document, implementers of technology relying on DNS resource records
    for critical decision making must take into consideration how the
    existence of such a volume of records might impact their technology.
 
@@ -1610,13 +1617,6 @@ Internet-Draft                   BULK RR                   February 2017
    features described in this document _can_be_eliminated_ from any such
    service or product.
 
-8.  IANA Considerations
-
-   IANA is requested to assign numbers for two DNS resource record types
-   identified in this document; BULK and NPN.
-
-
-
 
 
 
@@ -1625,6 +1625,11 @@ Woodworth, et al.        Expires August 19, 2017               [Page 29]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+8.  IANA Considerations
+
+   IANA is requested to assign numbers for two DNS resource record types
+   identified in this document; BULK and NPN.
 
 9.  Acknowledgments
 
@@ -1670,17 +1675,16 @@ Internet-Draft                   BULK RR                   February 2017
               System (DNS)", RFC 2536, DOI 10.17487/RFC2536, March 1999,
               <http://www.rfc-editor.org/info/rfc2536>.
 
-   [RFC2931]  Eastlake 3rd, D., "DNS Request and Transaction Signatures
-              ( SIG(0)s )", RFC 2931, DOI 10.17487/RFC2931, September
-              2000, <http://www.rfc-editor.org/info/rfc2931>.
-
-
 
 
 Woodworth, et al.        Expires August 19, 2017               [Page 30]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+   [RFC2931]  Eastlake 3rd, D., "DNS Request and Transaction Signatures
+              ( SIG(0)s )", RFC 2931, DOI 10.17487/RFC2931, September
+              2000, <http://www.rfc-editor.org/info/rfc2931>.
 
    [RFC3110]  Eastlake 3rd, D., "RSA/SHA-1 SIGs and RSA KEYs in the
               Domain Name System (DNS)", RFC 3110, DOI 10.17487/RFC3110,
@@ -1729,10 +1733,6 @@ Authors' Addresses
 
 
 
-
-
-
-
 Woodworth, et al.        Expires August 19, 2017               [Page 31]
 
 Internet-Draft                   BULK RR                   February 2017
@@ -1748,12 +1748,12 @@ Internet-Draft                   BULK RR                   February 2017
 
 
    Shashwath Bindinganaveli Raghavan
-   CenturyLink, Inc.
-   2355 Dulles Corner Blvd, Ste 200 300
-   Herndon  VA 20171
-   USA
+   Hughes Network Systems
 
-   Email: Shashwath.Bindinganaveliraghavan@CenturyLink.com
+   Email: shash.raghu@gmail.com
+
+
+
 
 
 

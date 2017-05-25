@@ -40,12 +40,8 @@ author:
   -
     ins: S. Bindinganaveli Raghavan
     name: Shashwath Bindinganaveli Raghavan
-    org: CenturyLink, Inc.
-    street: 2355 Dulles Corner Blvd, Ste 200 300
-    city: Herndon
-    code: VA 20171
-    country: USA
-    email: Shashwath.Bindinganaveliraghavan@CenturyLink.com
+    org: Hughes Network Systems
+    email: shash.raghu@gmail.com
 
 normative:
   rfc1034:
@@ -224,7 +220,7 @@ appear anywhere outside of a range specification.
 #### Single hyphen
 
 If the domain name pattern field consists of a single hyphen it is not
-necessary to evaluate for numeric ranges or strings.  Implementors
+necessary to evaluate for numeric ranges or strings.  Implementers
 SHOULD simply set a flag indicating all ranges matching the query's
 label are true and backreferences (described in further detail in the
 "BULK Replacement" section) will be automatically set.
@@ -261,7 +257,7 @@ zone files) or when a RR transfer is received (raw Wire format).
 Stage two "write" evaluations MUST be performed prior to returning
 generated replacement answers.  Since logic to perform a stage two
 evaluation is already a requirement for DNS nameservers it may be
-easier for implementors to perform just stage two evaluations.
+easier for implementers to perform just stage two evaluations.
 Stage-two-only evaluation may be also preferred for performance
 purposes and is acceptable behavior.  Any stage two evaluation errors
 MUST be processed as if the record did not exist and if all BULK
@@ -333,7 +329,7 @@ The following BULK RR stores a block of A RRs for example.com.
 
 ~~~~
 *.example.com. 86400 IN BULK A (
-                         pool-A-\[0-255]-\[0-255].example.com.
+                         pool-A-[0-255]-[0-255].example.com.
                          10.55.${1}.${2}
                      )
 ~~~~
@@ -571,11 +567,13 @@ STEP 4
 
 NOTE: Data above is shown in multiple lines for clarity.
 
+~~~~
 "5" is captured and within range 0-f (hexadecimal)
 "5" is captured and within range 0-f (hexadecimal)
 ...
 "0" is captured and within range 0-f (hexadecimal)
 "0" is captured and within range 0-f (hexadecimal)
+~~~~
 
 EXAMPLE 3
 For this example the query is defined as an "AAAA" record for "pool-A-ff-aa.example.com." with an origin of "example.com." and the evaluating BULK RR as:
@@ -777,7 +775,7 @@ values in positions opposite to what is required or expected.
 
 This section provides examples of several BULK RR Replacement
 Patterns.  Each example is intended to further understanding for
-implementors and DNS administrators alike.
+implementers and DNS administrators alike.
 
 EXAMPLE 1 For this example the query is defined as a PTR record for
 "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating
@@ -837,9 +835,11 @@ is
 "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.". RRs for
 this example are defined as:
 
+~~~~
 $ORIGIN 2.10.in-addr.arpa.
 0-3 86400 IN      NS    ns1.sub.example.com.
 -   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
+~~~~
 
 For this example, the query would come in for
 "25.2.2.10.in-addr.arpa.".  After matching the owner filter (ending in
@@ -899,14 +899,20 @@ future use.
 +-+-+-+-+-+-+-+-+
 ~~~~
 
+~~~~
 Bits 0-4: Reserved for future
    These flags have no default value if set to false (0).
 Bit    5: Period As Number (.) Flag
-   This flag indicates the period (dot) will be processed as a number. This flag has no default value if set to false (0).
+   This flag indicates the period (dot) will be processed as a
+   number. This flag has no default value if set to false (0).
 Bit    6: Hyphen As Number (-) Flag
-   This flag indicates the hyphen (dash) will be processed as a number. This flag has no default value if set to false (0).
+   This flag indicates the hyphen (dash) will be processed as a
+   number. This flag has no default value if set to false (0).
 Bit    7: Hexadecimal (X) Flag
-   This flag indicates the highest value for Normalization Processing is "f".  Normalization Processing will be described in a later section.  This flag has a default value of "9" if set to false (0).
+   This flag indicates the highest value for Normalization Processing
+   is "f".  Normalization Processing will be described in a later
+   section.  This flag has a default value of 9 if set to false (0).
+~~~~
 
 ### The Owner Ignore field
 
@@ -1083,14 +1089,19 @@ boundary as defined by {{RFC2317}}.  The network for this example is
 "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs for
 this example are defined as:
 
+~~~~
 $ORIGIN 2.10.in-addr.arpa.
 0-3 86400 IN      NS    ns1.sub.example.com.
 -   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
 *   86400 IN NPN  CNAME 9 0 0 23
+~~~~
 
-For this example, a query of "10.2.2.65" would enter the nameserver as "65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of "65.2.0-3.2.10.in-addr.arpa." would be generated.
+For this example, a query of "10.2.2.65" would enter the nameserver as
+"65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of
+"65.2.0-3.2.10.in-addr.arpa." would be generated.
 
-By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "65.2" as illustrated below.
+By protecting the "Ignore" characters from the generated RR's RDATA
+the focus for normalization becomes "65.2" as illustrated below.
 
 ~~~~
                            1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2
@@ -1109,8 +1120,8 @@ between "0" and "9" as indicated by the NPN record's hexadecimal flag
 Normalized RDATA would therefore become "9.9.0-3.2.10.in-addr.arpa."
 and its signature would be based on this "normalized" RDATA field.
 This new "normalized" string would be used as an RDATA for the
-wildcard label of "*.2.10.in-addr.arpa." now encompassing all possible
-permutations of the "${*|.}.0-3.2.10.in-addr.arpa." pattern.
+wildcard label of "\*.2.10.in-addr.arpa." now encompassing all possible
+permutations of the "${\*|.}.0-3.2.10.in-addr.arpa." pattern.
 
 As in example 1, the verification (validation) nameserver would use
 the same NPN record for comparison.
@@ -1175,7 +1186,8 @@ this example are defined as:
 *.example.com. 86400 IN NPN  AAAA X 0 30 0
 ~~~~
 
-By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "00ff:00aa" as illustrated below.
+By protecting the "Ignore" characters from the generated RR's RDATA
+the focus for normalization becomes "00ff:00aa" as illustrated below.
 
 ~~~~
                       1 1 1 1 1 1 1 1 1 1 2 2
@@ -1381,7 +1393,7 @@ The production of such large scale "records in the wild" may have some
 unintended side-effects.  These side-effects could be of concern or
 add unexpected complications to DNS based security offerings or
 forensic and anti-spam measures.  While outside the scope of this
-document, implementors of technology relying on DNS resource records
+document, implementers of technology relying on DNS resource records
 for critical decision making must take into consideration how the
 existence of such a volume of records might impact their technology.
 
