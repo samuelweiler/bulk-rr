@@ -6,9 +6,11 @@
 
 DNSOP Working Group                                         J. Woodworth
 Internet-Draft                                                 D. Ballew
-Intended status: Standards Track                       CenturyLink, Inc.
-Expires: August 19, 2017                      S. Bindinganaveli Raghavan
-                                                  Hughes Network Systems
+Obsoletes: 222 (if approved)                           CenturyLink, Inc.
+Updates: 2308, 4033, 4034, 4035 (if           S. Bindinganaveli Raghavan
+         approved)                                Hughes Network Systems
+Intended status: Standards Track                             D. Lawrence
+Expires: August 19, 2017                             Akamai Technologies
                                                        February 15, 2017
 
 
@@ -17,16 +19,20 @@ Expires: August 19, 2017                      S. Bindinganaveli Raghavan
 
 Abstract
 
-   The BULK DNS resource record type defines a method of pattern based
-   creation of DNS resource records to be used in place of NXDOMAIN
-   errors which would normally be returned.  These records are currently
-   restricted to registered DNS resource record types A, AAAA, PTR and
-   CNAME.  The key benefit of the BULK resource record type is the
-   simplification of maintaining "generic" record assignments which
-   would otherwise be too many to manage or require scripts or
-   proprietary methods as bind's $GENERATE.
+   The BULK DNS resource record type defines a method of pattern-based
+   creation of DNS resource records.  The intent of BULK is to simplify
+   generic assignments in a memory-efficient way that can be easily
+   shared between the primary and secondary nameservers for a zone.
 
-   This document updates RFCs 2308, 4033, 4034 and 4035.
+Ed note
+
+   Text inside square brackets ([]) is additional background
+   information, answers to frequently asked questions, general musings,
+   etc.  They will be removed before publication.  This document is
+   being collaborated on in GitHub at <https://github.com/vttale/serve-
+   stale>.  The most recent version of the document, open issues, etc
+   should all be available here.  The authors gratefully accept pull
+   requests.
 
 Status of This Memo
 
@@ -63,26 +69,16 @@ Copyright Notice
 Table of Contents
 
    1.  Introduction
-     1.1.  Background and Related Documents
-     1.2.  Reserved Words
+     1.1.  Background and Terminology
    2.  The BULK Resource Record
-     2.1.  BULK OPTIONAL Hidden Wildcards
-     2.2.  BULK RDATA Wire Format
-       2.2.1.  The Match Type Field
-       2.2.2.  The Domain Name Pattern Field
-       2.2.3.  The Replacement Pattern Field
-     2.3.  The BULK RR Presentation Format
-     2.4.  BULK RR Examples
+     2.1.  BULK RDATA Wire Format
+     2.2.  The BULK RR Presentation Format
    3.  BULK Replacement
-     3.1.  Matching BULK "owner" field
-     3.2.  Matching the BULK "Match Type" field
-     3.3.  Matching the BULK "Domain Name Pattern" field
-       3.3.1.  Automatic Domain Name Pattern matching
-       3.3.2.  Manual Domain Name Pattern matching
-     3.4.  Record Generation using the BULK "Replacement Pattern"
+     3.1.  Matching the BULK "Domain Name Pattern" field
+     3.2.  Record Generation using the BULK "Replacement Pattern"
            field
-       3.4.1.  Replacement Pattern Backreferences
-       3.4.2.  Replacement Pattern examples
+       3.2.1.  Replacement Pattern References
+       3.2.2.  Replacement Pattern examples
    4.  The NPN Resource Record
      4.1.  NPN RDATA Wire Format
        4.1.1.  The Match Type field
@@ -110,51 +106,49 @@ Table of Contents
      7.4.  Implications of Large Scale DNS Records
    8.  IANA Considerations
    9.  Acknowledgments
-   10. Normative References
+   10. References
+     10.1.  Normative References
+     10.2.  Informative References
    Authors' Addresses
 
 1.  Introduction
 
-   The BULK DNS Resource Record (BULK) defines a maskable pattern based
-   method for real-time on-the-fly resource record generation.
-   Specifically, it allows one to manage large blocks of DNS records
-   based entirely on record owner data in the RR query and patterns (or
-   templates) designed by knowledgeable zone administrators.  Existing
-   DNS resource records covered by this document are Address (A), IPv6
-   Address (AAAA), Pointer (PTR) and Canonical Name (CNAME).  Although
-   other RR types are not explicitly forbidden from use with BULK logic
-   they fall outside of scope and will not be discussed in this
-   document.  This document defines the purpose of this new resource
-   record (BULK), its RDATA format, its presentation format (ASCII
-   representation) as well as generated responses to matched DNS
-   queries.
+   The BULK DNS resource record defines a pattern-based method for on-
+   the-fly resource record generation.  It is essentially an enhanced
+   wildcard mechanism, constraining generated resource record owner
+   names to those that match a pattern.  It is also akin to the
+   $GENERATE master file directive (FIXME insert ref to ISC
+   Bv9ARM.ch06.html), without being limited to numeric values and
+   without creating all possible records in the zone data.
 
-   Two Key benefits of this record type are; a) the ability to transfer
-   BULK RR intentions from primary to secondary nameservers with minimal
-   bandwidth and memory requirements; and b) the ability to manage large
-   volumes of pattern based records such as an IPv6 /64 CIDR or larger
-   in a single entry.
+   For example, consider the following record:
 
-   Support options for DNSSEC related complications resulting from
-   dynamically generated records are also provided in this document.
-   One such option is in the form of the Numeric Pattern Normalization
-   (NPN) resource record type also described in this document.  NPN
-   resource records provide a way of generating pattern based DNSSEC
-   signatures and securely performing DNSSEC validation on such
+   *.example.com. 86400 IN BULK A (
+                            pool-A-[0-255]-[0-255].example.com.
+                            10.55.${1}.${2}
+                        )
+
+   It will answer requests for pool-A-0-0.example.com through pool-
+   A-255-255.example.com with the IPv4 addresses 10.55.0.0 through
+   10.55.255.255.
+
+   Much larger record sets can be defined while minimizing the
+   associated requirements for server memory and zone transfer network
+   bandwidth.
+
+   DNSSEC support is also described.  The Numeric Pattern Normalization
+   (NPN) resource record provides a way of generating pattern-based
+   DNSSEC signatures, and securely performing DNSSEC validation on such
    signatures.
 
-1.1.  Background and Related Documents
+   Traditional wildcard substitution logic is extended to allow
 
-   This document assumes the reader is familiar with the basic DNS
-   concepts described in [RFC1034], [RFC1035], and the subsequent
-   documents that update them, particularly [RFC2181] and [RFC2308].
+1.1.  Background and Terminology
 
-   The reader is also assumed to be familiar with DNSSEC basics as
-   described in [RFC4033], [RFC4034] and [RFC4035] as well as the DNS
-   cryptographic signature generation process described in [RFC4033],
-   [RFC4034], [RFC4035], [RFC2536], [RFC2931] and [RFC3110].
-
-1.2.  Reserved Words
+   The reader is assumed to be familiar with the basic DNS and DNSSEC
+   concepts described in [RFC1034], [RFC1035], [RFC4033], [RFC4034], and
+   [RFC4035]; subsequent RFCs that update them in [RFC2181] and
+   [RFC2308]; and DNS terms in [RFC7719].
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
@@ -162,35 +156,16 @@ Table of Contents
 
 2.  The BULK Resource Record
 
-   The BULK resource record consists of details which enable a DNS
-   nameserver to generate RRs of other types based upon query received
-   and patterns provided.  Unless otherwise stated the letters used in
-   hexadecimal numbers (a-f) MUST be case insensitive and are assumed to
-   be lowercase.  All examples in this document using hexadecimal are
-   provided in lowercase.
+   The BULK resource record enables an authoritative nameserver to
+   generate RRs for other types based upon the query received.
 
-   The Type value for the BULK RR type is XX.
+   The Type value for the BULK RR type is TBD.
 
-   The BULK RR is class independent.
+   The BULK RR is class-independent.
 
-   The BULK RR has no special TTL requirements but some security
-   guidelines are offered in a later section.
+2.1.  BULK RDATA Wire Format
 
-2.1.  BULK OPTIONAL Hidden Wildcards
-
-   The BULK RR extends current wildcard substitution logic as defined in
-   [RFC1034] by allowing a single hyphen "-" in the leftmost label to
-   represent the intent of leveraging a modified wildcard matching
-   mechanism.  If this condition exists wildcard logic SHALL be used for
-   generated replacement records but not for the BULK resource records
-   themselves.  This will become clearer in the "BULK Replacement"
-   section of this document.  If an asterisk "*" (the standard wildcard
-   character) is used default wildcard behavior MUST be used.
-
-2.2.  BULK RDATA Wire Format
-
-   The RDATA for a BULK RR consists of a 2 octet Match Type Field, a
-   Domain Name Pattern Field and a Replacement Pattern Field.
+   The RDATA for a BULK RR is as follows:
 
                         1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -204,95 +179,58 @@ Table of Contents
    /                                                               /
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-2.2.1.  The Match Type Field
+   Match Type identifies the type of the RRset to be generated by this
+   BULK record.  It is two octets corresponding to an RR TYPE code as
+   specified in [RFC1035], Section 3.2.1.
 
-   The Match Type field identifies the type of the RRset identified by
-   this BULK record.  This field consists of two octets corresponding to
-   an RR TYPE code as specified in [RFC1035], Section 3.2.1.
+   Domain Name Pattern consists of a pattern encoded as a wire-format
+   domain name relative to the zone in which it appears.  Special
+   characters are interpreted as per the following Augmented Backus-Naur
+   Form notation from [RFC5234].
 
-2.2.2.  The Domain Name Pattern Field
+   DIGIT          =  %x30-39
+                          ; 0-9
+   HEXDIG         =  DIGIT / 0x41-0x46 / 0x61-66
+                          ; 0-9, A-F, a-f
+   DQUOTE         =  %x22
+                          ; " (Double Quote)
 
-   The Domain Name Pattern Field consists of a text string which may be
-   evaluated by the sections below.  The character encoding for this
-   field is [us-ascii] and may not contain whitespace unless enclosed
-   within double-quote characters.  The value of a single hyphen "-" has
-   special implications and will be discussed in greater detail below.
+   pattern        =  "-" / 1*part / DQUOTE 1*part DQUOTE
 
-   The following syntax specification uses the Augmented Backus-Naur
-   Form (ABNF) notation as specified in [RFC5234].
+   part           =  "\[" range "]" / string
 
-         DIGIT  = <as defined in RFC 5234 Appendix B.1>
-         HEXDIG = <as defined in RFC 5234 Appendix B.1>
-         DQUOTE = <as defined in RFC 5234 Appendix B.1>
+   range          =  number [ "-" number ]
 
-         pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
+   number         =  1*DIGIT / 1*HEXDIG
 
-         part                =   "\[" range "]" / string
+   octet          =  %x00-FF
 
-         range               =   number [ "-" number ]
+   ctext          =  <any octet excepting "\">
 
-         number              =   1*DIGIT / 1*HEXDIG
+   quoted-char    = "\" octet
+                          ; to allow [ and ] as literals
 
-         string              =   1*( %x01-5A / %x5C / %x5E-7F )
-                                    ; Any [US-ASCII] character excluding
-                                    ; NUL and square bracket characters
-                                    ; "\[" or "]"
+   string         =  *(ctext / quoted-pair)
 
-   Although allowed by [RFC2181]; the square bracket characters, "[" and
-   "]", are reserved to enclose a range specification and MUST NOT
-   appear anywhere outside of a range specification.
 
-2.2.2.1.  Single hyphen
+   [ Why does DQUOTE need to be a syntactic element?  What function is
+   it serving? ]
 
-   If the domain name pattern field consists of a single hyphen it is
-   not necessary to evaluate for numeric ranges or strings.
-   Implementers SHOULD simply set a flag indicating all ranges matching
-   the query's label are true and backreferences (described in further
-   detail in the "BULK Replacement" section) will be automatically set.
+   Interpretation of the Domain Name Pattern is described in detail in
+   the "BULK Replacement" section.
 
-2.2.2.2.  Numeric ranges
+   [ I admit this flexibility for strings might be a mistake, and will
+   be calling it out in dnsop specifically for discussion. ]
 
-   Numeric ranges include decimal or hexadecimal ranges depending on
-   which record type was used in the query.  This logic will be
-   described in further detail in the "Replacement Logic" section.
+   Replacement Pattern describes how the answer RRset MUST be generated
+   for the matching query.  It uses this format:
 
-   The numeric range pattern will be a range of allowed numbers lower
-   and upper values separated by a single hyphen "-".  If upper and
-   lower values are identical a single numeric value (without hyphen)
-   will suffice.  To easily distinguish numeric range patterns from
-   string values they MUST be enclosed within square brackets "[" and
-   "]".
-
-2.2.2.3.  String values
-
-   All values found before or after Numeric ranges (excluding single-
-   hyphen rule) are considered to be string values.  These values will
-   be taken literally when evaluating for pattern matches in the "BULK
-   Replacement" section below.
-
-2.2.3.  The Replacement Pattern Field
-
-   The Replacement Pattern field describes how the answer RRset SHOULD
-   be generated for the matching query.  It can either be a single
-   hyphen "-" or a string containing backreferences (described in
-   further detail in the "BULK Replacement" section).  This field MUST
-   be evaluated for proper syntax for resource records of its Match Type
-   defined above.  A "read" evaluation MAY be performed when a zone is
-   first committed to memory either while converting from Text to Wire
-   format (from stored zone files) or when a RR transfer is received
-   (raw Wire format).  Stage two "write" evaluations MUST be performed
-   prior to returning generated replacement answers.  Since logic to
-   perform a stage two evaluation is already a requirement for DNS
-   nameservers it may be easier for implementers to perform just stage
-   two evaluations.  Stage-two-only evaluation may be also preferred for
-   performance purposes and is acceptable behavior.  Any stage two
-   evaluation errors MUST be processed as if the record did not exist
-   and if all BULK generated records for a query answer-set evaluate to
-   errors the original condition of an NXDOMAIN error state MUST be
-   restored.
-
-   The following syntax specification uses the Augmented Backus-Naur
-   Form (ABNF) notation as specified in [RFC5234].
+   [ Presumably this could just build on the above but use a different
+   name for part and string (if string ends up being different, which it
+   probably shouldn't)?  There's a lot of redundancy with identical
+   definitions for six other elements, and it is easier for both readers
+   and implementers not to have to keep in mind that the same identifier
+   name, from the same source, has two different definitions ]
 
        DIGIT  = <as defined in RFC 5234 Appendix B.1>
        HEXDIG = <as defined in RFC 5234 Appendix B.1>
@@ -300,9 +238,9 @@ Table of Contents
 
        pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
 
-       part                =   backreference / string
+       part                =   reference / string
 
-       backreference       =   "$" "{" substitution "}"
+       reference       =   "$" "{" substitution "}"
 
        substitution        =   range 0*( "," range ) [ options ]
 
@@ -330,150 +268,72 @@ Table of Contents
                                   ; characters "{" or "}"
 
    The dollar sign, "$", and curly brace characters, "{" and "}", are
-   reserved to enclose regular-expression-esque backreferences and MUST
-   NOT appear anywhere outside of such a backreference specification.
-   This rigidity is necessary to simplify implementation of this
-   document and may relax once adoption reaches an acceptable level and
-   demand for such an exception exists.  The authors feel this
-   limitation is a reasonable limitation for the flexibility offered by
-   this document.
+   reserved to enclose regular-expression-esque references and MUST NOT
+   appear anywhere outside of such a reference specification.  This
+   rigidity is necessary to simplify implementation of this document and
+   may relax once adoption reaches an acceptable level and demand for
+   such an exception exists.  The authors feel this limitation is a
+   reasonable limitation for the flexibility offered by this document.
 
-2.3.  The BULK RR Presentation Format
+2.2.  The BULK RR Presentation Format
 
-   The Match Type field is represented as an RR type mnemonic.  When the
-   mnemonic is not known, the TYPE representation as described in
-   [RFC3597], Section 5, MUST be used.
+   Match Type is represented as an RR type mnemonic or [RFC3597]'s
+   generic TYPE mechanism.
 
-   The Domain Name Pattern and Replacement Pattern fields MUST be
-   presented as the TXT RR type described in [RFC1035], Section 3.3.14.
+   Domain Name Pattern is represented as a fully qualified domain name
+   as per RFC 1035 rules. [ FIXME: Find better reference, if any. ]
 
-2.4.  BULK RR Examples
+   Replacement Pattern is represented as with the TXT RR type described
+   in [RFC1035], Section 3.3.14.
 
-   EXAMPLE 1
-
-   The following BULK RR stores a block of A RRs for example.com.
-
-   *.example.com. 86400 IN BULK A (
-                            pool-A-[0-255]-[0-255].example.com.
-                            10.55.${1}.${2}
-                        )
-
-   The first four fields specify the owner name, TTL, Class, and RR type
-   (BULK).  Value "A" indicates that this BULK RR defines the A record
-   type (Address).  Value "pool-A-[0-255]-[0-255].example.com."
-   indicates the Domain Name Pattern.  Value "10.55.${1}.${2}" indicates
-   the Replacement Pattern.  The owner in this example is a wildcard and
-   matches any query ending with the string right of the asterisk.
-
-   EXAMPLE 2
-
-   The following BULK RR stores the reverse block of PTR records for the
-   first example.
-
-   *.55.10.in-addr.arpa. 86400 IN BULK PTR (
-                                \[0-255].\[0-255].55.10.in-addr.arpa.
-                                pool-A-${1}-${2}.example.com.
-                            )
-
-   The first four fields specify the owner name, TTL, Class, and RR type
-   (BULK).  Value "PTR" indicates that this BULK RR defines the PTR
-   record type (Pointer).  Value "[0-255].[0-255].55.10.in-addr.arpa."
-   indicates the Domain Name Pattern.  Value "pool-
-   A-${1}-${2}.example.com." indicates the Replacement Pattern.  The
-   owner in this example is a wildcard and matches any query ending with
-   the string right of the asterisk.
-
-   Additional examples can be found in the "BULK Replacement" section.
+   It is suggested that lines longer than 80 characters be wrapped with
+   standard master file parenthetical line continuation, per [RFC1035]
+   Section 5.1, starting after Match Type and ending after Replacement
+   Pattern.
 
 3.  BULK Replacement
 
-   The BULK Record is designed to enable DNS zone maintainers to manage
-   large blocks of DNS RRs which all conform to a common pattern.  The
-   Domain Name Pattern field provides both a tertiary filter (after
-   owner and type) and a definition of all numeric pattern ranges.
+   When an authoritative nameserver receives a query for which it does
+   not have an explicitly matching name, it then looks for a covering
+   wildcard as per [RFC1035]FIXME.  It then selects all BULK RRs with a
+   Match Type that matches the query type and a Domain Name Pattern that
+   matches the query name.  Note that query type ANY will select all
+   Match Types, and all query types match a CNAME [ and DNAME? ] Match
+   Type.  One or more answer RRs will be generated per the replacement
+   rules below.
 
-   When a query is first received by a DNS nameserver it begins its job
-   of locating an answer-set.  In its simplest form this begins by
-   locating the query owner (or wildcard suffix), class and type then
-   returning any matching RR RDATA (or errors).
+   [ I don't really grok hidden wildcards myself and have _currently_
+   elided discussion of them, to be possibly added back depending on our
+   conference call. - tale ]
 
-   In the event no matches for the query are found the nameserver of
-   authority will return an error type defined as NXDOMAIN.  In the case
-   of a "BULK" enabled authoritative nameserver an additional step MUST
-   be performed.  The nameserver MUST query its local RR database for
-   any "BULK" RRs with a matching owner, class and compatible Match
-   Type.  If any such RRs are found the query's owner MUST then be
-   matched against the Domain Name Pattern and all matching BULK records
-   MUST be placed into a temporary processing answer-set.  This
-   temporary processing answer-set MUST then follow the Replacement
-   Pattern for each matched record and provided no errors are found
-   SHALL then write this new answer-set to the query's complete answer
-   set.  Matching replacements will be of the type specified in the
-   Match Type field of the corresponding BULK RR.  Additional detail is
-   provided in the following sections.
+3.1.  Matching the BULK "Domain Name Pattern" field
 
-3.1.  Matching BULK "owner" field
+   Simple name matching is determined by use of a single hyphen, "-", as
+   the value for the Domain Name Pattern.  This assumes everything
+   matches, and all hexadecimal or decimal fields will be captured for
+   use as references in the Replacement Pattern as described below.
+   Simple matching by the solitary hyphen is often preferred for large
+   blocks such as the reverse IPv6 address space for the simplicity of
+   record management.
 
-   The owner field of all BULK records MUST be that of either a wildcard
-   or hidden wildcard as defined in previous sections.  While a hidden
-   wildcard will not be searched for BULK records it will be added to
-   the database for use with the corresponding type field of each BULK
-   RR.  This allows location of BULK records to be less conspicuous to
-   the public while still leveraging logic already included in the
-   nameserver thus minimizing the complexity of implementation.
+   Advanced name matching, while more complex, is designed to be both
+   simple to implement and simple to use.  Below is an example
+   implementation for label matching using a combination of parsing by
+   regular expression and matching of numeric ranges.
 
-   A query SHALL pass the first filter stage (owner match) ONLY IF: (1)
-   an NXDOMAIN is set as the query's current answer set AND (2) the
-   query's owner ends with the BULK record's owner field past the
-   leading hyphen "-" or asterisk "*".
+   Numeric ranges are either decimal or hexadecimal, as determined by
+   conditions of the query. [ I appreciate where you're going with this
+   to trying to be more intuitive for zone maintainers, but wonder
+   whether this hasn't increased implementation complexity for only
+   minimal benefit.  Especially so with the automatic reference
+   direction described later which is also trying to be intuitive. ]
 
-3.2.  Matching the BULK "Match Type" field
+   o  If query type is A, ranges are set to decimal.
 
-   The RR type of the received query must be compatible with that of the
-   Match Type of owners matched in the section above.  That is to say a
-   query for an "A" record will only match BULK records with matching
-   owner and Match Types of "A" (or "CNAME").  All other BULK records
-   matching the query's owner are incompatible and MUST be ignored as
-   part of the selected answer set.
+   o  If query type is AAAA, ranges are set to hexadecimal.
 
-3.3.  Matching the BULK "Domain Name Pattern" field
-
-   Assuming the RR owner and Match Type fields match the next step is to
-   find compatible Domain Name Patterns.  The logic for this falls into
-   two categories; automatic and manual which are described in greater
-   detail in the following sections.
-
-3.3.1.  Automatic Domain Name Pattern matching
-
-   Automatic Domain Name Pattern matching is determined by use of a
-   single hyphen "-" as the value for Domain Name Pattern field.  This
-   assumes everything matches and all hexadecimal or decimal fields will
-   be captured for use as backreferences in the Replacement Pattern
-   (described below).  Automatic Domain Name Pattern matching is often
-   preferred for large blocks such as the reverse IPv6 address space for
-   the simplicity of record management.
-
-3.3.2.  Manual Domain Name Pattern matching
-
-   Manual Domain Name Pattern matching, while more complex is designed
-   to be both simple to implement and simple to use.  Below is an
-   example implementation for label matching using a combination of
-   parsing by regular expression and matching of numeric ranges.
-
-   Domain Name Patterns evaluate to current zone ORIGIN as defined in
-   [RFC1034], Section 3.  In short this means all Manual Domain Name
-   Patterns must be terminated with a period "." or are assumed relative
-   to the RR's origin.
-
-   Numeric Ranges are either decimal or hexadecimal as determined by
-   conditions of query.
-
-   o  If query type is "A" ranges are set to decimal.
-
-   o  If query type is "AAAA" ranges are set to hexadecimal.
-
-   o  If query type is PTR or CNAME the RR owner is used to determine
-      decimal or hexadecimal.
+   o  If query type is PTR or Match Type is CNAME, the RR owner is used
+      to determine decimal or hexadecimal.
 
    ** If RR owner ends in ".ip6.arpa.", ranges are set to hexadecimal.
 
@@ -484,195 +344,66 @@ Table of Contents
    range specification and MUST NOT appear anywhere outside of a range
    specification.
 
-3.3.2.1.  Manual Domain Name Pattern matching examples
-
-   EXAMPLE 1 For this example the query is defined as a PTR record for
-   "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating
-   BULK RR as:
-
-   -.2.10.in-addr.arpa. 86400 IN BULK PTR (
-                                          \[0-255].\[0-10]
-                                          pool-A-${1}-${2}.example.com.
-                                          )
-
-   STEP 1 Ensure "Domain Name Pattern" is Fully Qualified
-
-   [0-255].[0-10] == [0-255].[0-10].2.10.in-addr.arpa.
-
-   STEP 2 Determine whether range is decimal or hexadecimal
-
-   Query type == "PTR" AND RR owner != "*.ip6.arpa." so range is
-   decimal.
-
-   STEP 3 Build regular expression based on fully qualified domain name
-   pattern.
-
-      \[0-255].\[0-10].2.10.in-addr.arpa. ==
-           /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
-
-   The above regular expression simply matches numeric ranges based on
-   decimal or hexadecimal and length.  Numeric range validation occurs
-   in the next step.
-
-   STEP 4 Compare captured numbers and validate ranges
-
-      4.3.2.10.in-addr.arpa. =~
-           /^(\[0-9]{1,3})\.(\[0-9]{1,2})\.2\.10\.in-addr\.arpa\.$/
-
-   "4" is captured and within range 0-255 (decimal) "3" is captured and
-   within range 0-10 (decimal)
-
-   EXAMPLE 2
-
-   For this example the query is defined as a PTR record for "fc00::55"
-   with an origin of "0.0.c.f.ip6.arpa." and the evaluating BULK RR as:
-
-   -.0.0.c.f.ip6.arpa. 86400 IN BULK PTR (
-                                 -
-                                 pool-${1-16|}-${17-28|}.example.com.
-                             )
-
-   STEP 1 Ensure "Domain Name Pattern" is Fully Qualified
-
-      - == \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
-           \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
-           \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].   ~~
-           \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa.
-
-   NOTE: Data above is shown in multiple lines for clarity.
-
-   Since Hyphen invokes "Automatic Domain Name Pattern" matching, all
-   fields are captured for future use as backreferences.
-
-   STEP 2 Determine whether range is decimal or hexadecimal
-
-   Query type == "PTR" AND RR owner == "*.ip6.arpa." so range is
-   hexadecimal.
-
-   STEP 3 Build regular expression based on fully qualified domain name
-   pattern.
-
-   \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
-   \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
-   \[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].\[0-f].          ~~
-   \[0-f].\[0-f].\[0-f].\[0-f].0.0.c.f.ip6.arpa. ==
-                  /^(\[0-9a-f]{1}\.){28}\.0\.0\.c\.f\.ip6\.arpa\.$/
-
-   NOTE: Data above is shown in multiple lines for clarity.
-
-   The above regular expression simply matches numeric ranges based on
-   decimal or hexadecimal and length.  Numeric range validation occurs
-   in the next step.
-
-   STEP 4 Compare captured numbers and validate ranges
-
-   5.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.                            ~~
-   0.0.0.0.0.0.0.0.0.0.0.0.0.0.c.f.ip6.arpa.
-               =~ /^(\[0-9a-f]{1}\.){28}\.0\.0\.c\.f\.ip6\.arpa\.$/
-
-   NOTE: Data above is shown in multiple lines for clarity.
-
-   "5" is captured and within range 0-f (hexadecimal)
-   "5" is captured and within range 0-f (hexadecimal)
-   ...
-   "0" is captured and within range 0-f (hexadecimal)
-   "0" is captured and within range 0-f (hexadecimal)
-
-   EXAMPLE 3 For this example the query is defined as an "AAAA" record
-   for "pool-A-ff-aa.example.com." with an origin of "example.com." and
-   the evaluating BULK RR as:
-
-   -.example.com. 86400 IN BULK AAAA (
-                                      pool-A-\[0-ffff]-\[0-ffff]
-                                      fc00::${1}:${2}
-                                     )
-
-   STEP 1 Ensure "Domain Name Pattern" is Fully Qualified
-
-   pool-A-[0-ffff]-[0-ffff] == pool-A-[0-ffff]-[0-ffff].example.com.
-
-   STEP 2 Determine whether range is decimal or hexadecimal
-
-   Query type == "AAAA" so range is hexadecimal.
-
-   STEP 3 Build regular expression based on fully qualified domain name
-   pattern.
-
-   pool-A-\[0-ffff]-\[0-ffff].example.com. ==
-        /^pool-A(-(\[0-9a-fA-F]{1,4})){2}\.example\.com\.$/
-
-   The above regular expression simply matches numeric ranges based on
-   decimal or hexadecimal and length.  Numeric range validation occurs
-   in the next step.
-
-   STEP 4 Compare captured numbers and validate ranges
-
-   pool-A-ff-aa.example.com. =~
-     /^pool-A-(\[0-9a-fA-F]{1,4})-(\[0-9a-fA-F]{1,4})\.example\.com\.$/
-
-   "ff" is captured and within range 0-ffff (hexadecimal) "aa" is
-   captured and within range 0-ffff (hexadecimal)
-
-3.4.  Record Generation using the BULK "Replacement Pattern" field
+3.2.  Record Generation using the BULK "Replacement Pattern" field
 
    Once it has been determined a query meets all criteria for a BULK
    record generation the below rules are followed to process captured
    numeric data and Replacement Pattern into RRs to apply to the answer-
    set.
 
-3.4.1.  Replacement Pattern Backreferences
+3.2.1.  Replacement Pattern References
 
    Before a record may be generated data must be captured in the Domain
    Name Pattern comparison step above.  Each provided numeric range is
    assigned to a temporary buffer to be used in this step.  To make the
    jobs' of zone administrators easier the order of these buffers will
    change based on the Match Type and owner so they will default to feel
-   more natural or intuitive.  Captured patterns and backreferences are
-   in the same vein as regular expressions and are intended to feel
+   more natural or intuitive.  Captured patterns and references are in
+   the same vein as regular expressions and are intended to feel
    "familiar".  This is described in further detail (with examples) in
    the sections below.
 
-3.4.1.1.  Backreference Notation
+3.2.1.1.  Reference Notation
 
    BULK RRs use a dollar-sign "$" and curly braces "{" and "}" to
-   enclose backreferences within the Replacement Pattern.  The following
+   enclose references within the Replacement Pattern.  The following
    rules are used to determine the final replacement string.
 
-3.4.1.1.1.  Simple numeric backreference replacement
+3.2.1.1.1.  Simple numeric reference replacement
 
-   The simplest form of backreference notation is its numeric form.  In
-   this form only the backreference number falls between the curly
-   braces "{" and "}".  An example is "${1}" which would be replaced by
-   the value in the first capture position.  Position is described in
-   detail in a later section.
+   The simplest form of reference notation is its numeric form.  In this
+   form only the reference number falls between the curly braces "{" and
+   "}".  An example is "${1}" which would be replaced by the value in
+   the first capture position.  Position is described in detail in a
+   later section.
 
-   Numeric backreference replacement indices start with one "1" to
-   maintain consistency with regular expression backreferences.
+   Numeric reference replacement indices start with one "1" to maintain
+   consistency with regular expression references.
 
-3.4.1.1.2.  Star backreference replacement
+3.2.1.1.2.  Star reference replacement
 
-   The next form of backreference notation is its star (or asterisk "_")
+   The next form of reference notation is its star (or asterisk "_")
    form.  In this form only an asterisk falls between the curly braces
    "{" and "}".  This form "${_}" would be replaced by all captured
    values in order of ascending position delimited by its default
    delimiter (described below).  Position is described in detail in a
    later section.
 
-3.4.1.1.3.  Numeric range backreference replacement
+3.2.1.1.3.  Numeric range reference replacement
 
-   The next form of backreference notation is the numeric range form.
-   In this form a range of numbers falls between the curly braces "{"
-   and "}".  An example of this is "${1-4}" which would be replaced by
-   all captured values within this range (1-4) in order of positions
+   The next form of reference notation is the numeric range form.  In
+   this form a range of numbers falls between the curly braces "{" and
+   "}".  An example of this is "${1-4}" which would be replaced by all
+   captured values within this range (1-4) in order of positions
    provided delimited its default delimiter (described below).  To
    reverse the order of positions in this example one could simply
    reverse the upper and lower values to look like "${4-1}".  Position
    is described in detail in a later section.
 
-3.4.1.1.4.  Numeric set backreference replacement
+3.2.1.1.4.  Numeric set reference replacement
 
-   The next form of backreference notation is the numeric set form.  In
-   this form a set of numbers falls between the curly braces "{" and "}"
+   The next form of reference notation is the numeric set form.  In this
+   form a set of numbers falls between the curly braces "{" and "}"
    separated by commas.  An example of this is "${1,4}" which would be
    replaced by the first and fourth captured values in the order of
    position provided delimited its default delimiter (described below).
@@ -682,7 +413,7 @@ Table of Contents
    specific positions or position ranges to be used.  Examples would be
    "${3,2,1,4-8}" and "${8-12,1-4}".
 
-3.4.1.1.5.  Backreference delimiter
+3.2.1.1.5.  Reference delimiter
 
    The above sections reference a default delimiter.  In an effort to
    provide an intuitive zone management experience the default delimiter
@@ -690,36 +421,35 @@ Table of Contents
    default delimiter SHALL be a period ".", for Match Type "AAAA" the
    default delimiter SHALL be a colon ":" and for Match Types "PTR" and
    "CNAME" the default delimiter SHALL be a hyphen "-".  In any case the
-   default delimiter MAY be overridden by including it in the
-   backreference braces after the set selectors and a backreference
-   field separator character, the pipe "|".  An example would be
-   "${_|-}" which would force a hyphen "-" delimiter.  An empty or null
-   delimiter is allowed by not specifying a delimiter character, for
-   example "${_|}", which would simply concatenate all captured values
-   in order of capture position.  Position is described in detail in a
-   later section.
+   default delimiter MAY be overridden by including it in the reference
+   braces after the set selectors and a reference field separator
+   character, the pipe "|".  An example would be "${_|-}" which would
+   force a hyphen "-" delimiter.  An empty or null delimiter is allowed
+   by not specifying a delimiter character, for example "${_|}", which
+   would simply concatenate all captured values in order of capture
+   position.  Position is described in detail in a later section.
 
-3.4.1.1.6.  Backreference delimiter interval
+3.2.1.1.6.  Reference delimiter interval
 
-   The default behavior of a backreference set is to combine each
-   captured value specified with a delimiter between each.  To allow
-   captured backreferences to be delimited at another interval a third
-   backreference field is provided.  An example would be "${*|-|4}"
-   which would concatenate all captured values but delimiting only every
-   fourth value with hyphens "-".  This can be a handy feature in the
-   IPv6 reverse namespace where every nibble is captured as a separate
-   value and generated hostnames include sets of 4 nibbles.  An empty or
-   null value MUST be interpreted as "1" or every captured value.
+   The default behavior of a reference set is to combine each captured
+   value specified with a delimiter between each.  To allow captured
+   references to be delimited at another interval a third reference
+   field is provided.  An example would be "${*|-|4}" which would
+   concatenate all captured values but delimiting only every fourth
+   value with hyphens "-".  This can be a handy feature in the IPv6
+   reverse namespace where every nibble is captured as a separate value
+   and generated hostnames include sets of 4 nibbles.  An empty or null
+   value MUST be interpreted as "1" or every captured value.
 
-3.4.1.1.7.  Backreference padding length
+3.2.1.1.7.  Reference padding length
 
    When generating BULK based records a common requirement is to convert
    from one numeric format to another, padding is among the most common
-   of these.  The fourth and final backreference field determines what
-   width to pad to.  An example would be "${_|||4}" which would set the
-   width of all captured values to 4 by inserting leading zeros to fill
-   the void.  The default is empty or null which MUST be interpreted as
-   NO modification.  A width of zero "0" has a special interpretation
+   of these.  The fourth and final reference field determines what width
+   to pad to.  An example would be "${_|||4}" which would set the width
+   of all captured values to 4 by inserting leading zeros to fill the
+   void.  The default is empty or null which MUST be interpreted as NO
+   modification.  A width of zero "0" has a special interpretation
    referred to as "unpad" meaning all leading zeros MUST be removed.  If
    a value is provided captured values longer than this width MUST be
    truncated to fit the specified width.  In the case where a delimiter
@@ -729,7 +459,7 @@ Table of Contents
    combine each range of 4 captured values and pad them to a width of 4
    characters by inserting leading zeros where necessary.
 
-3.4.1.1.8.  Backreference Position
+3.2.1.1.8.  Reference Position
 
    Great effort has gone into providing zone maintainers an intuitive
    syntax.  As part of this effort, the captured values will reverse
@@ -757,18 +487,17 @@ Table of Contents
    Match Type RRs for "A" (Address), "AAAA" (IPv6 Address) and "CNAME"
    (Canonical Name) are forward.
 
-3.4.1.1.9.  Backreference Position Negation
+3.2.1.1.9.  Reference Position Negation
 
-   To allow simple reversal of any backreference notation a single
+   To allow simple reversal of any reference notation a single
    exclamation point character "!"  MAY be used as the first character
-   of a backreference set.  Examples would be "${!*}" and "${!1-4,7}".
-   In both of the examples the backreference positions SHALL be the
-   exact mirror equivalent as those without the leading exclamation
-   point "!".  This can be very important if the BULK generated
-   replacements have values in positions opposite to what is required or
-   expected.
+   of a reference set.  Examples would be "${!*}" and "${!1-4,7}".  In
+   both of the examples the reference positions SHALL be the exact
+   mirror equivalent as those without the leading exclamation point "!".
+   This can be very important if the BULK generated replacements have
+   values in positions opposite to what is required or expected.
 
-3.4.2.  Replacement Pattern examples
+3.2.2.  Replacement Pattern examples
 
    This section provides examples of several BULK RR Replacement
    Patterns.  Each example is intended to further understanding for
@@ -791,19 +520,18 @@ Table of Contents
    Type are accepted and will be captured for use in the Replacement
    Pattern.
 
-   Third, the Replacement Pattern contains a single "star" backreference
-   denoting all captured numeric (decimal) backreferences will be
-   combined with its default delimiter of hyphen "-" (for PTR) and
-   placed into the backreference's position in the answer-set.  Should
-   this generate an invalid hostname the response will be NXDOMAIN
-   unless other BULK records match and are successfully generated
-   without error.
+   Third, the Replacement Pattern contains a single "star" reference
+   denoting all captured numeric (decimal) references will be combined
+   with its default delimiter of hyphen "-" (for PTR) and placed into
+   the reference's position in the answer-set.  Should this generate an
+   invalid hostname the response will be NXDOMAIN unless other BULK
+   records match and are successfully generated without error.
 
    The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates
-   matching backreferences for "4", "3", "2" and "10" then reverses
-   their indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to
-   "3" and "${4}" to "4" respectively.  When applied to the Replacement
-   Pattern the answer becomes "pool-10-2-3-4.example.com.".
+   matching references for "4", "3", "2" and "10" then reverses their
+   indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and
+   "${4}" to "4" respectively.  When applied to the Replacement Pattern
+   the answer becomes "pool-10-2-3-4.example.com.".
 
    EXAMPLE 2 For this example the query is defined as a PTR record for
    "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating
@@ -819,7 +547,7 @@ Table of Contents
    interval and a padding width of 3.
 
    The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates
-   matching backreferences for "4", "3", "2" and "10" and reverses their
+   matching references for "4", "3", "2" and "10" and reverses their
    indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and
    "${4}" to "4" respectively.  When applied to the Replacement Pattern
    the answer becomes "pool-010002003004.example.com.".
@@ -1402,7 +1130,9 @@ Table of Contents
 
    Robert Whelton (CenturyLink, Inc.)
 
-10.  Normative References
+10.  References
+
+10.1.  Normative References
 
    [RFC1034]  Mockapetris, P., "Domain names - concepts and facilities",
               STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987,
@@ -1471,6 +1201,12 @@ Table of Contents
               Set -- 7-bit American Standard Code for Information
               Interchange", ANSI X3.4, 1986.
 
+10.2.  Informative References
+
+   [RFC7719]  Hoffman, P., Sullivan, A., and K. Fujiwara, "DNS
+              Terminology", RFC 7719, DOI 10.17487/RFC7719, December
+              2015, <http://www.rfc-editor.org/info/rfc7719>.
+
 Authors' Addresses
 
    John Woodworth
@@ -1493,7 +1229,19 @@ Authors' Addresses
 
    Shashwath Bindinganaveli Raghavan
    Hughes Network Systems
+   11717 Exploration Lane
+   Germantown  MD 20876
+   USA
 
-   Email: shash.raghu@gmail.com
+   Email: shashwath.bindinganaveliraghavan@hughes.com
+
+
+   David C Lawrence
+   Akamai Technologies
+   150 Broadway
+   Cambridge  MA 02142-1054
+   USA
+
+   Email: tale@akamai.com
 
 ```
