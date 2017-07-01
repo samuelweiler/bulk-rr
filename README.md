@@ -20,9 +20,10 @@ Expires: August 19, 2017                             Akamai Technologies
 Abstract
 
    The BULK DNS resource record type defines a method of pattern-based
-   creation of DNS resource records.  The intent of BULK is to simplify
-   generic assignments in a memory-efficient way that can be easily
-   shared between the primary and secondary nameservers for a zone.
+   creation of DNS resource records based on numeric substrings of query
+   names.  The intent of BULK is to simplify generic assignments in a
+   memory-efficient way that can be easily shared between the primary
+   and secondary nameservers for a zone.
 
 Ed note
 
@@ -121,10 +122,10 @@ Table of Contents
    The BULK DNS resource record defines a pattern-based method for on-
    the-fly resource record generation.  It is essentially an enhanced
    wildcard mechanism, constraining generated resource record owner
-   names to those that match a pattern.  It is also akin to the
-   $GENERATE master file directive [bind-arm] without being limited to
-   numeric values and without creating all possible records in the zone
-   data.
+   names to those that match a pattern of variable numeric substrings.
+   It is also akin to the $GENERATE master file directive [bind-arm]
+   without being limited to numeric values and without creating all
+   possible records in the zone data.
 
    For example, consider the following record:
 
@@ -204,8 +205,10 @@ Table of Contents
    string        =  1*(ctext / quoted-char)
 
    decnum        =  1*decdigit
+                         ; constrained to 65535 maximum.
 
    hexnum        =  1*hexdigit
+                         ; constrained to ffff maximum.
 
    octet         =  %x00-FF
 
@@ -263,11 +266,11 @@ Table of Contents
    generic TYPE mechanism.
 
    Domain Name Pattern is represented as a fully qualified domain name
-   as per [RFC1035] Section 5.1 rules for encoding special and non-
-   printing characters.
+   as per [RFC1035] Section 5.1 rules for encoding whitespace and other
+   special characters.
 
    Replacement Pattern is represented by the standard <character-string>
-   rules for master files as per [RFC1035] section 5.1.
+   text rules for master files as per [RFC1035] section 5.1.
 
    It is suggested that lines longer than 80 characters be wrapped with
    parenthetical line continuation, per [RFC1035] Section 5.1, starting
@@ -394,7 +397,7 @@ Table of Contents
    The NPN resource record provides pre-processing directives for
    Numeric Pattern Normalization (NPN) based RR signature generation.
 
-   The Type value for the NPN RR type is XX.
+   The Type value for the NPN RR type is TBD.
 
    The NPN RR is class independent.
 
