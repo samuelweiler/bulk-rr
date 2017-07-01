@@ -380,10 +380,12 @@
 <link href="#rfc.section.2.1" rel="Chapter" title="2.1 BULK RDATA Wire Format">
 <link href="#rfc.section.2.2" rel="Chapter" title="2.2 The BULK RR Presentation Format">
 <link href="#rfc.section.3" rel="Chapter" title="3 BULK Replacement">
-<link href="#rfc.section.3.1" rel="Chapter" title='3.1 Matching the BULK "Domain Name Pattern" field'>
-<link href="#rfc.section.3.2" rel="Chapter" title='3.2 Record Generation using the BULK "Replacement Pattern" field'>
-<link href="#rfc.section.3.2.1" rel="Chapter" title="3.2.1 Replacement Pattern References">
-<link href="#rfc.section.3.2.2" rel="Chapter" title="3.2.2 Replacement Pattern examples">
+<link href="#rfc.section.3.1" rel="Chapter" title="3.1 Matching the Domain Name Pattern">
+<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Record Generation using Replacement Pattern">
+<link href="#rfc.section.3.2.1" rel="Chapter" title="3.2.1 Delimiters">
+<link href="#rfc.section.3.2.2" rel="Chapter" title="3.2.2 Delimiter intervals">
+<link href="#rfc.section.3.2.3" rel="Chapter" title="3.2.3 Padding length">
+<link href="#rfc.section.3.2.4" rel="Chapter" title="3.2.4 Final processing">
 <link href="#rfc.section.4" rel="Chapter" title="4 The NPN Resource Record">
 <link href="#rfc.section.4.1" rel="Chapter" title="4.1 NPN RDATA Wire Format">
 <link href="#rfc.section.4.1.1" rel="Chapter" title="4.1.1 The Match Type field">
@@ -414,6 +416,10 @@
 <link href="#rfc.references" rel="Chapter" title="10 References">
 <link href="#rfc.references.1" rel="Chapter" title="10.1 Normative References">
 <link href="#rfc.references.2" rel="Chapter" title="10.2 Informative References">
+<link href="#rfc.appendix.A" rel="Chapter" title="A BULK Examples">
+<link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Example 1">
+<link href="#rfc.appendix.A.2" rel="Chapter" title="A.2 Example 2">
+<link href="#rfc.appendix.A.3" rel="Chapter" title="A.3 Example 3">
 <link href="#rfc.authors" rel="Chapter">
 
 
@@ -476,7 +482,7 @@
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
 <p>The BULK DNS resource record type defines a method of pattern-based creation of DNS resource records.  The intent of BULK is to simplify generic assignments in a memory-efficient way that can be easily shared between the primary and secondary nameservers for a zone.</p>
 <h1><a>Ed note</a></h1>
-<p>Text inside square brackets ([]) is additional background information, answers to frequently asked questions, general musings, etc.  They will be removed before publication.  This document is being collaborated on in GitHub at &lt;https://github.com/vttale/serve-stale&gt;.  The most recent version of the document, open issues, etc should all be available here.  The authors gratefully accept pull requests.</p>
+<p>Text inside square brackets ([]) is additional background information, answers to frequently asked questions, general musings, etc.  They will be removed before publication.  This document is being collaborated on in GitHub at &lt;https://github.com/vttale/bulk-rr&gt;.  The most recent version of the document, open issues, etc should all be available here.  The authors gratefully accept pull requests.</p>
 <h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
@@ -503,13 +509,17 @@
 </li>
 </ul><li>3.   <a href="#rfc.section.3">BULK Replacement</a>
 </li>
-<ul><li>3.1.   <a href="#rfc.section.3.1">Matching the BULK "Domain Name Pattern" field</a>
+<ul><li>3.1.   <a href="#rfc.section.3.1">Matching the Domain Name Pattern</a>
 </li>
-<li>3.2.   <a href="#rfc.section.3.2">Record Generation using the BULK "Replacement Pattern" field</a>
+<li>3.2.   <a href="#rfc.section.3.2">Record Generation using Replacement Pattern</a>
 </li>
-<ul><li>3.2.1.   <a href="#rfc.section.3.2.1">Replacement Pattern References</a>
+<ul><li>3.2.1.   <a href="#rfc.section.3.2.1">Delimiters</a>
 </li>
-<li>3.2.2.   <a href="#rfc.section.3.2.2">Replacement Pattern examples</a>
+<li>3.2.2.   <a href="#rfc.section.3.2.2">Delimiter intervals</a>
+</li>
+<li>3.2.3.   <a href="#rfc.section.3.2.3">Padding length</a>
+</li>
+<li>3.2.4.   <a href="#rfc.section.3.2.4">Final processing</a>
 </li>
 </ul></ul><li>4.   <a href="#rfc.section.4">The NPN Resource Record</a>
 </li>
@@ -571,6 +581,14 @@
 </li>
 <li>10.2.   <a href="#rfc.references.2">Informative References</a>
 </li>
+</ul><li>Appendix A.   <a href="#rfc.appendix.A">BULK Examples</a>
+</li>
+<ul><li>A.1.   <a href="#rfc.appendix.A.1">Example 1</a>
+</li>
+<li>A.2.   <a href="#rfc.appendix.A.2">Example 2</a>
+</li>
+<li>A.3.   <a href="#rfc.appendix.A.3">Example 3</a>
+</li>
 </ul><li><a href="#rfc.authors">Authors' Addresses</a>
 </li>
 
@@ -580,22 +598,21 @@
   <h1 id="rfc.section.1">
 <a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
 </h1>
-<p id="rfc.section.1.p.1">The BULK DNS resource record defines a pattern-based method for on-the-fly resource record generation.  It is essentially an enhanced wildcard mechanism, constraining generated resource record owner names to those that match a pattern.  It is also akin to the $GENERATE master file directive (FIXME insert ref to ISC Bv9ARM.ch06.html), without being limited to numeric values and without creating all possible records in the zone data.</p>
+<p id="rfc.section.1.p.1">The BULK DNS resource record defines a pattern-based method for on-the-fly resource record generation.  It is essentially an enhanced wildcard mechanism, constraining generated resource record owner names to those that match a pattern.  It is also akin to the $GENERATE master file directive <a href="#bind-arm" class="xref">[bind-arm]</a> without being limited to numeric values and without creating all possible records in the zone data.</p>
 <p id="rfc.section.1.p.2">For example, consider the following record:</p>
 <pre>
-*.example.com. 86400 IN BULK A (
-                         pool-A-[0-255]-[0-255].example.com.
-                         10.55.${1}.${2}
-                     )
+example.com. 86400 IN BULK A (
+                      pool-A-[0-255]-[0-255].example.com.
+                      10.55.${1}.${2}
+                   )
 </pre>
 <p id="rfc.section.1.p.3">It will answer requests for pool-A-0-0.example.com through pool-A-255-255.example.com with the IPv4 addresses 10.55.0.0 through 10.55.255.255.</p>
 <p id="rfc.section.1.p.4">Much larger record sets can be defined while minimizing the associated requirements for server memory and zone transfer network bandwidth.</p>
 <p id="rfc.section.1.p.5">DNSSEC support is also described.  The Numeric Pattern Normalization (NPN) resource record provides a way of generating pattern-based DNSSEC signatures, and securely performing DNSSEC validation on such signatures.</p>
-<p id="rfc.section.1.p.6">Traditional wildcard substitution logic is extended to allow</p>
 <h1 id="rfc.section.1.1">
 <a href="#rfc.section.1.1">1.1.</a> <a href="#background-and-terminology" id="background-and-terminology">Background and Terminology</a>
 </h1>
-<p id="rfc.section.1.1.p.1">The reader is assumed to be familiar with the basic DNS and DNSSEC concepts described in <a href="#RFC1034" class="xref">[RFC1034]</a>, <a href="#RFC1035" class="xref">[RFC1035]</a>, <a href="#RFC4033" class="xref">[RFC4033]</a>, <a href="#RFC4034" class="xref">[RFC4034]</a>, and <a href="#RFC4035" class="xref">[RFC4035]</a>; subsequent RFCs that update them in <a href="#RFC2181" class="xref">[RFC2181]</a> and <a href="#RFC2308" class="xref">[RFC2308]</a>; and DNS terms in <a href="#RFC7719" class="xref">[RFC7719]</a>.</p>
+<p id="rfc.section.1.1.p.1">ppThe reader is assumed to be familiar with the basic DNS and DNSSEC concepts described in <a href="#RFC1034" class="xref">[RFC1034]</a>, <a href="#RFC1035" class="xref">[RFC1035]</a>, <a href="#RFC4033" class="xref">[RFC4033]</a>, <a href="#RFC4034" class="xref">[RFC4034]</a>, and <a href="#RFC4035" class="xref">[RFC4035]</a>; subsequent RFCs that update them in <a href="#RFC2181" class="xref">[RFC2181]</a> and <a href="#RFC2308" class="xref">[RFC2308]</a>; and DNS terms in <a href="#RFC7719" class="xref">[RFC7719]</a>.</p>
 <p id="rfc.section.1.1.p.2">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <a href="#RFC2119" class="xref">[RFC2119]</a>.</p>
 <h1 id="rfc.section.2">
 <a href="#rfc.section.2">2.</a> <a href="#the-bulk-resource-record" id="the-bulk-resource-record">The BULK Resource Record</a>
@@ -621,186 +638,101 @@
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </pre>
 <p id="rfc.section.2.1.p.2">Match Type identifies the type of the RRset to be generated by this BULK record.  It is two octets corresponding to an RR TYPE code as specified in <a href="#RFC1035" class="xref">[RFC1035]</a>, Section 3.2.1.</p>
-<p id="rfc.section.2.1.p.3">Domain Name Pattern consists of a pattern encoded as a wire-format domain name relative to the zone in which it appears.  Special characters are interpreted as per the following Augmented Backus-Naur Form notation from <a href="#RFC5234" class="xref">[RFC5234]</a>.</p>
+<p id="rfc.section.2.1.p.3">Domain Name Pattern consists of a pattern encoded as a wire-format domain name relative to the zone in which it appears.  Special characters are interpreted as per the following Augmented Backus-Naur Form (ABNF) notation from <a href="#RFC5234" class="xref">[RFC5234]</a>.</p>
 <pre>
-DIGIT          =  %x30-39
-                       ; 0-9
-HEXDIG         =  DIGIT / 0x41-0x46 / 0x61-66
-                       ; 0-9, A-F, a-f
-DQUOTE         =  %x22
-                       ; " (Double Quote)
+match         =  1*(range / string)
 
-pattern        =  "-" / 1*part / DQUOTE 1*part DQUOTE
+range         =  "[" decnum "-" decnum "]" /
+                  "&lt;" hexnum "-" hexnum "&gt;"
+                      ; create references for substitution
 
-part           =  "\[" range "]" / string
+string        =  1*(ctext / quoted-char)
 
-range          =  number [ "-" number ]
+decnum        =  1*decdigit
 
-number         =  1*DIGIT / 1*HEXDIG
+hexnum        =  1*hexdigit
 
-octet          =  %x00-FF
+octet         =  %x00-FF
 
-ctext          =  &lt;any octet excepting "\"&gt;
+decdigit      =  %x30-39
+                      ; 0-9
+hexdigit      =  DIGIT / 0x41-0x46 / 0x61-66
+                      ; 0-9, A-F, a-f
 
-quoted-char    = "\" octet
-                       ; to allow [ and ] as literals
+ctext         =  &lt;any octet excepting "\"&gt;
 
-string         =  *(ctext / quoted-pair)
+quoted-char   = "\" octet
+                       ; to allow special characters as literals
+</pre>
+<p id="rfc.section.2.1.p.4">Interpretation of the Domain Name Pattern is described in detail in the "BULK Replacement" section.</p>
+<p id="rfc.section.2.1.p.5">Replacement Pattern describes how the answer RRset MUST be generated for the matching query.  It uses the following additional ABNF elements:</p>
+<pre>
+replace       =   1*(reference / string)
+
+reference     =   "$" "{" (positions / "*") [options] "}"
+
+positions     =   (position / posrange) 0*("," (position / posrange))
+
+posrange      =   position "-" position
+
+position      =   1*decnum
+
+options       =   delimiter [interval [padding]]
+
+delimiter     =   "|" *1(ctext | quoted-char)
+                        ; "\|" to use "|" as delimiter
+                        ; "\\" to use "\" as delimiter
+
+interval      =   "|" *2DIGIT
+
+padding       =   "|" *2DIGIT
 
 </pre>
-<p id="rfc.section.2.1.p.4">[ Why does DQUOTE need to be a syntactic element?  What function is it serving? ]</p>
-<p id="rfc.section.2.1.p.5">Interpretation of the Domain Name Pattern is described in detail in the "BULK Replacement" section.</p>
-<p id="rfc.section.2.1.p.6">[ I admit this flexibility for strings might be a mistake, and will be calling it out in dnsop specifically for discussion. ]</p>
-<p id="rfc.section.2.1.p.7">Replacement Pattern describes how the answer RRset MUST be generated for the matching query.  It uses this format:</p>
-<p id="rfc.section.2.1.p.8">[ Presumably this could just build on the above but use a different name for part and string (if string ends up being different, which it probably shouldn't)?  There's a lot of redundancy with identical definitions for six other elements, and it is easier for both readers and implementers not to have to keep in mind that the same identifier name, from the same source, has two different definitions ]</p>
-<pre>
-    DIGIT  = &lt;as defined in RFC 5234 Appendix B.1&gt;
-    HEXDIG = &lt;as defined in RFC 5234 Appendix B.1&gt;
-    DQUOTE = &lt;as defined in RFC 5234 Appendix B.1&gt;
-
-    pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
-
-    part                =   reference / string
-
-    reference       =   "$" "{" substitution "}"
-
-    substitution        =   range 0*( "," range ) [ options ]
-
-    substitution        =/  "*" [ options ]
-
-    options             =   delimiter [ interval [ padding ] ]
-
-    delimiter           =   "|" 0*1( %x01-23 / %x25-7A / %7E-7F )
-                               ; Any single [US-ASCII] character
-                               ; excluding NUL, dollar sign "$",
-                               ; pipe "|" and curly brace characters
-                               ; "{" or "}"
-
-    interval            =   "|" *2DIGIT
-
-    padding             =   "|" *2DIGIT
-
-    range               =   number [ "-" number ]
-
-    number              =   1*DIGIT / 1*HEXDIG
-
-    string              =   1*( %x01-23 / %x25-7A / %x7C / %7E-7F )
-                               ; Any [US-ASCII] character excluding
-                               ; NUL, dollar sign "$" and curly brace
-                               ; characters "{" or "}"
-</pre>
-<p id="rfc.section.2.1.p.9">The dollar sign, "$", and curly brace characters, "{" and "}", are reserved to enclose regular-expression-esque references and MUST NOT appear anywhere outside of such a reference specification.  This rigidity is necessary to simplify implementation of this document and may relax once adoption reaches an acceptable level and demand for such an exception exists.  The authors feel this limitation is a reasonable limitation for the flexibility offered by this document.</p>
+<p id="rfc.section.2.1.p.6">[ Is this complexity beyond simple ${1}, ${2}, etc, really worth it?  I definitely see how it could make for shorter replacement patterns, but does it enhance their clarity and usability? ]</p>
 <h1 id="rfc.section.2.2">
 <a href="#rfc.section.2.2">2.2.</a> <a href="#the-bulk-rr-presentation-format" id="the-bulk-rr-presentation-format">The BULK RR Presentation Format</a>
 </h1>
-<p id="rfc.section.2.2.p.1">Match Type is represented as an RR type mnemonic or <a href="#RFC3597" class="xref">[RFC3597]</a>'s generic TYPE mechanism.</p>
-<p id="rfc.section.2.2.p.2">Domain Name Pattern is represented as a fully qualified domain name as per RFC 1035 rules. [ FIXME: Find better reference, if any. ]</p>
+<p id="rfc.section.2.2.p.1">Match Type is represented as an RR type mnemonic or with <a href="#RFC3597" class="xref">[RFC3597]</a>'s generic TYPE mechanism.</p>
+<p id="rfc.section.2.2.p.2">Domain Name Pattern is represented as a fully qualified domain name as per <a href="#RFC1035" class="xref">[RFC1035]</a> Section 5.1 rules for encoding special and non-printing characters.</p>
 <p id="rfc.section.2.2.p.3">Replacement Pattern is represented as with the TXT RR type described in <a href="#RFC1035" class="xref">[RFC1035]</a>, Section 3.3.14.</p>
 <p id="rfc.section.2.2.p.4">It is suggested that lines longer than 80 characters be wrapped with standard master file parenthetical line continuation, per <a href="#RFC1035" class="xref">[RFC1035]</a> Section 5.1, starting after Match Type and ending after Replacement Pattern.</p>
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#bulk-replacement" id="bulk-replacement">BULK Replacement</a>
 </h1>
-<p id="rfc.section.3.p.1">When an authoritative nameserver receives a query for which it does not have an explicitly matching name, it then looks for a covering wildcard as per <a href="#RFC1035" class="xref">[RFC1035]</a>FIXME.  It then selects all BULK RRs with a Match Type that matches the query type and a Domain Name Pattern that matches the query name.  Note that query type ANY will select all Match Types, and all query types match a CNAME [ and DNAME? ] Match Type.  One or more answer RRs will be generated per the replacement rules below.</p>
-<p id="rfc.section.3.p.2">[ I don't really grok hidden wildcards myself and have <em>currently</em> elided discussion of them, to be possibly added back depending on our conference call. &#8211; tale ]</p>
+<p id="rfc.section.3.p.1">When an authoritative nameserver receives a query for which it does not have a matching name or a covering wildcard, it MUST then look for BULK RRs at the zone apex, selecting all BULK RRs with a Match Type that matches the query type and a Domain Name Pattern that matches the query name.  Note that query type ANY will select all Match Types, and all query types match a CNAME Match Type [ and DNAME? ].  One or more answer RRs will be generated per the replacement rules below.  Examples are provided in an appendix.</p>
 <h1 id="rfc.section.3.1">
-<a href="#rfc.section.3.1">3.1.</a> <a href="#matching-the-bulk-domain-name-pattern-field" id="matching-the-bulk-domain-name-pattern-field">Matching the BULK "Domain Name Pattern" field</a>
+<a href="#rfc.section.3.1">3.1.</a> <a href="#matching-the-domain-name-pattern" id="matching-the-domain-name-pattern">Matching the Domain Name Pattern</a>
 </h1>
-<p id="rfc.section.3.1.p.1">Simple name matching is determined by use of a single hyphen, "-", as the value for the Domain Name Pattern.  This assumes everything matches, and all hexadecimal or decimal fields will be captured for use as references in the Replacement Pattern as described below.  Simple matching by the solitary hyphen is often preferred for large blocks such as the reverse IPv6 address space for the simplicity of record management.</p>
-<p id="rfc.section.3.1.p.2">Advanced name matching, while more complex, is designed to be both simple to implement and simple to use.  Below is an example implementation for label matching using a combination of parsing by regular expression and matching of numeric ranges.</p>
-<p id="rfc.section.3.1.p.3">Numeric ranges are either decimal or hexadecimal, as determined by conditions of the query. [ I appreciate where you're going with this to trying to be more intuitive for zone maintainers, but wonder whether this hasn't increased implementation complexity for only minimal benefit.  Especially so with the automatic reference direction described later which is also trying to be intuitive. ]</p>
-<p></p>
-
-<ul>
-<li>If query type is A, ranges are set to decimal.</li>
-<li>If query type is AAAA, ranges are set to hexadecimal.</li>
-<li>If query type is PTR or Match Type is CNAME, the RR owner is used to determine decimal or hexadecimal.</li>
-</ul>
-<p id="rfc.section.3.1.p.5">** If RR owner ends in ".ip6.arpa.", ranges are set to hexadecimal.</p>
-<p id="rfc.section.3.1.p.6">** If RR owner does not end in ".ip6.arpa.", ranges are set to decimal.</p>
-<p id="rfc.section.3.1.p.7">The square bracket characters, "[" and "]", are reserved to enclose a range specification and MUST NOT appear anywhere outside of a range specification.</p>
+<p id="rfc.section.3.1.p.1">A query name matches the Domain Name Pattern if the characters that appear outside the range match exactly and those within numeric ranges have values that fall within the range.  Numeric matches MUST be of the appropriate decimal or hexadecimal type as specified by the delimiters in the pattern.  For example, if a range is given as [0-255], then FF does not match even though its value as a hexadecimal number is within the range.</p>
+<p id="rfc.section.3.1.p.2">When a query name matches a Domain Name Pattern, the value in each numeric range is stored for use by the Replacement Pattern, with reference numbers starting at 1 and counting from the left.  For example, matching the query name host-24-156 against host-[0-255]-[0-255] assigns 24 to ${1} and 156 to ${2}.</p>
 <h1 id="rfc.section.3.2">
-<a href="#rfc.section.3.2">3.2.</a> <a href="#record-generation-using-the-bulk-replacement-pattern-field" id="record-generation-using-the-bulk-replacement-pattern-field">Record Generation using the BULK "Replacement Pattern" field</a>
+<a href="#rfc.section.3.2">3.2.</a> <a href="#record-generation-using-replacement-pattern" id="record-generation-using-replacement-pattern">Record Generation using Replacement Pattern</a>
 </h1>
-<p id="rfc.section.3.2.p.1">Once it has been determined a query meets all criteria for a BULK record generation the below rules are followed to process captured numeric data and Replacement Pattern into RRs to apply to the answer-set.</p>
+<p id="rfc.section.3.2.p.1">The Replacement Pattern generates the record data by replacing the ${&#8230;} references with data captured from the query name, and copying all other characters literally.</p>
+<p id="rfc.section.3.2.p.2">The simplest form of reference uses only the reference number between the braces, "{" and "}".  The value of the reference is simply copied directly from the matching position of the query name.</p>
+<p id="rfc.section.3.2.p.3">The next form of reference notation uses the asterisk, "<em>".  With ${</em>}, all captured values in order of ascending position, delimited by its default delimiter (described below), are placed in the answer.</p>
+<p id="rfc.section.3.2.p.4">Numeric range references, such as ${1-4}, replaces all values captured by those references, in order, delimited by the default delimiter described below.  To reverse the order in which they are copied, reverse the upper and lower values, such as ${4-1}.  This is useful for generating PTR records from query names in which the address is encoded in network order.</p>
+<p id="rfc.section.3.2.p.5">Similar to range references, separating positions by commas creates sets for replacement. For example, ${1,4} would be replaced by the first and fourth captured values, delimited its default delimiter.  This notation may be combined with the numeric range form, such as ${3,2,1,8-4}.</p>
 <h1 id="rfc.section.3.2.1">
-<a href="#rfc.section.3.2.1">3.2.1.</a> <a href="#replacement-pattern-references" id="replacement-pattern-references">Replacement Pattern References</a>
+<a href="#rfc.section.3.2.1">3.2.1.</a> <a href="#delimiters" id="delimiters">Delimiters</a>
 </h1>
-<p id="rfc.section.3.2.1.p.1">Before a record may be generated data must be captured in the Domain Name Pattern comparison step above.  Each provided numeric range is assigned to a temporary buffer to be used in this step.  To make the jobs' of zone administrators easier the order of these buffers will change based on the Match Type and owner so they will default to feel more natural or intuitive.  Captured patterns and references are in the same vein as regular expressions and are intended to feel "familiar".  This is described in further detail (with examples) in the sections below.</p>
-<h1 id="rfc.section.3.2.1.1">
-<a href="#rfc.section.3.2.1.1">3.2.1.1.</a> <a href="#reference-notation" id="reference-notation">Reference Notation</a>
-</h1>
-<p id="rfc.section.3.2.1.1.p.1">BULK RRs use a dollar-sign "$" and curly braces "{" and "}" to enclose references within the Replacement Pattern.  The following rules are used to determine the final replacement string.</p>
-<h1 id="rfc.section.3.2.1.1.1">
-<a href="#rfc.section.3.2.1.1.1">3.2.1.1.1.</a> <a href="#simple-numeric-reference-replacement" id="simple-numeric-reference-replacement">Simple numeric reference replacement</a>
-</h1>
-<p id="rfc.section.3.2.1.1.1.p.1">The simplest form of reference notation is its numeric form.  In this form only the reference number falls between the curly braces "{" and "}".  An example is "${1}" which would be replaced by the value in the first capture position.  Position is described in detail in a later section.</p>
-<p id="rfc.section.3.2.1.1.1.p.2">Numeric reference replacement indices start with one "1" to maintain consistency with regular expression references.</p>
-<h1 id="rfc.section.3.2.1.1.2">
-<a href="#rfc.section.3.2.1.1.2">3.2.1.1.2.</a> <a href="#star-reference-replacement" id="star-reference-replacement">Star reference replacement</a>
-</h1>
-<p id="rfc.section.3.2.1.1.2.p.1">The next form of reference notation is its star (or asterisk "<em>") form.  In this form only an asterisk falls between the curly braces "{" and "}".  This form "${</em>}" would be replaced by all captured values in order of ascending position delimited by its default delimiter (described below).  Position is described in detail in a later section.</p>
-<h1 id="rfc.section.3.2.1.1.3">
-<a href="#rfc.section.3.2.1.1.3">3.2.1.1.3.</a> <a href="#numeric-range-reference-replacement" id="numeric-range-reference-replacement">Numeric range reference replacement</a>
-</h1>
-<p id="rfc.section.3.2.1.1.3.p.1">The next form of reference notation is the numeric range form. In this form a range of numbers falls between the curly braces "{" and "}".  An example of this is "${1-4}" which would be replaced by all captured values within this range (1-4) in order of positions provided delimited its default delimiter (described below).  To reverse the order of positions in this example one could simply reverse the upper and lower values to look like "${4-1}".  Position is described in detail in a later section.</p>
-<h1 id="rfc.section.3.2.1.1.4">
-<a href="#rfc.section.3.2.1.1.4">3.2.1.1.4.</a> <a href="#numeric-set-reference-replacement" id="numeric-set-reference-replacement">Numeric set reference replacement</a>
-</h1>
-<p id="rfc.section.3.2.1.1.4.p.1">The next form of reference notation is the numeric set form.  In this form a set of numbers falls between the curly braces "{" and "}" separated by commas.  An example of this is "${1,4}" which would be replaced by the first and fourth captured values in the order of position provided delimited its default delimiter (described below).  Position is described in detail in a later section.</p>
-<p id="rfc.section.3.2.1.1.4.p.2">This notation may be combined with the numeric range form allowing specific positions or position ranges to be used.  Examples would be "${3,2,1,4-8}" and "${8-12,1-4}".</p>
-<h1 id="rfc.section.3.2.1.1.5">
-<a href="#rfc.section.3.2.1.1.5">3.2.1.1.5.</a> <a href="#reference-delimiter" id="reference-delimiter">Reference delimiter</a>
-</h1>
-<p id="rfc.section.3.2.1.1.5.p.1">The above sections reference a default delimiter.  In an effort to provide an intuitive zone management experience the default delimiter will be based on the BULK RR's Match Type.  For Match Type "A" the default delimiter SHALL be a period ".", for Match Type "AAAA" the default delimiter SHALL be a colon ":" and for Match Types "PTR" and "CNAME" the default delimiter SHALL be a hyphen "-". In any case the default delimiter MAY be overridden by including it in the reference braces after the set selectors and a reference field separator character, the pipe "|".  An example would be "${<em>|-}" which would force a hyphen "-" delimiter.  An empty or null delimiter is allowed by not specifying a delimiter character, for example "${</em>|}", which would simply concatenate all captured values in order of capture position.  Position is described in detail in a later section.</p>
-<h1 id="rfc.section.3.2.1.1.6">
-<a href="#rfc.section.3.2.1.1.6">3.2.1.1.6.</a> <a href="#reference-delimiter-interval" id="reference-delimiter-interval">Reference delimiter interval</a>
-</h1>
-<p id="rfc.section.3.2.1.1.6.p.1">The default behavior of a reference set is to combine each captured value specified with a delimiter between each.  To allow captured references to be delimited at another interval a third reference field is provided.  An example would be "${*|-|4}" which would concatenate all captured values but delimiting only every fourth value with hyphens "-".  This can be a handy feature in the IPv6 reverse namespace where every nibble is captured as a separate value and generated hostnames include sets of 4 nibbles.  An empty or null value MUST be interpreted as "1" or every captured value.</p>
-<h1 id="rfc.section.3.2.1.1.7">
-<a href="#rfc.section.3.2.1.1.7">3.2.1.1.7.</a> <a href="#reference-padding-length" id="reference-padding-length">Reference padding length</a>
-</h1>
-<p id="rfc.section.3.2.1.1.7.p.1">When generating BULK based records a common requirement is to convert from one numeric format to another, padding is among the most common of these.  The fourth and final reference field determines what width to pad to.  An example would be "${<em>|||4}" which would set the width of all captured values to 4 by inserting leading zeros to fill the void.  The default is empty or null which MUST be interpreted as NO modification.  A width of zero "0" has a special interpretation referred to as "unpad" meaning all leading zeros MUST be removed.  If a value is provided captured values longer than this width MUST be truncated to fit the specified width.  In the case where a delimiter interval is provided captured values between the intervals will be concatenated and the padding or unpadding applied as a unit and not individually.  An example of this would be "${</em>||4|4}" which would combine each range of 4 captured values and pad them to a width of 4 characters by inserting leading zeros where necessary.</p>
-<h1 id="rfc.section.3.2.1.1.8">
-<a href="#rfc.section.3.2.1.1.8">3.2.1.1.8.</a> <a href="#reference-position" id="reference-position">Reference Position</a>
-</h1>
-<p id="rfc.section.3.2.1.1.8.p.1">Great effort has gone into providing zone maintainers an intuitive syntax.  As part of this effort, the captured values will reverse direction depending on several factors.</p>
-<p id="rfc.section.3.2.1.1.8.p.2">As a general rule of thumb, if it makes sense the numeric ranges are in reverse order from query to answer then they will be reversed. Otherwise they will be in the same order.</p>
-<p id="rfc.section.3.2.1.1.8.p.3">Take for example a simple reverse DNS lookup, from "10.2.3.4" to "pool-A-3-4.example.com.".  Since DNS zones are arranged according to management authority the records appear reversed numerically. In this example "10.2.3.4" becomes "4.3.2.10.in-addr.arpa.". One would intuitively expect this reversal to be reversed so positional indices of captured values would increment toward the right of the Replacement Pattern.  This expectation is especially important when using range based replacements.</p>
-<p id="rfc.section.3.2.1.1.8.p.4">Formally, the rules for position reversal are as follows:</p>
-<p id="rfc.section.3.2.1.1.8.p.5">Match Type RRs for "PTR" are reversed for zone owners ending in either ".in-addr.arpa." or "ip6.arpa.".  All other Match Type RRs for "PTR" are forward.</p>
-<p id="rfc.section.3.2.1.1.8.p.6">Match Type RRs for "A" (Address), "AAAA" (IPv6 Address) and "CNAME" (Canonical Name) are forward.</p>
-<h1 id="rfc.section.3.2.1.1.9">
-<a href="#rfc.section.3.2.1.1.9">3.2.1.1.9.</a> <a href="#reference-position-negation" id="reference-position-negation">Reference Position Negation</a>
-</h1>
-<p id="rfc.section.3.2.1.1.9.p.1">To allow simple reversal of any reference notation a single exclamation point character "!" MAY be used as the first character of a reference set.  Examples would be "${!*}" and "${!1-4,7}". In both of the examples the reference positions SHALL be the exact mirror equivalent as those without the leading exclamation point "!".  This can be very important if the BULK generated replacements have values in positions opposite to what is required or expected.</p>
+<p id="rfc.section.3.2.1.p.1">A reference can specify a delimiter to use between copied position values by following a vertical bar, "|", with either zero or one characters.  [ Why not any length? ]?  Zero characters, such as in ${1-3|}, means no delimiter is used.  The default delimiter is the hyphen, "-". [ Earlier drafts attempted to make the default delimiter context-dependent, such as by using a period for A requests and a colon for AAAA requests.  This increases implementation complexity as an attempt to make things more intuitive for zone administrators.  However it isn't clear that this is a net gain for ease of use. ]</p>
 <h1 id="rfc.section.3.2.2">
-<a href="#rfc.section.3.2.2">3.2.2.</a> <a href="#replacement-pattern-examples" id="replacement-pattern-examples">Replacement Pattern examples</a>
+<a href="#rfc.section.3.2.2">3.2.2.</a> <a href="#delimiter-intervals" id="delimiter-intervals">Delimiter intervals</a>
 </h1>
-<p id="rfc.section.3.2.2.p.1">This section provides examples of several BULK RR Replacement Patterns.  Each example is intended to further understanding for implementers and DNS administrators alike.</p>
-<p id="rfc.section.3.2.2.p.2">EXAMPLE 1 For this example the query is defined as a PTR record for "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating BULK RR as:</p>
-<pre>
-    - 86400 IN BULK PTR - pool-${*}.example.com.
-</pre>
-<p id="rfc.section.3.2.2.p.3">This example contains several of the features described above.</p>
-<p id="rfc.section.3.2.2.p.4">First, the record owner is simply a single hyphen "-" denoting it is a "hidden wildcard" (wildcard for generated records but not for BULK).</p>
-<p id="rfc.section.3.2.2.p.5">Second, the Domain Name Pattern is also a single hyphen "-" denoting all queries matching the owner's wildcard pattern for the "PTR" Match Type are accepted and will be captured for use in the Replacement Pattern.</p>
-<p id="rfc.section.3.2.2.p.6">Third, the Replacement Pattern contains a single "star" reference denoting all captured numeric (decimal) references will be combined with its default delimiter of hyphen "-" (for PTR) and placed into the reference's position in the answer-set.  Should this generate an invalid hostname the response will be NXDOMAIN unless other BULK records match and are successfully generated without error.</p>
-<p id="rfc.section.3.2.2.p.7">The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates matching references for "4", "3", "2" and "10" then reverses their indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and "${4}" to "4" respectively.  When applied to the Replacement Pattern the answer becomes "pool-10-2-3-4.example.com.".</p>
-<p id="rfc.section.3.2.2.p.8">EXAMPLE 2 For this example the query is defined as a PTR record for "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating BULK RR as:</p>
-<pre>
-- 86400 IN BULK PTR - pool-${*|||3}.example.com.
-</pre>
-<p id="rfc.section.3.2.2.p.9">This example expands on EXAMPLE 1 with the differences outlined below.</p>
-<p id="rfc.section.3.2.2.p.10">The only change to the BULK RR is the Replacement Pattern includes additional fields, specifically null values for delimiter and interval and a padding width of 3.</p>
-<p id="rfc.section.3.2.2.p.11">The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates matching references for "4", "3", "2" and "10" and reverses their indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and "${4}" to "4" respectively.  When applied to the Replacement Pattern the answer becomes "pool-010002003004.example.com.".</p>
-<p id="rfc.section.3.2.2.p.12">EXAMPLE 3 This example contains a classless IPv4 delegation on the /22 CIDR boundary as defined by <a href="#RFC2317" class="xref">[RFC2317]</a>.  The network for this example is</p>
-<p id="rfc.section.3.2.2.p.13">"10.2.0/22" delegated to a nameserver "ns1.sub.example.com.". RRs for this example are defined as:</p>
-<pre>
-$ORIGIN 2.10.in-addr.arpa.
-0-3 86400 IN      NS    ns1.sub.example.com.
--   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
-</pre>
-<p id="rfc.section.3.2.2.p.14">For this example, the query would come in for "25.2.2.10.in-addr.arpa.".  After matching the owner filter (ending in ".2.10.in-addr.arpa.") and the fully qualified domain name pattern of "[0-255].[0-3].2.10.in-addr.arpa." the answer-set would include a generated RR consisting of captured values "25" and "2" joined by the custom delimiter of period "." then joined by ".0-3" and made fully qualified.  The resulting RR would be a "CNAME" with RDATA of "25.2.0-3.2.10.in-addr.arpa.".  This record is now one delegated to "ns1.sub.example.com." as its authority and the answer-set is complete.</p>
+<p id="rfc.section.3.2.2.p.1">A second vertical bar in the reference options introduces a delimiter interval.  The default behavior of a multi-position reference is to combine each captured value specified with a delimiter between each.  With a delimiter interval the delimiters are only added between every Nth value.  For example, ${*|-|4} adds a hyphen between every group of four captured positions.  This can be a handy feature in the IPv6 reverse namespace where every nibble is captured as a separate value and generated hostnames include sets of 4 nibbles.  An empty or 0 value for the delimiter interval MUST be interpreted as the default value of 1.</p>
+<h1 id="rfc.section.3.2.3">
+<a href="#rfc.section.3.2.3">3.2.3.</a> <a href="#padding-length" id="padding-length">Padding length</a>
+</h1>
+<p id="rfc.section.3.2.3.p.1">The fourth and final reference option determines the field width of the copied value.  Shorter values MUST be padded with leading zeroes ("0") and longer values MUST be truncated to the width.</p>
+<p id="rfc.section.3.2.3.p.2">The default behavior, and that of an explicit empty padding length, is that the captured query name substring is copied exactly.  A width of zero "0" is a signal to "unpad", and any leading zeros MUST be removed. [ Unnecessary complexity? ]</p>
+<p id="rfc.section.3.2.3.p.3">If a delimiter interval greater than 1 is used, captured values between the intervals will be concatenated and the padding or unpadding applied as a unit and not individually.  An example of this would be ${*||4|4} which would combine each range of 4 captured values and pad or truncate them to a width of 4 characters.</p>
+<p id="rfc.section.3.2.3.p.4">[ If this is kept, the element/feature should probably be renamed from "padding" since it is just as likely to truncate. ]</p>
+<h1 id="rfc.section.3.2.4">
+<a href="#rfc.section.3.2.4">3.2.4.</a> <a href="#final-processing" id="final-processing">Final processing</a>
+</h1>
+<p id="rfc.section.3.2.4.p.1">The TTL of each RR generated by a BULK RR is the TTL of the corresponding BULK record itself.  [ BULK should probably have its own TTL field.  ]</p>
+<p id="rfc.section.3.2.4.p.2">If the generated record type is one that uses domain names in its resource record data, such as CNAME, any relative domain names MUST be fully qualified with the origin domain of the BULK RR.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#the-npn-resource-record" id="the-npn-resource-record">The NPN Resource Record</a>
 </h1>
@@ -906,7 +838,7 @@ Bit    7: Hexadecimal (X) Flag
 <p id="rfc.section.4.3.2.p.1">EXAMPLE 1 For this example the query is defined as a PTR record for "10.2.3.44" with an origin of "2.10.in-addr.arpa." and the evaluating BULK and NPN RR as:</p>
 <pre>
    -.2.10.in-addr.arpa. 86400 IN BULK PTR (
-                                       \[0-255].\[0-10]
+                                       [0-255].[0-10]
                                        pool-A-${1}-${2}.example.com.
                                        )
    *.2.10.in-addr.arpa. 86400 IN NPN  PTR 9 0 7 13
@@ -929,7 +861,7 @@ Bit    7: Hexadecimal (X) Flag
 <pre>
 $ORIGIN 2.10.in-addr.arpa.
 0-3 86400 IN      NS    ns1.sub.example.com.
--   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
+-   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
 *   86400 IN NPN  CNAME 9 0 0 23
 </pre>
 <p id="rfc.section.4.3.2.p.8">For this example, a query of "10.2.2.65" would enter the nameserver as "65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of "65.2.0-3.2.10.in-addr.arpa." would be generated.</p>
@@ -948,7 +880,7 @@ $ORIGIN 2.10.in-addr.arpa.
 <p id="rfc.section.4.3.2.p.12">EXAMPLE 3 This example provides reverse logic for example 1 by providing an IPv4 "A" record for a requested hostname.  For this example the query is defined as an "A" record for "pool-A-3-44.example.com." with an origin of "example.com.".  RRs for this example are defined as:</p>
 <pre>
 -.example.com. 86400 IN BULK A (
-                                   pool-A-\[0-10]-\[0-255]
+                                   pool-A-[0-10]-[0-255]
                                    10.2.${*}
                                   )
 *.example.com. 86400 IN NPN  A 9 0 8 0
@@ -968,7 +900,7 @@ $ORIGIN 2.10.in-addr.arpa.
 <p id="rfc.section.4.3.2.p.16">EXAMPLE 4 This example provides similar logic for an IPv6 AAAA record.  For this example the query is defined as an "AAAA" record for "pool-A-ff-aa.example.com." with an origin of "example.com.".  RRs for this example are defined as:</p>
 <pre>
 -.example.com. 86400 IN BULK AAAA (
-                                   pool-A-\[0-ffff]-\[0-ffff]
+                                   pool-A-[0-ffff]-[0-ffff]
                                    fc00::${1}:${2}
                                   )
 *.example.com. 86400 IN NPN  AAAA X 0 30 0
@@ -1001,7 +933,7 @@ $ORIGIN 2.10.in-addr.arpa.
 <a href="#rfc.section.5.1">5.1.</a> <a href="#record-superimposition" id="record-superimposition">Record Superimposition</a>
 </h1>
 <p id="rfc.section.5.1.p.1">The main side-effect of the BULK RR design is superimposition.  RRs created by the BULK generation process generally rely on the logic of wildcard assignment.  This logic only provides answers where no others exist.  This means in the reverse DNS world (network assignment) HUGE blocks of addresses can be assigned a single BULK record and where delegated to another customer or SWIP will be automatically overridden.</p>
-<p id="rfc.section.5.1.p.2">When compared with bind's $GENERATE statement, if a singleton record such as CNAME appears within a $GENERATE range, either the CNAME or $GENERATE becomes invalid.  While a BULK record range would automatically notch out the CNAME without user intervention or creating a potential management problem for the future when two $GENERATES create a hole where the CNAME no longer exists.  BULK RRs would again automatically reassign the missing record to one of its own.</p>
+<p id="rfc.section.5.1.p.2">When compared with BIND's $GENERATE statement, if a singleton record such as CNAME appears within a $GENERATE range, either the CNAME or $GENERATE becomes invalid.  While a BULK record range would automatically notch out the CNAME without user intervention or creating a potential management problem for the future when two $GENERATES create a hole where the CNAME no longer exists.  BULK RRs would again automatically reassign the missing record to one of its own.</p>
 <h1 id="rfc.section.5.2">
 <a href="#rfc.section.5.2">5.2.</a> <a href="#pattern-based-dnssec-support" id="pattern-based-dnssec-support">Pattern Based DNSSEC support</a>
 </h1>
@@ -1063,13 +995,12 @@ $ORIGIN 2.10.in-addr.arpa.
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
 </h1>
-<p id="rfc.section.8.p.1">IANA is requested to assign numbers for two DNS resource record types identified in this document; BULK and NPN.</p>
+<p id="rfc.section.8.p.1">IANA is requested to assign numbers for two DNS resource record types identified in this document: BULK and NPN.</p>
 <h1 id="rfc.section.9">
 <a href="#rfc.section.9">9.</a> <a href="#acknowledgments" id="acknowledgments">Acknowledgments</a>
 </h1>
 <p id="rfc.section.9.p.1">This document was created as an extension to the DNS infrastructure. As such, many people over the years have contributed to its creation and the authors are appreciative to each of them even if not thanked or identified individually.</p>
-<p id="rfc.section.9.p.2">A special thanks is extended for the kindness, wisdom and technical advice of:</p>
-<p id="rfc.section.9.p.3">Robert Whelton (CenturyLink, Inc.)</p>
+<p id="rfc.section.9.p.2">A special thanks is extended for the kindness, wisdom and technical advice of Robert Whelton (CenturyLink, Inc.) and</p>
 <h1 id="rfc.references">
 <a href="#rfc.references">10.</a> References</h1>
 <h1 id="rfc.references.1">
@@ -1106,21 +1037,6 @@ $ORIGIN 2.10.in-addr.arpa.
 <a>Eidnes, H.</a>, <a>de Groot, G.</a> and <a>P. Vixie</a>, "<a href="http://tools.ietf.org/html/rfc2317">Classless IN-ADDR.ARPA delegation</a>", BCP 20, RFC 2317, DOI 10.17487/RFC2317, March 1998.</td>
 </tr>
 <tr>
-<td class="reference"><b id="RFC2536">[RFC2536]</b></td>
-<td class="top">
-<a>Eastlake 3rd, D.</a>, "<a href="http://tools.ietf.org/html/rfc2536">DSA KEYs and SIGs in the Domain Name System (DNS)</a>", RFC 2536, DOI 10.17487/RFC2536, March 1999.</td>
-</tr>
-<tr>
-<td class="reference"><b id="RFC2931">[RFC2931]</b></td>
-<td class="top">
-<a>Eastlake 3rd, D.</a>, "<a href="http://tools.ietf.org/html/rfc2931">DNS Request and Transaction Signatures ( SIG(0)s )</a>", RFC 2931, DOI 10.17487/RFC2931, September 2000.</td>
-</tr>
-<tr>
-<td class="reference"><b id="RFC3110">[RFC3110]</b></td>
-<td class="top">
-<a>Eastlake 3rd, D.</a>, "<a href="http://tools.ietf.org/html/rfc3110">RSA/SHA-1 SIGs and RSA KEYs in the Domain Name System (DNS)</a>", RFC 3110, DOI 10.17487/RFC3110, May 2001.</td>
-</tr>
-<tr>
 <td class="reference"><b id="RFC3597">[RFC3597]</b></td>
 <td class="top">
 <a>Gustafsson, A.</a>, "<a href="http://tools.ietf.org/html/rfc3597">Handling of Unknown DNS Resource Record (RR) Types</a>", RFC 3597, DOI 10.17487/RFC3597, September 2003.</td>
@@ -1145,19 +1061,77 @@ $ORIGIN 2.10.in-addr.arpa.
 <td class="top">
 <a>Crocker, D.</a> and <a>P. Overell</a>, "<a href="http://tools.ietf.org/html/rfc5234">Augmented BNF for Syntax Specifications: ABNF</a>", STD 68, RFC 5234, DOI 10.17487/RFC5234, January 2008.</td>
 </tr>
-<tr>
-<td class="reference"><b id="us-ascii">[us-ascii]</b></td>
-<td class="top">
-<a>American National Standards Institute</a>, "<a>Coded Character Set -- 7-bit American Standard Code for Information Interchange</a>", ANSI X3.4, 1986.</td>
-</tr>
 </tbody></table>
 <h1 id="rfc.references.2">
 <a href="#rfc.references.2">10.2.</a> Informative References</h1>
-<table><tbody><tr>
+<table><tbody>
+<tr>
+<td class="reference"><b id="bind-arm">[bind-arm]</b></td>
+<td class="top">
+<a>Internet Systems Consortium</a>, "<a href="https://ftp.isc.org/isc/bind9/cur/9.9/doc/arm/Bv9ARM.html">BIND 9 Configuration Reference</a>", 2016.</td>
+</tr>
+<tr>
 <td class="reference"><b id="RFC7719">[RFC7719]</b></td>
 <td class="top">
 <a>Hoffman, P.</a>, <a>Sullivan, A.</a> and <a>K. Fujiwara</a>, "<a href="http://tools.ietf.org/html/rfc7719">DNS Terminology</a>", RFC 7719, DOI 10.17487/RFC7719, December 2015.</td>
-</tr></tbody></table>
+</tr>
+</tbody></table>
+<h1 id="rfc.appendix.A">
+<a href="#rfc.appendix.A">Appendix A.</a> <a href="#bulk-examples" id="bulk-examples">BULK Examples</a>
+</h1>
+<h1 id="rfc.appendix.A.1">
+<a href="#rfc.appendix.A.1">A.1.</a> <a href="#example-1" id="example-1">Example 1</a>
+</h1>
+<pre>
+$ORIGIN 2.10.in-addr.arpa.
+@ 86400 IN BULK PTR (
+          [0-255].[0-255].2.10.in-addr.arpa.
+          pool-${*}.example.com.
+        )
+</pre>
+<p id="rfc.section.A.1.p.1">A query received for the PTR of 4.3.2.10.in-addr.arpa will create the references ${1} and ${2} with values 4 and 3, respectively.  The ${*} reference in the replacement pattern will then substitute them with the default delimiter of hyphen between every character and no special field width modifications.  The TTL of the BULK RR is used for the generated record, making the response:</p>
+<pre>
+4.3.2.10.in-addr.arpa 86400 IN PTR pool-4-3.example.com.
+</pre>
+<p id="rfc.section.A.1.p.2">[ John and Dean, I realize that without the automagic and reference creation of the whole name as was described by earlier drafts, this example materially changes by not only not having the numeric order unreversed, but also by not including the 10 and the 2 in the generated name.  With the current definition you would get the same result as the original simply by using:</p>
+<pre>
+   @ 86400 IN BULK PTR (
+          [0-255].[0-255].2.10.in-addr.arpa.
+          pool-10-2-${2,1}.example.com.
+        )
+</pre>
+<p id="rfc.section.A.1.p.3">I will however also admit that it would be nice to get that 10 and 2 in there without having to hardcode them, so it needs some more thought.</p>
+<p id="rfc.section.A.1.p.4">]</p>
+<h1 id="rfc.appendix.A.2">
+<a href="#rfc.appendix.A.2">A.2.</a> <a href="#example-2" id="example-2">Example 2</a>
+</h1>
+<pre>
+$ORIGIN 2.10.in-addr.arpa.
+@ 86400 IN BULK PTR (
+          [0-255].[0-255].2.10.in-addr.arpa.
+          pool-${2,1|||3}.example.com.
+        )
+</pre>
+<p id="rfc.section.A.2.p.1">Example 2 is similar to Example 1, except that it modifies the replacement pattern.  The empty option after the first vertical bar causes no delimiters to be inserted, while the second empty option that would keep the delimiter interval as 1.  The latter is relevant because the final value, padding of 3, is applied over each delimiter interval even when no delimiter is used.</p>
+<p id="rfc.section.A.2.p.2">The result is that a query for the PTR of 4.3.2.10.in-addr.arpa generates this response:</p>
+<pre>
+4.3.2.10.in-addr.arpa 86400 IN PTR pool-003004.example.com.
+</pre>
+<p id="rfc.section.A.2.p.3">[ Admittedly you can't do this very effectively without the field width complexity. Is this sort of name common?  Does it need support? Admittedly $GENERATE had the feature, but is that reason enough? ]</p>
+<h1 id="rfc.appendix.A.3">
+<a href="#rfc.appendix.A.3">A.3.</a> <a href="#example-3" id="example-3">Example 3</a>
+</h1>
+<p id="rfc.section.A.3.p.1">This example contains a classless IPv4 delegation on the /22 CIDR boundary as defined by <a href="#RFC2317" class="xref">[RFC2317]</a>.  The network for this example is "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.". RRs for this example are defined as:</p>
+<pre>
+$ORIGIN 2.10.in-addr.arpa.
+@    7200 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
+0-3 86400 IN NS ns1.sub.example.com.
+</pre>
+<p id="rfc.section.A.3.p.2">A query for the PTR of 25.2.2.10.in-addr.arpa is received and the BULK record with the CNAME Match Type matches all query types.  25 and 2 are captured as references, and joined in the answer by the period (".") character as a delimiter, with ".0-3" then appended literally and fully qualified by the origin domain.  The final synthesized record is:</p>
+<pre>
+25.2.2.10.in-addr.arpa 7200 IN CNAME 25.2.0-3.2.10.in-addr.arpa.
+</pre>
+<p id="rfc.section.A.3.p.3">[ Without $* and options complexity, pattern to get the same result is just ${1}.{$2}.0-3 ]</p>
 <h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
 <div class="avoidbreak">
   <address class="vcard">

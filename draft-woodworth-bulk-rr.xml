@@ -9,9 +9,6 @@
 <!ENTITY RFC2181 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2181.xml">
 <!ENTITY RFC2308 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2308.xml">
 <!ENTITY RFC2317 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2317.xml">
-<!ENTITY RFC2536 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2536.xml">
-<!ENTITY RFC2931 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2931.xml">
-<!ENTITY RFC3110 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3110.xml">
 <!ENTITY RFC3597 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.3597.xml">
 <!ENTITY RFC4033 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4033.xml">
 <!ENTITY RFC4034 SYSTEM "https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.4034.xml">
@@ -104,7 +101,7 @@ shared between the primary and secondary nameservers for a zone.</t>
 information, answers to frequently asked questions, general musings,
 etc.  They will be removed before publication.  This document is being
 collaborated on in GitHub at
-&lt;https://github.com/vttale/serve-stale&gt;.  The most recent
+&lt;https://github.com/vttale/bulk-rr&gt;.  The most recent
 version of the document, open issues, etc should all be available
 here.  The authors gratefully accept pull requests.</t>
 
@@ -123,17 +120,16 @@ here.  The authors gratefully accept pull requests.</t>
 on-the-fly resource record generation.  It is essentially an enhanced
 wildcard mechanism, constraining generated resource record owner names
 to those that match a pattern.  It is also akin to the $GENERATE
-master file directive (FIXME insert ref to ISC Bv9ARM.ch06.html),
-without being limited to numeric values and without creating all
-possible records in the zone data.</t>
+master file directive <xref target="bind-arm"/> without being limited to numeric
+values and without creating all possible records in the zone data.</t>
 
 <t>For example, consider the following record:</t>
 
 <figure><artwork><![CDATA[
-*.example.com. 86400 IN BULK A (
-                         pool-A-[0-255]-[0-255].example.com.
-                         10.55.${1}.${2}
-                     )
+example.com. 86400 IN BULK A (
+                      pool-A-[0-255]-[0-255].example.com.
+                      10.55.${1}.${2}
+                   )
 ]]></artwork></figure>
 
 <t>It will answer requests for pool-A-0-0.example.com through
@@ -148,11 +144,9 @@ requirements for server memory and zone transfer network bandwidth.</t>
 DNSSEC signatures, and securely performing DNSSEC validation on such
 signatures.</t>
 
-<t>Traditional wildcard substitution logic is extended to allow</t>
-
 <section anchor="background-and-terminology" title="Background and Terminology">
 
-<t>The reader is assumed to be familiar with the basic DNS and DNSSEC
+<t>ppThe reader is assumed to be familiar with the basic DNS and DNSSEC
 concepts described in <xref target="RFC1034"/>, <xref target="RFC1035"/>, <xref target="RFC4033"/>,
 <xref target="RFC4034"/>, and <xref target="RFC4035"/>; subsequent RFCs that update them in
 <xref target="RFC2181"/> and <xref target="RFC2308"/>; and DNS terms in <xref target="RFC7719"/>.</t>
@@ -197,107 +191,76 @@ specified in <xref target="RFC1035"/>, Section 3.2.1.</t>
 <t>Domain Name Pattern consists of a pattern encoded as a wire-format
 domain name relative to the zone in which it appears.  Special
 characters are interpreted as per the following Augmented Backus-Naur
-Form notation from <xref target="RFC5234"/>.</t>
+Form (ABNF) notation from <xref target="RFC5234"/>.</t>
 
 <figure><artwork><![CDATA[
-DIGIT          =  %x30-39
-                       ; 0-9
-HEXDIG         =  DIGIT / 0x41-0x46 / 0x61-66
-                       ; 0-9, A-F, a-f
-DQUOTE         =  %x22
-                       ; " (Double Quote)
+match         =  1*(range / string)
 
-pattern        =  "-" / 1*part / DQUOTE 1*part DQUOTE
+range         =  "[" decnum "-" decnum "]" /
+                  "<" hexnum "-" hexnum ">"
+                      ; create references for substitution
 
-part           =  "\[" range "]" / string
+string        =  1*(ctext / quoted-char)
 
-range          =  number [ "-" number ]
+decnum        =  1*decdigit
 
-number         =  1*DIGIT / 1*HEXDIG
+hexnum        =  1*hexdigit
 
-octet          =  %x00-FF
+octet         =  %x00-FF
 
-ctext          =  <any octet excepting "\">
+decdigit      =  %x30-39
+                      ; 0-9
+hexdigit      =  DIGIT / 0x41-0x46 / 0x61-66
+                      ; 0-9, A-F, a-f
 
-quoted-char    = "\" octet
-                       ; to allow [ and ] as literals
+ctext         =  <any octet excepting "\">
 
-string         =  *(ctext / quoted-pair)
-
+quoted-char   = "\" octet
+                       ; to allow special characters as literals
 ]]></artwork></figure>
-
-<t>[ Why does DQUOTE need to be a syntactic element?  What function is
-it serving? ]</t>
 
 <t>Interpretation of the Domain Name Pattern is described in detail in
 the "BULK Replacement" section.</t>
 
-<t>[ I admit this flexibility for strings might be a mistake, and will be
-calling it out in dnsop specifically for discussion. ]</t>
-
 <t>Replacement Pattern describes how the answer RRset MUST be generated
-for the matching query.  It uses this format:</t>
-
-<t>[ Presumably this could just build on the above but use a different
-name for part and string (if string ends up being different, which it
-probably shouldn't)?  There's a lot of redundancy with identical
-definitions for six other elements, and it is easier for both
-readers and implementers not to have to keep in mind that the same
-identifier name, from the same source, has two different definitions ]</t>
+for the matching query.  It uses the following additional ABNF elements:</t>
 
 <figure><artwork><![CDATA[
-    DIGIT  = <as defined in RFC 5234 Appendix B.1>
-    HEXDIG = <as defined in RFC 5234 Appendix B.1>
-    DQUOTE = <as defined in RFC 5234 Appendix B.1>
+replace       =   1*(reference / string)
 
-    pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
+reference     =   "$" "{" (positions / "*") [options] "}"
 
-    part                =   reference / string
+positions     =   (position / posrange) 0*("," (position / posrange))
 
-    reference       =   "$" "{" substitution "}"
+posrange      =   position "-" position
 
-    substitution        =   range 0*( "," range ) [ options ]
+position      =   1*decnum
 
-    substitution        =/  "*" [ options ]
+options       =   delimiter [interval [padding]]
 
-    options             =   delimiter [ interval [ padding ] ]
+delimiter     =   "|" *1(ctext | quoted-char)
+                        ; "\|" to use "|" as delimiter
+                        ; "\\" to use "\" as delimiter
 
-    delimiter           =   "|" 0*1( %x01-23 / %x25-7A / %7E-7F )
-                               ; Any single [US-ASCII] character
-                               ; excluding NUL, dollar sign "$",
-                               ; pipe "|" and curly brace characters
-                               ; "{" or "}"
+interval      =   "|" *2DIGIT
 
-    interval            =   "|" *2DIGIT
+padding       =   "|" *2DIGIT
 
-    padding             =   "|" *2DIGIT
-
-    range               =   number [ "-" number ]
-
-    number              =   1*DIGIT / 1*HEXDIG
-
-    string              =   1*( %x01-23 / %x25-7A / %x7C / %7E-7F )
-                               ; Any [US-ASCII] character excluding
-                               ; NUL, dollar sign "$" and curly brace
-                               ; characters "{" or "}"
 ]]></artwork></figure>
 
-<t>The dollar sign, "$", and curly brace characters, "{" and "}", are
-reserved to enclose regular-expression-esque references and MUST
-NOT appear anywhere outside of such a reference specification.
-This rigidity is necessary to simplify implementation of this document
-and may relax once adoption reaches an acceptable level and demand for
-such an exception exists.  The authors feel this limitation is a
-reasonable limitation for the flexibility offered by this document.</t>
+<t>[ Is this complexity beyond simple ${1}, ${2}, etc, really worth
+it?  I definitely see how it could make for shorter replacement
+patterns, but does it enhance their clarity and usability? ]</t>
 
 </section>
 <section anchor="the-bulk-rr-presentation-format" title="The BULK RR Presentation Format">
 
-<t>Match Type is represented as an RR type mnemonic or <xref target="RFC3597"/>'s
+<t>Match Type is represented as an RR type mnemonic or with <xref target="RFC3597"/>'s
 generic TYPE mechanism.</t>
 
 <t>Domain Name Pattern is represented as a fully qualified domain name as
-per RFC 1035 rules. [ FIXME: Find better reference, if any. ]</t>
+per <xref target="RFC1035"/> Section 5.1 rules for encoding special and
+non-printing characters.</t>
 
 <t>Replacement Pattern is represented as with the TXT RR type described
 in <xref target="RFC1035"/>, Section 3.3.14.</t>
@@ -312,300 +275,115 @@ Pattern.</t>
 <section anchor="bulk-replacement" title="BULK Replacement">
 
 <t>When an authoritative nameserver receives a query for which it does
-not have an explicitly matching name, it then looks for a covering
-wildcard as per <xref target="RFC1035"/>FIXME.  It then selects all BULK RRs with a
-Match Type that matches the query type and a Domain Name Pattern that
-matches the query name.  Note that query type ANY will select all
-Match Types, and all query types match a CNAME [ and DNAME? ] Match
-Type.  One or more answer RRs will be generated per the replacement
-rules below.</t>
+not have a matching name or a covering wildcard, it MUST then look for
+BULK RRs at the zone apex, selecting all BULK RRs with a Match Type
+that matches the query type and a Domain Name Pattern that matches the
+query name.  Note that query type ANY will select all Match Types, and
+all query types match a CNAME Match Type [ and DNAME? ].  One or more
+answer RRs will be generated per the replacement rules below.
+Examples are provided in an appendix.</t>
 
-<t>[ I don't really grok hidden wildcards myself and have <spanx style="emph">currently</spanx>
-elided discussion of them, to be possibly added back depending on our
-conference call. &#8211; tale ]</t>
+<section anchor="matching-the-domain-name-pattern" title="Matching the Domain Name Pattern">
 
-<section anchor="matching-the-bulk-domain-name-pattern-field" title="Matching the BULK &quot;Domain Name Pattern&quot; field">
+<t>A query name matches the Domain Name Pattern if the characters that
+appear outside the range match exactly and those within numeric ranges
+have values that fall within the range.  Numeric matches MUST be of
+the appropriate decimal or hexadecimal type as specified by the
+delimiters in the pattern.  For example, if a range is given as
+[0-255], then FF does not match even though its value as a hexadecimal
+number is within the range.</t>
 
-<t>Simple name matching is determined by use of a single hyphen, "-", as
-the value for the Domain Name Pattern.  This assumes everything
-matches, and all hexadecimal or decimal fields will be captured for
-use as references in the Replacement Pattern as described below.
-Simple matching by the solitary hyphen is often preferred for large
-blocks such as the reverse IPv6 address space for the simplicity of
-record management.</t>
-
-<t>Advanced name matching, while more complex, is designed to be both
-simple to implement and simple to use.  Below is an example
-implementation for label matching using a combination of parsing by
-regular expression and matching of numeric ranges.</t>
-
-<t>Numeric ranges are either decimal or hexadecimal, as determined by
-conditions of the query. [ I appreciate where you're going with this
-to trying to be more intuitive for zone maintainers, but wonder
-whether this hasn't increased implementation complexity for only
-minimal benefit.  Especially so with the automatic reference direction
-described later which is also trying to be intuitive. ]</t>
-
-<t><list style="symbols">
-  <t>If query type is A, ranges are set to decimal.</t>
-  <t>If query type is AAAA, ranges are set to hexadecimal.</t>
-  <t>If query type is PTR or Match Type is CNAME, the RR owner is used to
-determine decimal or hexadecimal.</t>
-</list></t>
-
-<t>** If RR owner ends in ".ip6.arpa.", ranges are set to hexadecimal.</t>
-
-<t>** If RR owner does not end in ".ip6.arpa.", ranges are set to decimal.</t>
-
-<t>The square bracket characters, "[" and "]", are reserved to enclose a
-range specification and MUST NOT appear anywhere outside of a range
-specification.</t>
+<t>When a query name matches a Domain Name Pattern, the value in each
+numeric range is stored for use by the Replacement Pattern, with
+reference numbers starting at 1 and counting from the left.  For
+example, matching the query name host-24-156 against
+host-[0-255]-[0-255] assigns 24 to ${1} and 156 to ${2}.</t>
 
 </section>
-<section anchor="record-generation-using-the-bulk-replacement-pattern-field" title="Record Generation using the BULK &quot;Replacement Pattern&quot; field">
+<section anchor="record-generation-using-replacement-pattern" title="Record Generation using Replacement Pattern">
 
-<t>Once it has been determined a query meets all criteria for a BULK
-record generation the below rules are followed to process captured
-numeric data and Replacement Pattern into RRs to apply to the
-answer-set.</t>
+<t>The Replacement Pattern generates the record data by replacing the
+${&#8230;} references with data captured from the query name, and copying
+all other characters literally.</t>
 
-<section anchor="replacement-pattern-references" title="Replacement Pattern References">
+<t>The simplest form of reference uses only the reference number between
+the braces, "{" and "}".  The value of the reference is simply
+copied directly from the matching position of the query name.</t>
 
-<t>Before a record may be generated data must be captured in the Domain
-Name Pattern comparison step above.  Each provided numeric range is
-assigned to a temporary buffer to be used in this step.  To make the
-jobs' of zone administrators easier the order of these buffers will
-change based on the Match Type and owner so they will default to feel
-more natural or intuitive.  Captured patterns and references are
-in the same vein as regular expressions and are intended to feel
-"familiar".  This is described in further detail (with examples) in
-the sections below.</t>
+<t>The next form of reference notation uses the asterisk, "<spanx style="emph">".  With
+${</spanx>}, all captured values in order of ascending position, delimited by
+its default delimiter (described below), are placed in the answer.</t>
 
-<section anchor="reference-notation" title="Reference Notation">
+<t>Numeric range references, such as ${1-4}, replaces all values captured
+by those references, in order, delimited by the default delimiter
+described below.  To reverse the order in which they are copied,
+reverse the upper and lower values, such as ${4-1}.  This is useful
+for generating PTR records from query names in which the address is
+encoded in network order.</t>
 
-<t>BULK RRs use a dollar-sign "$" and curly braces "{" and "}" to enclose
-references within the Replacement Pattern.  The following rules
-are used to determine the final replacement string.</t>
+<t>Similar to range references, separating positions by commas creates
+sets for replacement. For example, ${1,4} would be replaced by the
+first and fourth captured values, delimited its default delimiter.
+This notation may be combined with the numeric range form, such as 
+${3,2,1,8-4}.</t>
 
-<section anchor="simple-numeric-reference-replacement" title="Simple numeric reference replacement">
+<section anchor="delimiters" title="Delimiters">
 
-<t>The simplest form of reference notation is its numeric form.  In
-this form only the reference number falls between the curly braces
-"{" and "}".  An example is "${1}" which would be replaced by the
-value in the first capture position.  Position is described in detail
-in a later section.</t>
-
-<t>Numeric reference replacement indices start with one "1" to
-maintain consistency with regular expression references.</t>
-
-</section>
-<section anchor="star-reference-replacement" title="Star reference replacement">
-
-<t>The next form of reference notation is its star (or asterisk "<spanx style="emph">")
-form.  In this form only an asterisk falls between the curly braces
-"{" and "}".  This form "${</spanx>}" would be replaced by all captured
-values in order of ascending position delimited by its default
-delimiter (described below).  Position is described in detail in a
-later section.</t>
+<t>A reference can specify a delimiter to use between copied position
+values by following a vertical bar, "|", with either zero or one
+characters.  [ Why not any length? ]?  Zero characters, such as in
+${1-3|}, means no delimiter is used.  The default delimiter is the
+hyphen, "-". [ Earlier drafts attempted to make the default delimiter
+context-dependent, such as by using a period for A requests and a
+colon for AAAA requests.  This increases implementation complexity as
+an attempt to make things more intuitive for zone administrators.
+However it isn't clear that this is a net gain for ease of use. ]</t>
 
 </section>
-<section anchor="numeric-range-reference-replacement" title="Numeric range reference replacement">
+<section anchor="delimiter-intervals" title="Delimiter intervals">
 
-<t>The next form of reference notation is the numeric range form. In
-this form a range of numbers falls between the curly braces "{" and
-"}".  An example of this is "${1-4}" which would be replaced by all
-captured values within this range (1-4) in order of positions provided
-delimited its default delimiter (described below).  To reverse the
-order of positions in this example one could simply reverse the upper
-and lower values to look like "${4-1}".  Position is described in
-detail in a later section.</t>
-
-</section>
-<section anchor="numeric-set-reference-replacement" title="Numeric set reference replacement">
-
-<t>The next form of reference notation is the numeric set form.  In
-this form a set of numbers falls between the curly braces "{" and "}"
-separated by commas.  An example of this is "${1,4}" which would be
-replaced by the first and fourth captured values in the order of
-position provided delimited its default delimiter (described below).
-Position is described in detail in a later section.</t>
-
-<t>This notation may be combined with the numeric range form allowing
-specific positions or position ranges to be used.  Examples would be
-"${3,2,1,4-8}" and "${8-12,1-4}".</t>
-
-</section>
-<section anchor="reference-delimiter" title="Reference delimiter">
-
-<t>The above sections reference a default delimiter.  In an effort to
-provide an intuitive zone management experience the default delimiter
-will be based on the BULK RR's Match Type.  For Match Type "A" the
-default delimiter SHALL be a period ".", for Match Type "AAAA" the
-default delimiter SHALL be a colon ":" and for Match Types "PTR" and
-"CNAME" the default delimiter SHALL be a hyphen "-". In any case the
-default delimiter MAY be overridden by including it in the
-reference braces after the set selectors and a reference field
-separator character, the pipe "|".  An example would be "${<spanx style="emph">|-}" which
-would force a hyphen "-" delimiter.  An empty or null delimiter is
-allowed by not specifying a delimiter character, for example "${</spanx>|}",
-which would simply concatenate all captured values in order of capture
-position.  Position is described in detail in a later section.</t>
-
-</section>
-<section anchor="reference-delimiter-interval" title="Reference delimiter interval">
-
-<t>The default behavior of a reference set is to combine each
-captured value specified with a delimiter between each.  To allow
-captured references to be delimited at another interval a third
-reference field is provided.  An example would be "${*|-|4}" which
-would concatenate all captured values but delimiting only every fourth
-value with hyphens "-".  This can be a handy feature in the IPv6
+<t>A second vertical bar in the reference options introduces a delimiter
+interval.  The default behavior of a multi-position reference is to
+combine each captured value specified with a delimiter between each.
+With a delimiter interval the delimiters are only added between every
+Nth value.  For example, ${*|-|4} adds a hyphen between every group of
+four captured positions.  This can be a handy feature in the IPv6
 reverse namespace where every nibble is captured as a separate value
-and generated hostnames include sets of 4 nibbles.  An empty or null
-value MUST be interpreted as "1" or every captured value.</t>
+and generated hostnames include sets of 4 nibbles.  An empty or 0
+value for the delimiter interval MUST be interpreted as the default
+value of 1.</t>
 
 </section>
-<section anchor="reference-padding-length" title="Reference padding length">
+<section anchor="padding-length" title="Padding length">
 
-<t>When generating BULK based records a common requirement is to convert
-from one numeric format to another, padding is among the most common
-of these.  The fourth and final reference field determines what
-width to pad to.  An example would be "${<spanx style="emph">|||4}" which would set the
-width of all captured values to 4 by inserting leading zeros to fill
-the void.  The default is empty or null which MUST be interpreted as
-NO modification.  A width of zero "0" has a special interpretation
-referred to as "unpad" meaning all leading zeros MUST be removed.  If
-a value is provided captured values longer than this width MUST be
-truncated to fit the specified width.  In the case where a delimiter
-interval is provided captured values between the intervals will be
-concatenated and the padding or unpadding applied as a unit and not
-individually.  An example of this would be "${</spanx>||4|4}" which would
-combine each range of 4 captured values and pad them to a width of 4
-characters by inserting leading zeros where necessary.</t>
+<t>The fourth and final reference option determines the field width of
+the copied value.  Shorter values MUST be padded with leading zeroes
+("0") and longer values MUST be truncated to the width.</t>
 
-</section>
-<section anchor="reference-position" title="Reference Position">
+<t>The default behavior, and that of an explicit empty padding length, is
+that the captured query name substring is copied exactly.  A width of
+zero "0" is a signal to "unpad", and any leading zeros MUST be
+removed. [ Unnecessary complexity? ]</t>
 
-<t>Great effort has gone into providing zone maintainers an intuitive
-syntax.  As part of this effort, the captured values will reverse
-direction depending on several factors.</t>
+<t>If a delimiter interval greater than 1 is used, captured values
+between the intervals will be concatenated and the padding or
+unpadding applied as a unit and not individually.  An example of this
+would be ${*||4|4} which would combine each range of 4 captured values
+and pad or truncate them to a width of 4 characters.</t>
 
-<t>As a general rule of thumb, if it makes sense the numeric ranges are
-in reverse order from query to answer then they will be
-reversed. Otherwise they will be in the same order.</t>
-
-<t>Take for example a simple reverse DNS lookup, from "10.2.3.4" to
-"pool-A-3-4.example.com.".  Since DNS zones are arranged according to
-management authority the records appear reversed numerically. In this
-example "10.2.3.4" becomes "4.3.2.10.in-addr.arpa.". One would
-intuitively expect this reversal to be reversed so positional indices
-of captured values would increment toward the right of the Replacement
-Pattern.  This expectation is especially important when using range
-based replacements.</t>
-
-<t>Formally, the rules for position reversal are as follows:</t>
-
-<t>Match Type RRs for "PTR" are reversed for zone owners ending in either
-".in-addr.arpa." or "ip6.arpa.".  All other Match Type RRs for "PTR"
-are forward.</t>
-
-<t>Match Type RRs for "A" (Address), "AAAA" (IPv6 Address) and "CNAME"
-(Canonical Name) are forward.</t>
+<t>[ If this is kept, the element/feature should probably be renamed
+from "padding" since it is just as likely to truncate. ]</t>
 
 </section>
-<section anchor="reference-position-negation" title="Reference Position Negation">
+<section anchor="final-processing" title="Final processing">
 
-<t>To allow simple reversal of any reference notation a single
-exclamation point character "!" MAY be used as the first character of
-a reference set.  Examples would be "${!*}" and "${!1-4,7}". In
-both of the examples the reference positions SHALL be the exact
-mirror equivalent as those without the leading exclamation point "!".
-This can be very important if the BULK generated replacements have
-values in positions opposite to what is required or expected.</t>
+<t>The TTL of each RR generated by a BULK RR is the TTL of the
+corresponding BULK record itself.  [ BULK should probably have its
+own TTL field.  ]</t>
 
-</section>
-</section>
-</section>
-<section anchor="replacement-pattern-examples" title="Replacement Pattern examples">
-
-<t>This section provides examples of several BULK RR Replacement
-Patterns.  Each example is intended to further understanding for
-implementers and DNS administrators alike.</t>
-
-<t>EXAMPLE 1 For this example the query is defined as a PTR record for
-"10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating
-BULK RR as:</t>
-
-<figure><artwork><![CDATA[
-    - 86400 IN BULK PTR - pool-${*}.example.com.
-]]></artwork></figure>
-
-<t>This example contains several of the features described above.</t>
-
-<t>First, the record owner is simply a single hyphen "-" denoting it is a
-"hidden wildcard" (wildcard for generated records but not for BULK).</t>
-
-<t>Second, the Domain Name Pattern is also a single hyphen "-" denoting
-all queries matching the owner's wildcard pattern for the "PTR" Match
-Type are accepted and will be captured for use in the Replacement
-Pattern.</t>
-
-<t>Third, the Replacement Pattern contains a single "star" reference
-denoting all captured numeric (decimal) references will be
-combined with its default delimiter of hyphen "-" (for PTR) and placed
-into the reference's position in the answer-set.  Should this
-generate an invalid hostname the response will be NXDOMAIN unless
-other BULK records match and are successfully generated without error.</t>
-
-<t>The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates
-matching references for "4", "3", "2" and "10" then reverses their
-indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and
-"${4}" to "4" respectively.  When applied to the Replacement Pattern
-the answer becomes "pool-10-2-3-4.example.com.".</t>
-
-<t>EXAMPLE 2 For this example the query is defined as a PTR record for
-"10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating
-BULK RR as:</t>
-
-<figure><artwork><![CDATA[
-- 86400 IN BULK PTR - pool-${*|||3}.example.com.
-]]></artwork></figure>
-
-<t>This example expands on EXAMPLE 1 with the differences outlined below.</t>
-
-<t>The only change to the BULK RR is the Replacement Pattern includes
-additional fields, specifically null values for delimiter and interval
-and a padding width of 3.</t>
-
-<t>The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates
-matching references for "4", "3", "2" and "10" and reverses their
-indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and
-"${4}" to "4" respectively.  When applied to the Replacement Pattern
-the answer becomes "pool-010002003004.example.com.".</t>
-
-<t>EXAMPLE 3 This example contains a classless IPv4 delegation on the /22
-CIDR boundary as defined by <xref target="RFC2317"/>.  The network for this example
-is</t>
-
-<t>"10.2.0/22" delegated to a nameserver "ns1.sub.example.com.". RRs for
-this example are defined as:</t>
-
-<figure><artwork><![CDATA[
-$ORIGIN 2.10.in-addr.arpa.
-0-3 86400 IN      NS    ns1.sub.example.com.
--   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
-]]></artwork></figure>
-
-<t>For this example, the query would come in for
-"25.2.2.10.in-addr.arpa.".  After matching the owner filter (ending in
-".2.10.in-addr.arpa.") and the fully qualified domain name pattern of
-"[0-255].[0-3].2.10.in-addr.arpa." the answer-set would include a
-generated RR consisting of captured values "25" and "2" joined by the
-custom delimiter of period "." then joined by ".0-3" and made fully
-qualified.  The resulting RR would be a "CNAME" with RDATA of
-"25.2.0-3.2.10.in-addr.arpa.".  This record is now one delegated to
-"ns1.sub.example.com." as its authority and the answer-set is
-complete.</t>
+<t>If the generated record type is one that uses domain names in its
+resource record data, such as CNAME, any relative domain names MUST be
+fully qualified with the origin domain of the BULK RR.</t>
 
 </section>
 </section>
@@ -801,7 +579,9 @@ members of a DNSSEC compatible RRset (including BULK generated ones).</t>
    dnssec_sign<sigrrset>
 ]]></artwork></figure>
 
-<t>Similar logic MUST be used for determining DNSSEC validity of RRsets in verification (validation) nameservers for signatures generated based on NPN normalization.</t>
+<t>Similar logic MUST be used for determining DNSSEC validity of RRsets
+in verification (validation) nameservers for signatures generated
+based on NPN normalization.</t>
 
 </section>
 <section anchor="npn-normalization-processing-examples" title="NPN Normalization Processing examples">
@@ -811,7 +591,7 @@ For this example the query is defined as a PTR record for "10.2.3.44" with an or
 
 <figure><artwork><![CDATA[
    -.2.10.in-addr.arpa. 86400 IN BULK PTR (
-                                       \[0-255].\[0-10]
+                                       [0-255].[0-10]
                                        pool-A-${1}-${2}.example.com.
                                        )
    *.2.10.in-addr.arpa. 86400 IN NPN  PTR 9 0 7 13
@@ -858,7 +638,7 @@ this example are defined as:</t>
 <figure><artwork><![CDATA[
 $ORIGIN 2.10.in-addr.arpa.
 0-3 86400 IN      NS    ns1.sub.example.com.
--   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
+-   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
 *   86400 IN NPN  CNAME 9 0 0 23
 ]]></artwork></figure>
 
@@ -900,7 +680,7 @@ of "example.com.".  RRs for this example are defined as:</t>
 
 <figure><artwork><![CDATA[
 -.example.com. 86400 IN BULK A (
-                                   pool-A-\[0-10]-\[0-255]
+                                   pool-A-[0-10]-[0-255]
                                    10.2.${*}
                                   )
 *.example.com. 86400 IN NPN  A 9 0 8 0
@@ -946,7 +726,7 @@ this example are defined as:</t>
 
 <figure><artwork><![CDATA[
 -.example.com. 86400 IN BULK AAAA (
-                                   pool-A-\[0-ffff]-\[0-ffff]
+                                   pool-A-[0-ffff]-[0-ffff]
                                    fc00::${1}:${2}
                                   )
 *.example.com. 86400 IN NPN  AAAA X 0 30 0
@@ -1012,7 +792,7 @@ blocks of addresses can be assigned a single BULK record and where
 delegated to another customer or SWIP will be automatically
 overridden.</t>
 
-<t>When compared with bind's $GENERATE statement, if a singleton record
+<t>When compared with BIND's $GENERATE statement, if a singleton record
 such as CNAME appears within a $GENERATE range, either the CNAME or
 $GENERATE becomes invalid.  While a BULK record range would
 automatically notch out the CNAME without user intervention or
@@ -1193,7 +973,7 @@ service or product.</t>
 <section anchor="iana-considerations" title="IANA Considerations">
 
 <t>IANA is requested to assign numbers for two DNS resource record types
-identified in this document; BULK and NPN.</t>
+identified in this document: BULK and NPN.</t>
 
 </section>
 <section anchor="acknowledgments" title="Acknowledgments">
@@ -1204,9 +984,7 @@ to its creation and the authors are appreciative to each of them even
 if not thanked or identified individually.</t>
 
 <t>A special thanks is extended for the kindness, wisdom and technical
-advice of:</t>
-
-<t>Robert Whelton (CenturyLink, Inc.)</t>
+advice of Robert Whelton (CenturyLink, Inc.) and</t>
 
 </section>
 
@@ -1223,24 +1001,11 @@ advice of:</t>
 &RFC2181;
 &RFC2308;
 &RFC2317;
-&RFC2536;
-&RFC2931;
-&RFC3110;
 &RFC3597;
 &RFC4033;
 &RFC4034;
 &RFC4035;
 &RFC5234;
-<reference anchor="us-ascii" >
-  <front>
-    <title>Coded Character Set -- 7-bit American Standard Code for Information Interchange</title>
-    <author >
-      <organization>American National Standards Institute</organization>
-    </author>
-    <date year="1986"/>
-  </front>
-  <seriesInfo name="ANSI" value="X3.4"/>
-</reference>
 
 
     </references>
@@ -1248,347 +1013,421 @@ advice of:</t>
     <references title='Informative References'>
 
 &RFC7719;
+<reference anchor="bind-arm" target="https://ftp.isc.org/isc/bind9/cur/9.9/doc/arm/Bv9ARM.html">
+  <front>
+    <title>BIND 9 Configuration Reference</title>
+    <author >
+      <organization>Internet Systems Consortium</organization>
+    </author>
+    <date year="2016"/>
+  </front>
+</reference>
 
 
     </references>
 
 
+<section anchor="bulk-examples" title="BULK Examples">
+
+<section anchor="example-1" title="Example 1">
+
+<figure><artwork><![CDATA[
+$ORIGIN 2.10.in-addr.arpa.
+@ 86400 IN BULK PTR (
+          [0-255].[0-255].2.10.in-addr.arpa.
+          pool-${*}.example.com.
+        )
+]]></artwork></figure>
+
+<t>A query received for the PTR of 4.3.2.10.in-addr.arpa will create
+the references ${1} and ${2} with values 4 and 3, respectively.  The
+${*} reference in the replacement pattern will then substitute them
+with the default delimiter of hyphen between every character and no
+special field width modifications.  The TTL of the BULK RR is used for
+the generated record, making the response:</t>
+
+<figure><artwork><![CDATA[
+4.3.2.10.in-addr.arpa 86400 IN PTR pool-4-3.example.com.
+]]></artwork></figure>
+
+<t>[ John and Dean, I realize that without the automagic and reference
+creation of the whole name as was described by earlier drafts, this
+example materially changes by not only not having the numeric order
+unreversed, but also by not including the 10 and the 2 in the
+generated name.  With the current definition you would get the same
+result as the original simply by using:</t>
+
+<figure><artwork><![CDATA[
+   @ 86400 IN BULK PTR (
+          [0-255].[0-255].2.10.in-addr.arpa.
+          pool-10-2-${2,1}.example.com.
+        )
+]]></artwork></figure>
+
+<t>I will however also admit that it would be nice to get that 10 and 2
+in there without having to hardcode them, so it needs some more thought.</t>
+
+<t>]</t>
+
+</section>
+<section anchor="example-2" title="Example 2">
+
+<figure><artwork><![CDATA[
+$ORIGIN 2.10.in-addr.arpa.
+@ 86400 IN BULK PTR (
+          [0-255].[0-255].2.10.in-addr.arpa.
+          pool-${2,1|||3}.example.com.
+        )
+]]></artwork></figure>
+
+<t>Example 2 is similar to Example 1, except that it modifies the
+replacement pattern.  The empty option after the first
+vertical bar causes no delimiters to be inserted, while the second
+empty option that would keep the delimiter interval as 1.  The latter
+is relevant because the final value, padding of 3, is applied over
+each delimiter interval even when no delimiter is used.</t>
+
+<t>The result is that a query for the PTR of 4.3.2.10.in-addr.arpa
+generates this response:</t>
+
+<figure><artwork><![CDATA[
+4.3.2.10.in-addr.arpa 86400 IN PTR pool-003004.example.com.
+]]></artwork></figure>
+
+<t>[ Admittedly you can't do this very effectively without the field
+width complexity. Is this sort of name common?  Does it need support?
+Admittedly $GENERATE had the feature, but is that reason enough? ]</t>
+
+</section>
+<section anchor="example-3" title="Example 3">
+
+<t>This example contains a classless IPv4 delegation on the /22 CIDR
+boundary as defined by <xref target="RFC2317"/>.  The network for this example is
+"10.2.0/22" delegated to a nameserver "ns1.sub.example.com.". RRs for
+this example are defined as:</t>
+
+<figure><artwork><![CDATA[
+$ORIGIN 2.10.in-addr.arpa.
+@    7200 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
+0-3 86400 IN NS ns1.sub.example.com.
+]]></artwork></figure>
+
+<t>A query for the PTR of 25.2.2.10.in-addr.arpa is received and the BULK
+record with the CNAME Match Type matches all query types.  25 and 2
+are captured as references, and joined in the answer by the period
+(".") character as a delimiter, with ".0-3" then appended literally
+and fully qualified by the origin domain.  The final synthesized
+record is:</t>
+
+<figure><artwork><![CDATA[
+25.2.2.10.in-addr.arpa 7200 IN CNAME 25.2.0-3.2.10.in-addr.arpa.
+]]></artwork></figure>
+
+<t>[ Without $* and options complexity, pattern to get the same result
+is just ${1}.{$2}.0-3 ]</t>
+
+</section>
+</section>
+
 
   </back>
 
 <!-- ##markdown-source:
-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
+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
 
 -->
 

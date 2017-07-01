@@ -29,8 +29,8 @@ Ed note
    Text inside square brackets ([]) is additional background
    information, answers to frequently asked questions, general musings,
    etc.  They will be removed before publication.  This document is
-   being collaborated on in GitHub at <https://github.com/vttale/serve-
-   stale>.  The most recent version of the document, open issues, etc
+   being collaborated on in GitHub at <https://github.com/vttale/bulk-
+   rr>.  The most recent version of the document, open issues, etc
    should all be available here.  The authors gratefully accept pull
    requests.
 
@@ -74,11 +74,12 @@ Table of Contents
      2.1.  BULK RDATA Wire Format
      2.2.  The BULK RR Presentation Format
    3.  BULK Replacement
-     3.1.  Matching the BULK "Domain Name Pattern" field
-     3.2.  Record Generation using the BULK "Replacement Pattern"
-           field
-       3.2.1.  Replacement Pattern References
-       3.2.2.  Replacement Pattern examples
+     3.1.  Matching the Domain Name Pattern
+     3.2.  Record Generation using Replacement Pattern
+       3.2.1.  Delimiters
+       3.2.2.  Delimiter intervals
+       3.2.3.  Padding length
+       3.2.4.  Final processing
    4.  The NPN Resource Record
      4.1.  NPN RDATA Wire Format
        4.1.1.  The Match Type field
@@ -109,6 +110,10 @@ Table of Contents
    10. References
      10.1.  Normative References
      10.2.  Informative References
+   Appendix A.  BULK Examples
+     A.1.  Example 1
+     A.2.  Example 2
+     A.3.  Example 3
    Authors' Addresses
 
 1.  Introduction
@@ -117,16 +122,16 @@ Table of Contents
    the-fly resource record generation.  It is essentially an enhanced
    wildcard mechanism, constraining generated resource record owner
    names to those that match a pattern.  It is also akin to the
-   $GENERATE master file directive (FIXME insert ref to ISC
-   Bv9ARM.ch06.html), without being limited to numeric values and
-   without creating all possible records in the zone data.
+   $GENERATE master file directive [bind-arm] without being limited to
+   numeric values and without creating all possible records in the zone
+   data.
 
    For example, consider the following record:
 
-   *.example.com. 86400 IN BULK A (
-                            pool-A-[0-255]-[0-255].example.com.
-                            10.55.${1}.${2}
-                        )
+   example.com. 86400 IN BULK A (
+                         pool-A-[0-255]-[0-255].example.com.
+                         10.55.${1}.${2}
+                      )
 
    It will answer requests for pool-A-0-0.example.com through pool-
    A-255-255.example.com with the IPv4 addresses 10.55.0.0 through
@@ -141,11 +146,9 @@ Table of Contents
    DNSSEC signatures, and securely performing DNSSEC validation on such
    signatures.
 
-   Traditional wildcard substitution logic is extended to allow
-
 1.1.  Background and Terminology
 
-   The reader is assumed to be familiar with the basic DNS and DNSSEC
+   ppThe reader is assumed to be familiar with the basic DNS and DNSSEC
    concepts described in [RFC1034], [RFC1035], [RFC4033], [RFC4034], and
    [RFC4035]; subsequent RFCs that update them in [RFC2181] and
    [RFC2308]; and DNS terms in [RFC7719].
@@ -186,102 +189,72 @@ Table of Contents
    Domain Name Pattern consists of a pattern encoded as a wire-format
    domain name relative to the zone in which it appears.  Special
    characters are interpreted as per the following Augmented Backus-Naur
-   Form notation from [RFC5234].
+   Form (ABNF) notation from [RFC5234].
 
-   DIGIT          =  %x30-39
-                          ; 0-9
-   HEXDIG         =  DIGIT / 0x41-0x46 / 0x61-66
-                          ; 0-9, A-F, a-f
-   DQUOTE         =  %x22
-                          ; " (Double Quote)
+   match         =  1*(range / string)
 
-   pattern        =  "-" / 1*part / DQUOTE 1*part DQUOTE
+   range         =  "[" decnum "-" decnum "]" /
+                     "<" hexnum "-" hexnum ">"
+                         ; create references for substitution
 
-   part           =  "\[" range "]" / string
+   string        =  1*(ctext / quoted-char)
 
-   range          =  number [ "-" number ]
+   decnum        =  1*decdigit
 
-   number         =  1*DIGIT / 1*HEXDIG
+   hexnum        =  1*hexdigit
 
-   octet          =  %x00-FF
+   octet         =  %x00-FF
 
-   ctext          =  <any octet excepting "\">
+   decdigit      =  %x30-39
+                         ; 0-9
+   hexdigit      =  DIGIT / 0x41-0x46 / 0x61-66
+                         ; 0-9, A-F, a-f
 
-   quoted-char    = "\" octet
-                          ; to allow [ and ] as literals
+   ctext         =  <any octet excepting "\">
 
-   string         =  *(ctext / quoted-pair)
-
-
-   [ Why does DQUOTE need to be a syntactic element?  What function is
-   it serving? ]
+   quoted-char   = "\" octet
+                          ; to allow special characters as literals
 
    Interpretation of the Domain Name Pattern is described in detail in
    the "BULK Replacement" section.
 
-   [ I admit this flexibility for strings might be a mistake, and will
-   be calling it out in dnsop specifically for discussion. ]
-
    Replacement Pattern describes how the answer RRset MUST be generated
-   for the matching query.  It uses this format:
+   for the matching query.  It uses the following additional ABNF
+   elements:
 
-   [ Presumably this could just build on the above but use a different
-   name for part and string (if string ends up being different, which it
-   probably shouldn't)?  There's a lot of redundancy with identical
-   definitions for six other elements, and it is easier for both readers
-   and implementers not to have to keep in mind that the same identifier
-   name, from the same source, has two different definitions ]
+   replace       =   1*(reference / string)
 
-       DIGIT  = <as defined in RFC 5234 Appendix B.1>
-       HEXDIG = <as defined in RFC 5234 Appendix B.1>
-       DQUOTE = <as defined in RFC 5234 Appendix B.1>
+   reference     =   "$" "{" (positions / "*") [options] "}"
 
-       pattern             =   "-" / 1*part / DQUOTE 1*part DQUOTE
+   positions     =   (position / posrange) 0*("," (position / posrange))
 
-       part                =   reference / string
+   posrange      =   position "-" position
 
-       reference       =   "$" "{" substitution "}"
+   position      =   1*decnum
 
-       substitution        =   range 0*( "," range ) [ options ]
+   options       =   delimiter [interval [padding]]
 
-       substitution        =/  "*" [ options ]
+   delimiter     =   "|" *1(ctext | quoted-char)
+                           ; "\|" to use "|" as delimiter
+                           ; "\\" to use "\" as delimiter
 
-       options             =   delimiter [ interval [ padding ] ]
+   interval      =   "|" *2DIGIT
 
-       delimiter           =   "|" 0*1( %x01-23 / %x25-7A / %7E-7F )
-                                  ; Any single [US-ASCII] character
-                                  ; excluding NUL, dollar sign "$",
-                                  ; pipe "|" and curly brace characters
-                                  ; "{" or "}"
+   padding       =   "|" *2DIGIT
 
-       interval            =   "|" *2DIGIT
 
-       padding             =   "|" *2DIGIT
-
-       range               =   number [ "-" number ]
-
-       number              =   1*DIGIT / 1*HEXDIG
-
-       string              =   1*( %x01-23 / %x25-7A / %x7C / %7E-7F )
-                                  ; Any [US-ASCII] character excluding
-                                  ; NUL, dollar sign "$" and curly brace
-                                  ; characters "{" or "}"
-
-   The dollar sign, "$", and curly brace characters, "{" and "}", are
-   reserved to enclose regular-expression-esque references and MUST NOT
-   appear anywhere outside of such a reference specification.  This
-   rigidity is necessary to simplify implementation of this document and
-   may relax once adoption reaches an acceptable level and demand for
-   such an exception exists.  The authors feel this limitation is a
-   reasonable limitation for the flexibility offered by this document.
+   [ Is this complexity beyond simple ${1}, ${2}, etc, really worth it?
+   I definitely see how it could make for shorter replacement patterns,
+   but does it enhance their clarity and usability? ]
 
 2.2.  The BULK RR Presentation Format
 
-   Match Type is represented as an RR type mnemonic or [RFC3597]'s
+   Match Type is represented as an RR type mnemonic or with [RFC3597]'s
    generic TYPE mechanism.
 
    Domain Name Pattern is represented as a fully qualified domain name
-   as per RFC 1035 rules. [ FIXME: Find better reference, if any. ]
+   as per [RFC1035] Section 5.1 rules for encoding special and non-
+   printing characters.
 
    Replacement Pattern is represented as with the TXT RR type described
    in [RFC1035], Section 3.3.14.
@@ -294,285 +267,111 @@ Table of Contents
 3.  BULK Replacement
 
    When an authoritative nameserver receives a query for which it does
-   not have an explicitly matching name, it then looks for a covering
-   wildcard as per [RFC1035]FIXME.  It then selects all BULK RRs with a
-   Match Type that matches the query type and a Domain Name Pattern that
+   not have a matching name or a covering wildcard, it MUST then look
+   for BULK RRs at the zone apex, selecting all BULK RRs with a Match
+   Type that matches the query type and a Domain Name Pattern that
    matches the query name.  Note that query type ANY will select all
-   Match Types, and all query types match a CNAME [ and DNAME? ] Match
-   Type.  One or more answer RRs will be generated per the replacement
-   rules below.
+   Match Types, and all query types match a CNAME Match Type [ and
+   DNAME? ].  One or more answer RRs will be generated per the
+   replacement rules below.  Examples are provided in an appendix.
 
-   [ I don't really grok hidden wildcards myself and have _currently_
-   elided discussion of them, to be possibly added back depending on our
-   conference call. - tale ]
+3.1.  Matching the Domain Name Pattern
 
-3.1.  Matching the BULK "Domain Name Pattern" field
+   A query name matches the Domain Name Pattern if the characters that
+   appear outside the range match exactly and those within numeric
+   ranges have values that fall within the range.  Numeric matches MUST
+   be of the appropriate decimal or hexadecimal type as specified by the
+   delimiters in the pattern.  For example, if a range is given as
+   [0-255], then FF does not match even though its value as a
+   hexadecimal number is within the range.
 
-   Simple name matching is determined by use of a single hyphen, "-", as
-   the value for the Domain Name Pattern.  This assumes everything
-   matches, and all hexadecimal or decimal fields will be captured for
-   use as references in the Replacement Pattern as described below.
-   Simple matching by the solitary hyphen is often preferred for large
-   blocks such as the reverse IPv6 address space for the simplicity of
-   record management.
+   When a query name matches a Domain Name Pattern, the value in each
+   numeric range is stored for use by the Replacement Pattern, with
+   reference numbers starting at 1 and counting from the left.  For
+   example, matching the query name host-24-156 against
+   host-[0-255]-[0-255] assigns 24 to ${1} and 156 to ${2}.
 
-   Advanced name matching, while more complex, is designed to be both
-   simple to implement and simple to use.  Below is an example
-   implementation for label matching using a combination of parsing by
-   regular expression and matching of numeric ranges.
+3.2.  Record Generation using Replacement Pattern
 
-   Numeric ranges are either decimal or hexadecimal, as determined by
-   conditions of the query. [ I appreciate where you're going with this
-   to trying to be more intuitive for zone maintainers, but wonder
-   whether this hasn't increased implementation complexity for only
-   minimal benefit.  Especially so with the automatic reference
-   direction described later which is also trying to be intuitive. ]
+   The Replacement Pattern generates the record data by replacing the
+   ${...} references with data captured from the query name, and copying
+   all other characters literally.
 
-   o  If query type is A, ranges are set to decimal.
+   The simplest form of reference uses only the reference number between
+   the braces, "{" and "}".  The value of the reference is simply copied
+   directly from the matching position of the query name.
 
-   o  If query type is AAAA, ranges are set to hexadecimal.
+   The next form of reference notation uses the asterisk, "_".  With
+   ${_}, all captured values in order of ascending position, delimited
+   by its default delimiter (described below), are placed in the answer.
 
-   o  If query type is PTR or Match Type is CNAME, the RR owner is used
-      to determine decimal or hexadecimal.
+   Numeric range references, such as ${1-4}, replaces all values
+   captured by those references, in order, delimited by the default
+   delimiter described below.  To reverse the order in which they are
+   copied, reverse the upper and lower values, such as ${4-1}.  This is
+   useful for generating PTR records from query names in which the
+   address is encoded in network order.
 
-   ** If RR owner ends in ".ip6.arpa.", ranges are set to hexadecimal.
+   Similar to range references, separating positions by commas creates
+   sets for replacement.  For example, ${1,4} would be replaced by the
+   first and fourth captured values, delimited its default delimiter.
+   This notation may be combined with the numeric range form, such as
+   ${3,2,1,8-4}.
 
-   ** If RR owner does not end in ".ip6.arpa.", ranges are set to
-   decimal.
+3.2.1.  Delimiters
 
-   The square bracket characters, "[" and "]", are reserved to enclose a
-   range specification and MUST NOT appear anywhere outside of a range
-   specification.
+   A reference can specify a delimiter to use between copied position
+   values by following a vertical bar, "|", with either zero or one
+   characters.  [ Why not any length? ]?  Zero characters, such as in
+   ${1-3|}, means no delimiter is used.  The default delimiter is the
+   hyphen, "-". [ Earlier drafts attempted to make the default delimiter
+   context-dependent, such as by using a period for A requests and a
+   colon for AAAA requests.  This increases implementation complexity as
+   an attempt to make things more intuitive for zone administrators.
+   However it isn't clear that this is a net gain for ease of use. ]
 
-3.2.  Record Generation using the BULK "Replacement Pattern" field
+3.2.2.  Delimiter intervals
 
-   Once it has been determined a query meets all criteria for a BULK
-   record generation the below rules are followed to process captured
-   numeric data and Replacement Pattern into RRs to apply to the answer-
-   set.
-
-3.2.1.  Replacement Pattern References
-
-   Before a record may be generated data must be captured in the Domain
-   Name Pattern comparison step above.  Each provided numeric range is
-   assigned to a temporary buffer to be used in this step.  To make the
-   jobs' of zone administrators easier the order of these buffers will
-   change based on the Match Type and owner so they will default to feel
-   more natural or intuitive.  Captured patterns and references are in
-   the same vein as regular expressions and are intended to feel
-   "familiar".  This is described in further detail (with examples) in
-   the sections below.
-
-3.2.1.1.  Reference Notation
-
-   BULK RRs use a dollar-sign "$" and curly braces "{" and "}" to
-   enclose references within the Replacement Pattern.  The following
-   rules are used to determine the final replacement string.
-
-3.2.1.1.1.  Simple numeric reference replacement
-
-   The simplest form of reference notation is its numeric form.  In this
-   form only the reference number falls between the curly braces "{" and
-   "}".  An example is "${1}" which would be replaced by the value in
-   the first capture position.  Position is described in detail in a
-   later section.
-
-   Numeric reference replacement indices start with one "1" to maintain
-   consistency with regular expression references.
-
-3.2.1.1.2.  Star reference replacement
-
-   The next form of reference notation is its star (or asterisk "_")
-   form.  In this form only an asterisk falls between the curly braces
-   "{" and "}".  This form "${_}" would be replaced by all captured
-   values in order of ascending position delimited by its default
-   delimiter (described below).  Position is described in detail in a
-   later section.
-
-3.2.1.1.3.  Numeric range reference replacement
-
-   The next form of reference notation is the numeric range form.  In
-   this form a range of numbers falls between the curly braces "{" and
-   "}".  An example of this is "${1-4}" which would be replaced by all
-   captured values within this range (1-4) in order of positions
-   provided delimited its default delimiter (described below).  To
-   reverse the order of positions in this example one could simply
-   reverse the upper and lower values to look like "${4-1}".  Position
-   is described in detail in a later section.
-
-3.2.1.1.4.  Numeric set reference replacement
-
-   The next form of reference notation is the numeric set form.  In this
-   form a set of numbers falls between the curly braces "{" and "}"
-   separated by commas.  An example of this is "${1,4}" which would be
-   replaced by the first and fourth captured values in the order of
-   position provided delimited its default delimiter (described below).
-   Position is described in detail in a later section.
-
-   This notation may be combined with the numeric range form allowing
-   specific positions or position ranges to be used.  Examples would be
-   "${3,2,1,4-8}" and "${8-12,1-4}".
-
-3.2.1.1.5.  Reference delimiter
-
-   The above sections reference a default delimiter.  In an effort to
-   provide an intuitive zone management experience the default delimiter
-   will be based on the BULK RR's Match Type.  For Match Type "A" the
-   default delimiter SHALL be a period ".", for Match Type "AAAA" the
-   default delimiter SHALL be a colon ":" and for Match Types "PTR" and
-   "CNAME" the default delimiter SHALL be a hyphen "-".  In any case the
-   default delimiter MAY be overridden by including it in the reference
-   braces after the set selectors and a reference field separator
-   character, the pipe "|".  An example would be "${_|-}" which would
-   force a hyphen "-" delimiter.  An empty or null delimiter is allowed
-   by not specifying a delimiter character, for example "${_|}", which
-   would simply concatenate all captured values in order of capture
-   position.  Position is described in detail in a later section.
-
-3.2.1.1.6.  Reference delimiter interval
-
-   The default behavior of a reference set is to combine each captured
-   value specified with a delimiter between each.  To allow captured
-   references to be delimited at another interval a third reference
-   field is provided.  An example would be "${*|-|4}" which would
-   concatenate all captured values but delimiting only every fourth
-   value with hyphens "-".  This can be a handy feature in the IPv6
+   A second vertical bar in the reference options introduces a delimiter
+   interval.  The default behavior of a multi-position reference is to
+   combine each captured value specified with a delimiter between each.
+   With a delimiter interval the delimiters are only added between every
+   Nth value.  For example, ${*|-|4} adds a hyphen between every group
+   of four captured positions.  This can be a handy feature in the IPv6
    reverse namespace where every nibble is captured as a separate value
-   and generated hostnames include sets of 4 nibbles.  An empty or null
-   value MUST be interpreted as "1" or every captured value.
+   and generated hostnames include sets of 4 nibbles.  An empty or 0
+   value for the delimiter interval MUST be interpreted as the default
+   value of 1.
 
-3.2.1.1.7.  Reference padding length
+3.2.3.  Padding length
 
-   When generating BULK based records a common requirement is to convert
-   from one numeric format to another, padding is among the most common
-   of these.  The fourth and final reference field determines what width
-   to pad to.  An example would be "${_|||4}" which would set the width
-   of all captured values to 4 by inserting leading zeros to fill the
-   void.  The default is empty or null which MUST be interpreted as NO
-   modification.  A width of zero "0" has a special interpretation
-   referred to as "unpad" meaning all leading zeros MUST be removed.  If
-   a value is provided captured values longer than this width MUST be
-   truncated to fit the specified width.  In the case where a delimiter
-   interval is provided captured values between the intervals will be
-   concatenated and the padding or unpadding applied as a unit and not
-   individually.  An example of this would be "${_||4|4}" which would
-   combine each range of 4 captured values and pad them to a width of 4
-   characters by inserting leading zeros where necessary.
+   The fourth and final reference option determines the field width of
+   the copied value.  Shorter values MUST be padded with leading zeroes
+   ("0") and longer values MUST be truncated to the width.
 
-3.2.1.1.8.  Reference Position
+   The default behavior, and that of an explicit empty padding length,
+   is that the captured query name substring is copied exactly.  A width
+   of zero "0" is a signal to "unpad", and any leading zeros MUST be
+   removed. [ Unnecessary complexity? ]
 
-   Great effort has gone into providing zone maintainers an intuitive
-   syntax.  As part of this effort, the captured values will reverse
-   direction depending on several factors.
+   If a delimiter interval greater than 1 is used, captured values
+   between the intervals will be concatenated and the padding or
+   unpadding applied as a unit and not individually.  An example of this
+   would be ${*||4|4} which would combine each range of 4 captured
+   values and pad or truncate them to a width of 4 characters.
 
-   As a general rule of thumb, if it makes sense the numeric ranges are
-   in reverse order from query to answer then they will be reversed.
-   Otherwise they will be in the same order.
+   [ If this is kept, the element/feature should probably be renamed
+   from "padding" since it is just as likely to truncate. ]
 
-   Take for example a simple reverse DNS lookup, from "10.2.3.4" to
-   "pool-A-3-4.example.com.".  Since DNS zones are arranged according to
-   management authority the records appear reversed numerically.  In
-   this example "10.2.3.4" becomes "4.3.2.10.in-addr.arpa.".  One would
-   intuitively expect this reversal to be reversed so positional indices
-   of captured values would increment toward the right of the
-   Replacement Pattern.  This expectation is especially important when
-   using range based replacements.
+3.2.4.  Final processing
 
-   Formally, the rules for position reversal are as follows:
+   The TTL of each RR generated by a BULK RR is the TTL of the
+   corresponding BULK record itself.  [ BULK should probably have its
+   own TTL field.  ]
 
-   Match Type RRs for "PTR" are reversed for zone owners ending in
-   either ".in-addr.arpa." or "ip6.arpa.".  All other Match Type RRs for
-   "PTR" are forward.
-
-   Match Type RRs for "A" (Address), "AAAA" (IPv6 Address) and "CNAME"
-   (Canonical Name) are forward.
-
-3.2.1.1.9.  Reference Position Negation
-
-   To allow simple reversal of any reference notation a single
-   exclamation point character "!"  MAY be used as the first character
-   of a reference set.  Examples would be "${!*}" and "${!1-4,7}".  In
-   both of the examples the reference positions SHALL be the exact
-   mirror equivalent as those without the leading exclamation point "!".
-   This can be very important if the BULK generated replacements have
-   values in positions opposite to what is required or expected.
-
-3.2.2.  Replacement Pattern examples
-
-   This section provides examples of several BULK RR Replacement
-   Patterns.  Each example is intended to further understanding for
-   implementers and DNS administrators alike.
-
-   EXAMPLE 1 For this example the query is defined as a PTR record for
-   "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating
-   BULK RR as:
-
-       - 86400 IN BULK PTR - pool-${*}.example.com.
-
-   This example contains several of the features described above.
-
-   First, the record owner is simply a single hyphen "-" denoting it is
-   a "hidden wildcard" (wildcard for generated records but not for
-   BULK).
-
-   Second, the Domain Name Pattern is also a single hyphen "-" denoting
-   all queries matching the owner's wildcard pattern for the "PTR" Match
-   Type are accepted and will be captured for use in the Replacement
-   Pattern.
-
-   Third, the Replacement Pattern contains a single "star" reference
-   denoting all captured numeric (decimal) references will be combined
-   with its default delimiter of hyphen "-" (for PTR) and placed into
-   the reference's position in the answer-set.  Should this generate an
-   invalid hostname the response will be NXDOMAIN unless other BULK
-   records match and are successfully generated without error.
-
-   The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates
-   matching references for "4", "3", "2" and "10" then reverses their
-   indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and
-   "${4}" to "4" respectively.  When applied to the Replacement Pattern
-   the answer becomes "pool-10-2-3-4.example.com.".
-
-   EXAMPLE 2 For this example the query is defined as a PTR record for
-   "10.2.3.4" with an origin of "2.10.in-addr.arpa." and the evaluating
-   BULK RR as:
-
-   - 86400 IN BULK PTR - pool-${*|||3}.example.com.
-
-   This example expands on EXAMPLE 1 with the differences outlined
-   below.
-
-   The only change to the BULK RR is the Replacement Pattern includes
-   additional fields, specifically null values for delimiter and
-   interval and a padding width of 3.
-
-   The owner for "10.2.3.4" is "4.3.2.10.in-addr.arpa." and creates
-   matching references for "4", "3", "2" and "10" and reverses their
-   indices so "${1}" resolves to "10", "${2}" to "2", "${3}" to "3" and
-   "${4}" to "4" respectively.  When applied to the Replacement Pattern
-   the answer becomes "pool-010002003004.example.com.".
-
-   EXAMPLE 3 This example contains a classless IPv4 delegation on the
-   /22 CIDR boundary as defined by [RFC2317].  The network for this
-   example is
-
-   "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs
-   for this example are defined as:
-
-   $ORIGIN 2.10.in-addr.arpa.
-   0-3 86400 IN      NS    ns1.sub.example.com.
-   -   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
-
-   For this example, the query would come in for "25.2.2.10.in-
-   addr.arpa.".  After matching the owner filter (ending in ".2.10.in-
-   addr.arpa.") and the fully qualified domain name pattern of
-   "[0-255].[0-3].2.10.in-addr.arpa." the answer-set would include a
-   generated RR consisting of captured values "25" and "2" joined by the
-   custom delimiter of period "." then joined by ".0-3" and made fully
-   qualified.  The resulting RR would be a "CNAME" with RDATA of
-   "25.2.0-3.2.10.in-addr.arpa.".  This record is now one delegated to
-   "ns1.sub.example.com." as its authority and the answer-set is
-   complete.
+   If the generated record type is one that uses domain names in its
+   resource record data, such as CNAME, any relative domain names MUST
+   be fully qualified with the origin domain of the BULK RR.
 
 4.  The NPN Resource Record
 
@@ -762,7 +561,7 @@ Table of Contents
    BULK and NPN RR as:
 
       -.2.10.in-addr.arpa. 86400 IN BULK PTR (
-                                          \[0-255].\[0-10]
+                                          [0-255].[0-10]
                                           pool-A-${1}-${2}.example.com.
                                           )
       *.2.10.in-addr.arpa. 86400 IN NPN  PTR 9 0 7 13
@@ -807,7 +606,7 @@ Table of Contents
 
    $ORIGIN 2.10.in-addr.arpa.
    0-3 86400 IN      NS    ns1.sub.example.com.
-   -   86400 IN BULK CNAME \[0-255].\[0-3] ${*|.}.0-3
+   -   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
    *   86400 IN NPN  CNAME 9 0 0 23
 
    For this example, a query of "10.2.2.65" would enter the nameserver
@@ -846,7 +645,7 @@ Table of Contents
    example are defined as:
 
    -.example.com. 86400 IN BULK A (
-                                      pool-A-\[0-10]-\[0-255]
+                                      pool-A-[0-10]-[0-255]
                                       10.2.${*}
                                      )
    *.example.com. 86400 IN NPN  A 9 0 8 0
@@ -887,7 +686,7 @@ Table of Contents
    RRs for this example are defined as:
 
    -.example.com. 86400 IN BULK AAAA (
-                                      pool-A-\[0-ffff]-\[0-ffff]
+                                      pool-A-[0-ffff]-[0-ffff]
                                       fc00::${1}:${2}
                                      )
    *.example.com. 86400 IN NPN  AAAA X 0 30 0
@@ -947,7 +746,7 @@ Table of Contents
    record and where delegated to another customer or SWIP will be
    automatically overridden.
 
-   When compared with bind's $GENERATE statement, if a singleton record
+   When compared with BIND's $GENERATE statement, if a singleton record
    such as CNAME appears within a $GENERATE range, either the CNAME or
    $GENERATE becomes invalid.  While a BULK record range would
    automatically notch out the CNAME without user intervention or
@@ -1116,7 +915,7 @@ Table of Contents
 8.  IANA Considerations
 
    IANA is requested to assign numbers for two DNS resource record types
-   identified in this document; BULK and NPN.
+   identified in this document: BULK and NPN.
 
 9.  Acknowledgments
 
@@ -1126,9 +925,7 @@ Table of Contents
    or identified individually.
 
    A special thanks is extended for the kindness, wisdom and technical
-   advice of:
-
-   Robert Whelton (CenturyLink, Inc.)
+   advice of Robert Whelton (CenturyLink, Inc.) and
 
 10.  References
 
@@ -1160,18 +957,6 @@ Table of Contents
               DOI 10.17487/RFC2317, March 1998,
               <http://www.rfc-editor.org/info/rfc2317>.
 
-   [RFC2536]  Eastlake 3rd, D., "DSA KEYs and SIGs in the Domain Name
-              System (DNS)", RFC 2536, DOI 10.17487/RFC2536, March 1999,
-              <http://www.rfc-editor.org/info/rfc2536>.
-
-   [RFC2931]  Eastlake 3rd, D., "DNS Request and Transaction Signatures
-              ( SIG(0)s )", RFC 2931, DOI 10.17487/RFC2931, September
-              2000, <http://www.rfc-editor.org/info/rfc2931>.
-
-   [RFC3110]  Eastlake 3rd, D., "RSA/SHA-1 SIGs and RSA KEYs in the
-              Domain Name System (DNS)", RFC 3110, DOI 10.17487/RFC3110,
-              May 2001, <http://www.rfc-editor.org/info/rfc3110>.
-
    [RFC3597]  Gustafsson, A., "Handling of Unknown DNS Resource Record
               (RR) Types", RFC 3597, DOI 10.17487/RFC3597, September
               2003, <http://www.rfc-editor.org/info/rfc3597>.
@@ -1196,16 +981,102 @@ Table of Contents
               DOI 10.17487/RFC5234, January 2008,
               <http://www.rfc-editor.org/info/rfc5234>.
 
-   [us-ascii]
-              American National Standards Institute, "Coded Character
-              Set -- 7-bit American Standard Code for Information
-              Interchange", ANSI X3.4, 1986.
-
 10.2.  Informative References
+
+   [bind-arm]
+              Internet Systems Consortium, "BIND 9 Configuration
+              Reference", 2016,
+              <https://ftp.isc.org/isc/bind9/cur/9.9/doc/arm/
+              Bv9ARM.html>.
 
    [RFC7719]  Hoffman, P., Sullivan, A., and K. Fujiwara, "DNS
               Terminology", RFC 7719, DOI 10.17487/RFC7719, December
               2015, <http://www.rfc-editor.org/info/rfc7719>.
+
+Appendix A.  BULK Examples
+
+A.1.  Example 1
+
+   $ORIGIN 2.10.in-addr.arpa.
+   @ 86400 IN BULK PTR (
+             [0-255].[0-255].2.10.in-addr.arpa.
+             pool-${*}.example.com.
+           )
+
+   A query received for the PTR of 4.3.2.10.in-addr.arpa will create the
+   references ${1} and ${2} with values 4 and 3, respectively.  The ${*}
+   reference in the replacement pattern will then substitute them with
+   the default delimiter of hyphen between every character and no
+   special field width modifications.  The TTL of the BULK RR is used
+   for the generated record, making the response:
+
+   4.3.2.10.in-addr.arpa 86400 IN PTR pool-4-3.example.com.
+
+   [ John and Dean, I realize that without the automagic and reference
+   creation of the whole name as was described by earlier drafts, this
+   example materially changes by not only not having the numeric order
+   unreversed, but also by not including the 10 and the 2 in the
+   generated name.  With the current definition you would get the same
+   result as the original simply by using:
+
+      @ 86400 IN BULK PTR (
+             [0-255].[0-255].2.10.in-addr.arpa.
+             pool-10-2-${2,1}.example.com.
+           )
+
+   I will however also admit that it would be nice to get that 10 and 2
+   in there without having to hardcode them, so it needs some more
+   thought.
+
+   ]
+
+A.2.  Example 2
+
+   $ORIGIN 2.10.in-addr.arpa.
+   @ 86400 IN BULK PTR (
+             [0-255].[0-255].2.10.in-addr.arpa.
+             pool-${2,1|||3}.example.com.
+           )
+
+   Example 2 is similar to Example 1, except that it modifies the
+   replacement pattern.  The empty option after the first vertical bar
+   causes no delimiters to be inserted, while the second empty option
+   that would keep the delimiter interval as 1.  The latter is relevant
+   because the final value, padding of 3, is applied over each delimiter
+   interval even when no delimiter is used.
+
+   The result is that a query for the PTR of 4.3.2.10.in-addr.arpa
+   generates this response:
+
+   4.3.2.10.in-addr.arpa 86400 IN PTR pool-003004.example.com.
+
+   [ Admittedly you can't do this very effectively without the field
+   width complexity.  Is this sort of name common?  Does it need
+   support?  Admittedly $GENERATE had the feature, but is that reason
+   enough? ]
+
+A.3.  Example 3
+
+   This example contains a classless IPv4 delegation on the /22 CIDR
+   boundary as defined by [RFC2317].  The network for this example is
+   "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs
+   for this example are defined as:
+
+   $ORIGIN 2.10.in-addr.arpa.
+   @    7200 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
+   0-3 86400 IN NS ns1.sub.example.com.
+
+   A query for the PTR of 25.2.2.10.in-addr.arpa is received and the
+   BULK record with the CNAME Match Type matches all query types.  25
+   and 2 are captured as references, and joined in the answer by the
+   period (".") character as a delimiter, with ".0-3" then appended
+   literally and fully qualified by the origin domain.  The final
+   synthesized record is:
+
+   25.2.2.10.in-addr.arpa 7200 IN CNAME 25.2.0-3.2.10.in-addr.arpa.
+
+   [ Without $* and options complexity, pattern to get the same result
+   is just ${1}.{$2}.0-3 ]
 
 Authors' Addresses
 
