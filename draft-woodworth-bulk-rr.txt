@@ -80,7 +80,7 @@ Table of Contents
    2.  The BULK Resource Record  . . . . . . . . . . . . . . . . . .   4
      2.1.  BULK RDATA Wire Format  . . . . . . . . . . . . . . . . .   4
      2.2.  The BULK RR Presentation Format . . . . . . . . . . . . .   6
-   3.  BULK Replacement  . . . . . . . . . . . . . . . . . . . . . .   6
+   3.  BULK Replacement  . . . . . . . . . . . . . . . . . . . . . .   7
      3.1.  Matching the Domain Name Pattern  . . . . . . . . . . . .   7
      3.2.  Record Generation using Replacement Pattern . . . . . . .   7
        3.2.1.  Delimiters  . . . . . . . . . . . . . . . . . . . . .   8
@@ -89,16 +89,16 @@ Table of Contents
        3.2.4.  Final processing  . . . . . . . . . . . . . . . . . .   9
    4.  The NPN Resource Record . . . . . . . . . . . . . . . . . . .   9
      4.1.  NPN RDATA Wire Format . . . . . . . . . . . . . . . . . .   9
-       4.1.1.  The Match Type field  . . . . . . . . . . . . . . . .   9
-       4.1.2.  The Flags field . . . . . . . . . . . . . . . . . . .   9
+       4.1.1.  The Match Type field  . . . . . . . . . . . . . . . .  10
+       4.1.2.  The Flags field . . . . . . . . . . . . . . . . . . .  10
        4.1.3.  The Owner Ignore field  . . . . . . . . . . . . . . .  10
        4.1.4.  The Left Ignore field . . . . . . . . . . . . . . . .  10
-       4.1.5.  The Right Ignore field  . . . . . . . . . . . . . . .  10
+       4.1.5.  The Right Ignore field  . . . . . . . . . . . . . . .  11
      4.2.  The NPN RR Presentation Format  . . . . . . . . . . . . .  11
      4.3.  Normalization Processing of NPN RRs . . . . . . . . . . .  11
        4.3.1.  Pseudocode for NPN Normalization Processing . . . . .  12
        4.3.2.  NPN Normalization Processing examples . . . . . . . .  13
-   5.  Positive Side-Effects . . . . . . . . . . . . . . . . . . . .  16
+   5.  Positive Side-Effects . . . . . . . . . . . . . . . . . . . .  17
      5.1.  Record Superimposition  . . . . . . . . . . . . . . . . .  17
      5.2.  Pattern Based DNSSEC support  . . . . . . . . . . . . . .  17
    6.  Known Limitations . . . . . . . . . . . . . . . . . . . . . .  17
@@ -307,6 +307,9 @@ Internet-Draft                   BULK RR                   February 2017
    I definitely see how it could make for shorter replacement patterns,
    but does it enhance their clarity and usability? ]
 
+   The Replacement Pattern MUST end in a period if it is intended to
+   represent a fully qualified domain name.
+
 2.2.  The BULK RR Presentation Format
 
    Match Type is represented as an RR type mnemonic or with [RFC3597]'s
@@ -323,13 +326,10 @@ Internet-Draft                   BULK RR                   February 2017
    parenthetical line continuation, per [RFC1035] Section 5.1, starting
    after Match Type and ending after Replacement Pattern.
 
-3.  BULK Replacement
 
-   When an authoritative nameserver receives a query for which it does
-   not have a matching name or a covering wildcard, it MUST then look
-   for BULK RRs at the zone apex, selecting all BULK RRs with a Match
-   Type that matches the query type and a Domain Name Pattern that
-   matches the query name.  Note that query type ANY will select all
+
+
+
 
 
 
@@ -338,6 +338,13 @@ Woodworth, et al.        Expires August 19, 2017                [Page 6]
 Internet-Draft                   BULK RR                   February 2017
 
 
+3.  BULK Replacement
+
+   When an authoritative nameserver receives a query for which it does
+   not have a matching name or a covering wildcard, it MUST then look
+   for BULK RRs at the zone apex, selecting all BULK RRs with a Match
+   Type that matches the query type and a Domain Name Pattern that
+   matches the query name.  Note that query type ANY will select all
    Match Types, and all query types match a CNAME Match Type [ and
    DNAME? ].  One or more answer RRs will be generated per the
    replacement rules below.  Examples are provided in an appendix.
@@ -379,13 +386,6 @@ Internet-Draft                   BULK RR                   February 2017
    useful for generating PTR records from query names in which the
    address is encoded in network order.
 
-   Similar to range references, separating positions by commas creates
-   sets for replacement.  For example, ${1,4} would be replaced by the
-   first and fourth captured values, delimited its default delimiter.
-   This notation may be combined with the numeric range form, such as
-   ${3,2,1,8-4}.
-
-
 
 
 
@@ -393,6 +393,12 @@ Woodworth, et al.        Expires August 19, 2017                [Page 7]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+   Similar to range references, separating positions by commas creates
+   sets for replacement.  For example, ${1,4} would be replaced by the
+   first and fourth captured values, delimited its default delimiter.
+   This notation may be combined with the numeric range form, such as
+   ${3,2,1,8-4}.
 
 3.2.1.  Delimiters
 
@@ -436,12 +442,6 @@ Internet-Draft                   BULK RR                   February 2017
    would be ${*||4|4} which would combine each range of 4 captured
    values and pad or truncate them to a width of 4 characters.
 
-   [ If this is kept, the element/feature should probably be renamed
-   from "padding" since it is just as likely to truncate. ]
-
-
-
-
 
 
 
@@ -450,7 +450,14 @@ Woodworth, et al.        Expires August 19, 2017                [Page 8]
 Internet-Draft                   BULK RR                   February 2017
 
 
+   [ If this is kept, the element/feature should probably be renamed
+   from "padding" since it is just as likely to truncate. ]
+
 3.2.4.  Final processing
+
+   The string that results from all replacements is converted to the
+   appropriate rdata format for the record type.  If the conversion
+   fails, the SERVFAIL rcode MUST be set on the response.
 
    The TTL of each RR generated by a BULK RR is the TTL of the
    corresponding BULK record itself.  [ BULK should probably have its
@@ -460,8 +467,8 @@ Internet-Draft                   BULK RR                   February 2017
    pretty useless normally. ]
 
    If the generated record type is one that uses domain names in its
-   resource record data, such as CNAME, any relative domain names MUST
-   be fully qualified with the origin domain of the BULK RR.
+   resource record data, such as CNAME, a relative domain names MUST be
+   fully qualified with the origin domain of the BULK RR.
 
 4.  The NPN Resource Record
 
@@ -488,6 +495,17 @@ Internet-Draft                   BULK RR                   February 2017
    |  Left Ignore  |  Right Ignore |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+
+
+
+
+
+
+Woodworth, et al.        Expires August 19, 2017                [Page 9]
+
+Internet-Draft                   BULK RR                   February 2017
+
+
 4.1.1.  The Match Type field
 
    The Match Type field identifies the type of the RRset identified by
@@ -498,14 +516,6 @@ Internet-Draft                   BULK RR                   February 2017
    The Flags field defines additional processing parameters for data
    normalization.  This document defines only the Period-As-Number flag
    "." (position 5), the Hyphen-As-Number "-" (position 6) and the
-
-
-
-Woodworth, et al.        Expires August 19, 2017                [Page 9]
-
-Internet-Draft                   BULK RR                   February 2017
-
-
    hexadecimal flag "X" (position 7).  All other flags are reserved for
    future use.
 
@@ -545,22 +555,19 @@ Internet-Draft                   BULK RR                   February 2017
    by the normalization process.  Normalization Processing will be
    described further in a later section.
 
-4.1.5.  The Right Ignore field
-
-   The Right Ignore field defines the length of characters as counted
-   from the right-hand side of the generated RDATA which MUST be ignored
-   by the normalization process.  Normalization Processing will be
-   described further in a later section.
-
-
-
-
 
 
 Woodworth, et al.        Expires August 19, 2017               [Page 10]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+4.1.5.  The Right Ignore field
+
+   The Right Ignore field defines the length of characters as counted
+   from the right-hand side of the generated RDATA which MUST be ignored
+   by the normalization process.  Normalization Processing will be
+   described further in a later section.
 
 4.2.  The NPN RR Presentation Format
 
@@ -602,14 +609,7 @@ Internet-Draft                   BULK RR                   February 2017
    the expectation other pattern-based resource records may emerge and
    leverage NPN records for their DNSSEC support requirements.
 
-   For RR's RDATA field, character from beginning to the index of Left
-   Ignore value or characters with index of Right Ignore value to the
-   end MUST NOT be modified by this algorithm.
 
-   In the remaining portion of both Owner and RDATA strings of numeric
-   data, defined as character "0" through "f" or "0" through "9"
-   depending on whether or not the Hexadecimal flag is set or not, MUST
-   be consolidated to a single character and set to the highest value
 
 
 
@@ -618,6 +618,14 @@ Woodworth, et al.        Expires August 19, 2017               [Page 11]
 Internet-Draft                   BULK RR                   February 2017
 
 
+   For RR's RDATA field, character from beginning to the index of Left
+   Ignore value or characters with index of Right Ignore value to the
+   end MUST NOT be modified by this algorithm.
+
+   In the remaining portion of both Owner and RDATA strings of numeric
+   data, defined as character "0" through "f" or "0" through "9"
+   depending on whether or not the Hexadecimal flag is set or not, MUST
+   be consolidated to a single character and set to the highest value
    defined by the Hexadecimal flag.  Examples may be found in the
    following section.  If period-as-number or hyphen-as-number flags are
    set whichever are used ("." or "-") would be treated as part of the
@@ -652,6 +660,20 @@ Internet-Draft                   BULK RR                   February 2017
    The pseudocode provided below assumes all associated RRs are valid
    members of a DNSSEC compatible RRset (including BULK generated ones).
 
+
+
+
+
+
+
+
+
+
+Woodworth, et al.        Expires August 19, 2017               [Page 12]
+
+Internet-Draft                   BULK RR                   February 2017
+
+
       for rr in rrset
           if (has_NPN<rr.owner, rr.class, rr.type>)
               rr.rdata_normal = NPN_normalize<rr.rdata>
@@ -665,14 +687,6 @@ Internet-Draft                   BULK RR                   February 2017
       process_canonical_form<sigrrset>
 
       dnssec_sign<sigrrset>
-
-
-
-
-Woodworth, et al.        Expires August 19, 2017               [Page 12]
-
-Internet-Draft                   BULK RR                   February 2017
-
 
    Similar logic MUST be used for determining DNSSEC validity of RRsets
    in verification (validation) nameservers for signatures generated
@@ -708,6 +722,14 @@ Internet-Draft                   BULK RR                   February 2017
    Everything to the left of "3-44" will remain intact as will
    everything to its right.  The remaining characters will be processed
    for numbers between "0" and "9" as indicated by the NPN record's
+
+
+
+Woodworth, et al.        Expires August 19, 2017               [Page 13]
+
+Internet-Draft                   BULK RR                   February 2017
+
+
    hexadecimal flag "9" and each run replaced by the single character
    "9".  The final Normalized RDATA would therefore become "pool-
    A-9-9.example.com." and its signature would be based on this
@@ -722,13 +744,6 @@ Internet-Draft                   BULK RR                   February 2017
    signature.
 
    EXAMPLE 2
-
-
-
-Woodworth, et al.        Expires August 19, 2017               [Page 13]
-
-Internet-Draft                   BULK RR                   February 2017
-
 
    This example contains a classless IPv4 delegation on the /22 CIDR
    boundary as defined by [RFC2317].  The network for this example is
@@ -763,6 +778,14 @@ Internet-Draft                   BULK RR                   February 2017
    3.2.10.in-addr.arpa." and its signature would be based on this
    "normalized" RDATA field.  This new "normalized" string would be used
    as an RDATA for the wildcard label of "*.2.10.in-addr.arpa." now
+
+
+
+Woodworth, et al.        Expires August 19, 2017               [Page 14]
+
+Internet-Draft                   BULK RR                   February 2017
+
+
    encompassing all possible permutations of the "${*|.}.0-3.2.10.in-
    addr.arpa." pattern.
 
@@ -774,17 +797,6 @@ Internet-Draft                   BULK RR                   February 2017
    example the query is defined as an "A" record for "pool-
    A-3-44.example.com." with an origin of "example.com.".  RRs for this
    example are defined as:
-
-
-
-
-
-
-
-Woodworth, et al.        Expires August 19, 2017               [Page 14]
-
-Internet-Draft                   BULK RR                   February 2017
-
 
    -.example.com. 86400 IN BULK A (
                                       pool-A-[0-10]-[0-255]
@@ -822,6 +834,14 @@ Internet-Draft                   BULK RR                   February 2017
    wildcard label of "_.example.com." now encompassing all possible
    permutations of the "10.2.${_}" pattern.
 
+
+
+
+Woodworth, et al.        Expires August 19, 2017               [Page 15]
+
+Internet-Draft                   BULK RR                   February 2017
+
+
    EXAMPLE 4 This example provides similar logic for an IPv6 AAAA
    record.  For this example the query is defined as an "AAAA" record
    for "pool-A-ff-aa.example.com." with an origin of "example.com.".
@@ -832,15 +852,6 @@ Internet-Draft                   BULK RR                   February 2017
                                       fc00::${1}:${2}
                                      )
    *.example.com. 86400 IN NPN  AAAA X 0 30 0
-
-
-
-
-
-Woodworth, et al.        Expires August 19, 2017               [Page 15]
-
-Internet-Draft                   BULK RR                   February 2017
-
 
    By protecting the "Ignore" characters from the generated RR's RDATA
    the focus for normalization becomes "00ff:00aa" as illustrated below.
@@ -879,17 +890,6 @@ Internet-Draft                   BULK RR                   February 2017
    "f".  The final Normalized RDATA would therefore become "fc00::f:f"
    and its signature would be based on this "normalized" RDATA field.
    This new "normalized" "AAAA" RR would be used as an RDATA for the
-   wildcard label of "*.example.com." now encompassing all possible
-   permutations of the "fc00::${1}:${2}" pattern.
-
-5.  Positive Side-Effects
-
-   This section highlights positive side effects of some architectural
-   decisions regarding the BULK RR design.
-
-
-
-
 
 
 
@@ -897,6 +897,14 @@ Woodworth, et al.        Expires August 19, 2017               [Page 16]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+   wildcard label of "*.example.com." now encompassing all possible
+   permutations of the "fc00::${1}:${2}" pattern.
+
+5.  Positive Side-Effects
+
+   This section highlights positive side effects of some architectural
+   decisions regarding the BULK RR design.
 
 5.1.  Record Superimposition
 
@@ -938,14 +946,6 @@ Internet-Draft                   BULK RR                   February 2017
    much more memory would be sacrificed with $GENERATES to save the CPU
    cycles required to support BULK records.  Additionally, $GENERATES
    cannot be transferred (i.e.  AXFR) without expansion and an IPv6 CIDR
-   even as small as /96 would be simply impossible.  BULK on the other
-   hand can easily support IPv6 CIDRs of /64 and much larger with very
-   little effort.
-
-
-
-
-
 
 
 
@@ -953,6 +953,10 @@ Woodworth, et al.        Expires August 19, 2017               [Page 17]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+   even as small as /96 would be simply impossible.  BULK on the other
+   hand can easily support IPv6 CIDRs of /64 and much larger with very
+   little effort.
 
 6.2.  Pre-Adoption Nameserver Implications
 
@@ -999,16 +1003,15 @@ Internet-Draft                   BULK RR                   February 2017
    fly signing or be ignored by implementations which can not or will
    not comply.
 
-   No changes to recursive (resolving) nameservers is required to
-   support this solution.
-
-
 
 
 Woodworth, et al.        Expires August 19, 2017               [Page 18]
 
 Internet-Draft                   BULK RR                   February 2017
 
+
+   No changes to recursive (resolving) nameservers is required to
+   support this solution.
 
 7.1.2.  Normalized (NPN Based) Signatures
 
@@ -1053,9 +1056,6 @@ Internet-Draft                   BULK RR                   February 2017
    support may serve such zones without either of the above solutions
    and records generated based on BULK RRs will require zero support
    from recursive (resolving) nameservers.
-
-
-
 
 
 
