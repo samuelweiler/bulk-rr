@@ -388,29 +388,21 @@
 <link href="#rfc.section.3.2.4" rel="Chapter" title="3.2.4 Final processing">
 <link href="#rfc.section.4" rel="Chapter" title="4 The NPN Resource Record">
 <link href="#rfc.section.4.1" rel="Chapter" title="4.1 NPN RDATA Wire Format">
-<link href="#rfc.section.4.1.1" rel="Chapter" title="4.1.1 The Match Type field">
-<link href="#rfc.section.4.1.2" rel="Chapter" title="4.1.2 The Flags field">
-<link href="#rfc.section.4.1.3" rel="Chapter" title="4.1.3 The Owner Ignore field">
-<link href="#rfc.section.4.1.4" rel="Chapter" title="4.1.4 The Left Ignore field">
-<link href="#rfc.section.4.1.5" rel="Chapter" title="4.1.5 The Right Ignore field">
 <link href="#rfc.section.4.2" rel="Chapter" title="4.2 The NPN RR Presentation Format">
-<link href="#rfc.section.4.3" rel="Chapter" title="4.3 Normalization Processing of NPN RRs">
+<link href="#rfc.section.4.3" rel="Chapter" title="4.3 Use and Normalization Processing of NPN RRs">
 <link href="#rfc.section.4.3.1" rel="Chapter" title="4.3.1 Pseudocode for NPN Normalization Processing">
-<link href="#rfc.section.4.3.2" rel="Chapter" title="4.3.2 NPN Normalization Processing examples">
-<link href="#rfc.section.5" rel="Chapter" title="5 Positive Side-Effects">
-<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Record Superimposition">
-<link href="#rfc.section.5.2" rel="Chapter" title="5.2 Pattern Based DNSSEC support">
-<link href="#rfc.section.6" rel="Chapter" title="6 Known Limitations">
-<link href="#rfc.section.6.1" rel="Chapter" title="6.1 Increased CPU utilization for NXDOMAIN RRs">
-<link href="#rfc.section.6.2" rel="Chapter" title="6.2 Pre-Adoption Nameserver Implications">
-<link href="#rfc.section.7" rel="Chapter" title="7 Security Considerations">
-<link href="#rfc.section.7.1" rel="Chapter" title="7.1 DNSSEC Signature Strategies">
-<link href="#rfc.section.7.1.1" rel="Chapter" title="7.1.1 On-the-fly (Live) Signatures">
-<link href="#rfc.section.7.1.2" rel="Chapter" title="7.1.2 Normalized (NPN Based) Signatures">
-<link href="#rfc.section.7.1.3" rel="Chapter" title="7.1.3 Non-DNSSEC Zone Support Only">
-<link href="#rfc.section.7.2" rel="Chapter" title="7.2 DNSSEC Verifier Details">
-<link href="#rfc.section.7.3" rel="Chapter" title="7.3 DDOS Attack Vectors and Mitigation">
-<link href="#rfc.section.7.4" rel="Chapter" title="7.4 Implications of Large Scale DNS Records">
+<link href="#rfc.section.4.4" rel="Chapter" title="4.4 Pattern Based DNSSEC support">
+<link href="#rfc.section.5" rel="Chapter" title="5 Known Limitations">
+<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Unsupported Nameservers">
+<link href="#rfc.section.6" rel="Chapter" title="6 Security Considerations">
+<link href="#rfc.section.6.1" rel="Chapter" title="6.1 DNSSEC Signature Strategies">
+<link href="#rfc.section.6.1.1" rel="Chapter" title="6.1.1 On-the-fly Signatures">
+<link href="#rfc.section.6.1.2" rel="Chapter" title="6.1.2 Normalized (NPN-Based) Signatures">
+<link href="#rfc.section.6.1.3" rel="Chapter" title="6.1.3 Non-DNSSEC Zone Support Only">
+<link href="#rfc.section.6.2" rel="Chapter" title="6.2 DNSSEC Validator Details">
+<link href="#rfc.section.6.3" rel="Chapter" title="6.3 DDOS Attack Vectors and Mitigation">
+<link href="#rfc.section.6.4" rel="Chapter" title="6.4 Implications of Large-Scale DNS Records">
+<link href="#rfc.section.7" rel="Chapter" title="7 Privacy Considerations">
 <link href="#rfc.section.8" rel="Chapter" title="8 IANA Considerations">
 <link href="#rfc.section.9" rel="Chapter" title="9 Acknowledgments">
 <link href="#rfc.references" rel="Chapter" title="10 References">
@@ -420,6 +412,11 @@
 <link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Example 1">
 <link href="#rfc.appendix.A.2" rel="Chapter" title="A.2 Example 2">
 <link href="#rfc.appendix.A.3" rel="Chapter" title="A.3 Example 3">
+<link href="#rfc.appendix.B" rel="Chapter" title="B NPN Examples">
+<link href="#rfc.appendix.B.1" rel="Chapter" title="B.1 EXAMPLE 1">
+<link href="#rfc.appendix.B.2" rel="Chapter" title="B.2 EXAMPLE 2">
+<link href="#rfc.appendix.B.3" rel="Chapter" title="B.3 EXAMPLE 3">
+<link href="#rfc.appendix.B.4" rel="Chapter" title="B.4 EXAMPLE 4">
 <link href="#rfc.authors" rel="Chapter">
 
 
@@ -525,53 +522,37 @@
 </li>
 <ul><li>4.1.   <a href="#rfc.section.4.1">NPN RDATA Wire Format</a>
 </li>
-<ul><li>4.1.1.   <a href="#rfc.section.4.1.1">The Match Type field</a>
+<li>4.2.   <a href="#rfc.section.4.2">The NPN RR Presentation Format</a>
 </li>
-<li>4.1.2.   <a href="#rfc.section.4.1.2">The Flags field</a>
-</li>
-<li>4.1.3.   <a href="#rfc.section.4.1.3">The Owner Ignore field</a>
-</li>
-<li>4.1.4.   <a href="#rfc.section.4.1.4">The Left Ignore field</a>
-</li>
-<li>4.1.5.   <a href="#rfc.section.4.1.5">The Right Ignore field</a>
-</li>
-</ul><li>4.2.   <a href="#rfc.section.4.2">The NPN RR Presentation Format</a>
-</li>
-<li>4.3.   <a href="#rfc.section.4.3">Normalization Processing of NPN RRs</a>
+<li>4.3.   <a href="#rfc.section.4.3">Use and Normalization Processing of NPN RRs</a>
 </li>
 <ul><li>4.3.1.   <a href="#rfc.section.4.3.1">Pseudocode for NPN Normalization Processing</a>
 </li>
-<li>4.3.2.   <a href="#rfc.section.4.3.2">NPN Normalization Processing examples</a>
+</ul><li>4.4.   <a href="#rfc.section.4.4">Pattern Based DNSSEC support</a>
 </li>
-</ul></ul><li>5.   <a href="#rfc.section.5">Positive Side-Effects</a>
+</ul><li>5.   <a href="#rfc.section.5">Known Limitations</a>
 </li>
-<ul><li>5.1.   <a href="#rfc.section.5.1">Record Superimposition</a>
+<ul><li>5.1.   <a href="#rfc.section.5.1">Unsupported Nameservers</a>
 </li>
-<li>5.2.   <a href="#rfc.section.5.2">Pattern Based DNSSEC support</a>
+</ul><li>6.   <a href="#rfc.section.6">Security Considerations</a>
 </li>
-</ul><li>6.   <a href="#rfc.section.6">Known Limitations</a>
+<ul><li>6.1.   <a href="#rfc.section.6.1">DNSSEC Signature Strategies</a>
 </li>
-<ul><li>6.1.   <a href="#rfc.section.6.1">Increased CPU utilization for NXDOMAIN RRs</a>
+<ul><li>6.1.1.   <a href="#rfc.section.6.1.1">On-the-fly Signatures</a>
 </li>
-<li>6.2.   <a href="#rfc.section.6.2">Pre-Adoption Nameserver Implications</a>
+<li>6.1.2.   <a href="#rfc.section.6.1.2">Normalized (NPN-Based) Signatures</a>
 </li>
-</ul><li>7.   <a href="#rfc.section.7">Security Considerations</a>
+<li>6.1.3.   <a href="#rfc.section.6.1.3">Non-DNSSEC Zone Support Only</a>
 </li>
-<ul><li>7.1.   <a href="#rfc.section.7.1">DNSSEC Signature Strategies</a>
+</ul><li>6.2.   <a href="#rfc.section.6.2">DNSSEC Validator Details</a>
 </li>
-<ul><li>7.1.1.   <a href="#rfc.section.7.1.1">On-the-fly (Live) Signatures</a>
+<li>6.3.   <a href="#rfc.section.6.3">DDOS Attack Vectors and Mitigation</a>
 </li>
-<li>7.1.2.   <a href="#rfc.section.7.1.2">Normalized (NPN Based) Signatures</a>
+<li>6.4.   <a href="#rfc.section.6.4">Implications of Large-Scale DNS Records</a>
 </li>
-<li>7.1.3.   <a href="#rfc.section.7.1.3">Non-DNSSEC Zone Support Only</a>
+</ul><li>7.   <a href="#rfc.section.7">Privacy Considerations</a>
 </li>
-</ul><li>7.2.   <a href="#rfc.section.7.2">DNSSEC Verifier Details</a>
-</li>
-<li>7.3.   <a href="#rfc.section.7.3">DDOS Attack Vectors and Mitigation</a>
-</li>
-<li>7.4.   <a href="#rfc.section.7.4">Implications of Large Scale DNS Records</a>
-</li>
-</ul><li>8.   <a href="#rfc.section.8">IANA Considerations</a>
+<li>8.   <a href="#rfc.section.8">IANA Considerations</a>
 </li>
 <li>9.   <a href="#rfc.section.9">Acknowledgments</a>
 </li>
@@ -588,6 +569,16 @@
 <li>A.2.   <a href="#rfc.appendix.A.2">Example 2</a>
 </li>
 <li>A.3.   <a href="#rfc.appendix.A.3">Example 3</a>
+</li>
+</ul><li>Appendix B.   <a href="#rfc.appendix.B">NPN Examples</a>
+</li>
+<ul><li>B.1.   <a href="#rfc.appendix.B.1">EXAMPLE 1</a>
+</li>
+<li>B.2.   <a href="#rfc.appendix.B.2">EXAMPLE 2</a>
+</li>
+<li>B.3.   <a href="#rfc.appendix.B.3">EXAMPLE 3</a>
+</li>
+<li>B.4.   <a href="#rfc.appendix.B.4">EXAMPLE 4</a>
 </li>
 </ul><li><a href="#rfc.authors">Authors' Addresses</a>
 </li>
@@ -669,7 +660,7 @@ quoted-char   = "\" octet
 </pre>
 <p id="rfc.section.2.1.p.5">[ Should [] and &lt;&gt; be allowed as short for [0-255] and &lt;00-ff&gt;? ]</p>
 <p id="rfc.section.2.1.p.6">Interpretation of the Domain Name Pattern is described in detail in the "BULK Replacement" section.</p>
-<p id="rfc.section.2.1.p.7">Replacement Pattern describes how the answer RRset MUST be generated for the matching query.  It needs no length indicator because its end can be derived from the rdata length minus Match Type and Domain Name Pattern lengths.  It uses the following additional ABNF elements:</p>
+<p id="rfc.section.2.1.p.7">Replacement Pattern describes how the answer RRset MUST be generated for the matching query.  It needs no length indicator because its end can be derived from the RDATA length minus Match Type and Domain Name Pattern lengths.  It uses the following additional ABNF elements:</p>
 <pre>
 replace       =   1*(reference / string)
 
@@ -694,6 +685,7 @@ padding       =   "|" *2DIGIT
 </pre>
 <p id="rfc.section.2.1.p.8">[ Is this complexity beyond simple ${1}, ${2}, etc, really worth it?  I definitely see how it could make for shorter replacement patterns, but does it enhance their clarity and usability? ]</p>
 <p id="rfc.section.2.1.p.9">The Replacement Pattern MUST end in a period if it is intended to represent a fully qualified domain name.</p>
+<p id="rfc.section.2.1.p.10">[ Should there be a defined limit on the number of references?  Even every hex character of an IPv6 address is only 32 references, and knowing a reasonable maximum can possibly simplify implementations. ]</p>
 <h1 id="rfc.section.2.2">
 <a href="#rfc.section.2.2">2.2.</a> <a href="#the-bulk-rr-presentation-format" id="the-bulk-rr-presentation-format">The BULK RR Presentation Format</a>
 </h1>
@@ -705,6 +697,7 @@ padding       =   "|" *2DIGIT
 <a href="#rfc.section.3">3.</a> <a href="#bulk-replacement" id="bulk-replacement">BULK Replacement</a>
 </h1>
 <p id="rfc.section.3.p.1">When an authoritative nameserver receives a query for which it does not have a matching name or a covering wildcard, it MUST then look for BULK RRs at the zone apex, selecting all BULK RRs with a Match Type that matches the query type and a Domain Name Pattern that matches the query name.  Note that query type ANY will select all Match Types, and all query types match a CNAME Match Type [ and DNAME? ].  One or more answer RRs will be generated per the replacement rules below.  Examples are provided in an appendix.</p>
+<p id="rfc.section.3.p.2">By only triggering the BULK algorithm when the query name does not exist, administrators are given the flexibility to explicitly override the behaviour of specific names that would otherwise match the BULK record's Domain Name Pattern.  This is unlike BIND's $GENERATE directive, which adds the generated RRs to any existing names.</p>
 <h1 id="rfc.section.3.1">
 <a href="#rfc.section.3.1">3.1.</a> <a href="#matching-the-domain-name-pattern" id="matching-the-domain-name-pattern">Matching the Domain Name Pattern</a>
 </h1>
@@ -736,20 +729,21 @@ padding       =   "|" *2DIGIT
 <h1 id="rfc.section.3.2.4">
 <a href="#rfc.section.3.2.4">3.2.4.</a> <a href="#final-processing" id="final-processing">Final processing</a>
 </h1>
-<p id="rfc.section.3.2.4.p.1">The string that results from all replacements is converted to the appropriate rdata format for the record type.  If the conversion fails, the SERVFAIL rcode MUST be set on the response.</p>
+<p id="rfc.section.3.2.4.p.1">The string that results from all replacements is converted to the appropriate RDATA format for the record type.  If the conversion fails, the SERVFAIL rcode MUST be set on the response.</p>
 <p id="rfc.section.3.2.4.p.2">The TTL of each RR generated by a BULK RR is the TTL of the corresponding BULK record itself.  [ BULK should probably have its own TTL field because using that of the record itself feels like bad design.  On the other hand, if BULK is never meant to be queried for directly and only appears in authoritative data, its own TTL is pretty useless normally. ]</p>
 <p id="rfc.section.3.2.4.p.3">If the generated record type is one that uses domain names in its resource record data, such as CNAME, a relative domain names MUST be fully qualified with the origin domain of the BULK RR.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#the-npn-resource-record" id="the-npn-resource-record">The NPN Resource Record</a>
 </h1>
-<p id="rfc.section.4.p.1">The NPN resource record provides pre-processing directives for Numeric Pattern Normalization (NPN) based RR signature generation.</p>
-<p id="rfc.section.4.p.2">The Type value for the NPN RR type is TBD.</p>
-<p id="rfc.section.4.p.3">The NPN RR is class independent.</p>
-<p id="rfc.section.4.p.4">The NPN RR has no special TTL requirements.</p>
+<p id="rfc.section.4.p.1">The Numeric Pattern Normalization (NPN) resource record provides pre-processing information to reduce the number of possible variants that can be generated by a BULK RR into one signable record.  By identifying parts of the dynamic resource record which should be ignored or represented as a static value, one exemplar record and signature is used to validate all other records that match the pattern.</p>
+<p id="rfc.section.4.p.2">For example, a pattern replacement like pool-A-${1}-${2}.example.com that generates PTR records for pool-A-0-0.example.com through pool-A-255-255.example.com would have an NPN record that signals a validating resolver to verify all pool-A-#-#.example.com names against a record for pool-A-9-9.example.com.</p>
+<p id="rfc.section.4.p.3">Though it is imperfect in that forged records could be validated as legitimate, it is nevertheless an improvement over the security afforded by non-DNSSEC DNS.</p>
+<p id="rfc.section.4.p.4">The Type value for the NPN RR type is TBD.</p>
+<p id="rfc.section.4.p.5">The NPN RR is class independent and has no special TTL requirements.</p>
 <h1 id="rfc.section.4.1">
 <a href="#rfc.section.4.1">4.1.</a> <a href="#npn-rdata-wire-format" id="npn-rdata-wire-format">NPN RDATA Wire Format</a>
 </h1>
-<p id="rfc.section.4.1.p.1">The RDATA for a NPN RR consists of a 2 octet Match Type field, a 1 octet Flags field, a 1 octet Owner Ignore field, a 1 octet Left Ignore field and a 1 octet Right Ignore field.</p>
+<p id="rfc.section.4.1.p.1">The RDATA for an NPN RR consists of a 2 octet Match Type field, a 1 octet Flags field, a 1 octet Owner Ignore field, a 1 octet Left Ignore field and a 1 octet Right Ignore field.</p>
 <pre>
                      1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -759,69 +753,70 @@ padding       =   "|" *2DIGIT
 |  Left Ignore  |  Right Ignore |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </pre>
-<h1 id="rfc.section.4.1.1">
-<a href="#rfc.section.4.1.1">4.1.1.</a> <a href="#the-match-type-field" id="the-match-type-field">The Match Type field</a>
-</h1>
-<p id="rfc.section.4.1.1.p.1">The Match Type field identifies the type of the RRset identified by this NPN record.</p>
-<h1 id="rfc.section.4.1.2">
-<a href="#rfc.section.4.1.2">4.1.2.</a> <a href="#the-flags-field" id="the-flags-field">The Flags field</a>
-</h1>
-<p id="rfc.section.4.1.2.p.1">The Flags field defines additional processing parameters for data normalization.  This document defines only the Period-As-Number flag "." (position 5), the Hyphen-As-Number "-" (position 6) and the hexadecimal flag "X" (position 7).  All other flags are reserved for future use.</p>
+<p id="rfc.section.4.1.p.2">Match Type indicates the type of the RRset with which this record is associated.</p>
+<p id="rfc.section.4.1.p.3">Flags defines additional processing parameters for data normalization.  This document defines only the Period-As-Number flag "." (position 5), the Hyphen-As-Number "-" (position 6) and the hexadecimal flag "X" (position 7).  All other flags are reserved for future use.</p>
 <pre>
  0 1 2 3 4 5 6 7
 +-+-+-+-+-+-+-+-+
 |Reserved |.|-|X|
 +-+-+-+-+-+-+-+-+
-</pre>
-<pre>
+
 Bits 0-4: Reserved for future
-   These flags have no default value if set to false (0).
+
 Bit    5: Period As Number (.) Flag
-   This flag indicates the period (dot) will be processed as a
-   number. This flag has no default value if set to false (0).
+   If 0, periods are treated as non-digits.
+   If 1, periods will be processed as digits.
+
 Bit    6: Hyphen As Number (-) Flag
-   This flag indicates the hyphen (dash) will be processed as a
-   number. This flag has no default value if set to false (0).
+   If 0, hyphens are treated as non-digits.
+   If 1, hyphens will be processed as digits.
+
 Bit    7: Hexadecimal (X) Flag
-   This flag indicates the highest value for Normalization Processing
-   is "f".  Normalization Processing will be described in a later
-   section.  This flag has a default value of 9 if set to false (0).
+   If 0, numeric digits include only 0-9.
+   If 1, numeric digits include a-f in addition to 0-9.
 </pre>
-<h1 id="rfc.section.4.1.3">
-<a href="#rfc.section.4.1.3">4.1.3.</a> <a href="#the-owner-ignore-field" id="the-owner-ignore-field">The Owner Ignore field</a>
-</h1>
-<p id="rfc.section.4.1.3.p.1">The Owner Ignore field defines the length of characters as counted from the left-hand side of the owner which MUST be ignored by the normalization process.  This field offers additional security to pattern based signatures which may not be immediately apparent.  By restricting the leftmost characters defined by this value, ultimately the length of the generated portion of the accompanying BULK RR will be confined accordingly.  Normalization Processing will be described further in a later section.</p>
-<h1 id="rfc.section.4.1.4">
-<a href="#rfc.section.4.1.4">4.1.4.</a> <a href="#the-left-ignore-field" id="the-left-ignore-field">The Left Ignore field</a>
-</h1>
-<p id="rfc.section.4.1.4.p.1">The Left Ignore field defines the length of characters as counted from the left-hand side of the generated RDATA which MUST be ignored by the normalization process.  Normalization Processing will be described further in a later section.</p>
-<h1 id="rfc.section.4.1.5">
-<a href="#rfc.section.4.1.5">4.1.5.</a> <a href="#the-right-ignore-field" id="the-right-ignore-field">The Right Ignore field</a>
-</h1>
-<p id="rfc.section.4.1.5.p.1">The Right Ignore field defines the length of characters as counted from the right-hand side of the generated RDATA which MUST be ignored by the normalization process.  Normalization Processing will be described further in a later section.</p>
+<p id="rfc.section.4.1.p.4">Owner Ignore defines the number of octets in the owner name, as counted from the left, which MUST be ignored by the normalization process.  This field offers additional security to pattern based signatures which may not be immediately apparent.  By restricting the leftmost characters defined by this value, ultimately the length of the generated portion of the accompanying BULK RR will be confined accordingly.</p>
+<p id="rfc.section.4.1.p.5">Left Ignore defines the number of octets of the generated RDATA, as counted from the left, which MUST be ignored by the normalization process.</p>
+<p id="rfc.section.4.1.p.6">Right Ignore defines the number of octets of the generated RDATA, as counted from the right, which MUST be ignored by the normalization process.</p>
 <h1 id="rfc.section.4.2">
 <a href="#rfc.section.4.2">4.2.</a> <a href="#the-npn-rr-presentation-format" id="the-npn-rr-presentation-format">The NPN RR Presentation Format</a>
 </h1>
-<p id="rfc.section.4.2.p.1">The Match Type field is represented as an RR type mnemonic.  When the mnemonic is not known, the TYPE representation as described in <a href="#RFC3597" class="xref">[RFC3597]</a>, Section 5, MUST be used.</p>
-<p id="rfc.section.4.2.p.2">The Flags field MUST be presented as a string of characters representing each flag bit.  This document defines only the period ".", hyphen "-" and hexadecimal "X" flags.  Flags MAY appear in any order.  For example; all three flags could appear as "-9." or ".f-" (without the quotes).  If all bits are zero all default values (if defined) would be presented ("9" as currently defined).</p>
-<p id="rfc.section.4.2.p.3">All Ignore fields MUST be presented as an unsigned decimal integers and fall within the 0-255 range available to a single octet.</p>
+<p id="rfc.section.4.2.p.1">Match Type is represented as an RR type mnemonic or with <a href="#RFC3597" class="xref">[RFC3597]</a>'s generic TYPE mechanism.</p>
+<p id="rfc.section.4.2.p.2">Flags is a string of characters indicating the status of each bit as per the following table.  The characters can appear in any order.</p>
+<pre>
++------------------+-----------+-----------+
+|       Flag       |   Unset   |    Set    |
++------------------+-----------+-----------+
+| Period As Number |           |     .     |
++------------------+-----------+-----------+
+| Hyphen As Number |           |     -     |
++------------------+-----------+-----------+
+|   Hexadecimal    |     9     |     f     |
++------------------+-----------+-----------+
+</pre>
+<p id="rfc.section.4.2.p.3">Owner Ignore, Left Ignore, and Right Ignore are displayed as unsigned decimal integers, ranging from 0 through 255.</p>
 <h1 id="rfc.section.4.3">
-<a href="#rfc.section.4.3">4.3.</a> <a href="#normalization-processing-of-npn-rrs" id="normalization-processing-of-npn-rrs">Normalization Processing of NPN RRs</a>
+<a href="#rfc.section.4.3">4.3.</a> <a href="#use-and-normalization-processing-of-npn-rrs" id="use-and-normalization-processing-of-npn-rrs">Use and Normalization Processing of NPN RRs</a>
 </h1>
-<p id="rfc.section.4.3.p.1">This document provides a minor yet significant modification to DNSSEC regarding how RRsets will be signed or verified.  Specifically the Signature Field of <a href="#RFC4034" class="xref">[RFC4034]</a>, Section 3.1.8.  Prior to processing into canonical form, signed zones may contain associated RRs where; owner, class and type of a non NPN RR directly corresponds with an NPN RR matching owner, class and Match Type.  If this condition exists the NPN RR's RDATA defines details for processing the associated RDATA into a "Normalized" format.  Normalized data is based on pre-canonical formatting and zero padded for "A" and "AAAA" RR types for acceptable precision during the process.  This concept will become clearer in the NPN pseudocode and examples provided in the sections to follow.</p>
-<p id="rfc.section.4.3.p.2">The rules for this transformation are simple:</p>
-<p id="rfc.section.4.3.p.3">For RR's Owner field, characters from the beginning to the index of the Owner Ignore value or the final string of characters belonging to the zone's ORIGIN MUST NOT be modified by this algorithm.  While the Owner Ignore value is not used for BULK records but is included with the expectation other pattern-based resource records may emerge and leverage NPN records for their DNSSEC support requirements.</p>
-<p id="rfc.section.4.3.p.4">For RR's RDATA field, character from beginning to the index of Left Ignore value or characters with index of Right Ignore value to the end MUST NOT be modified by this algorithm.</p>
-<p id="rfc.section.4.3.p.5">In the remaining portion of both Owner and RDATA strings of numeric data, defined as character "0" through "f" or "0" through "9" depending on whether or not the Hexadecimal flag is set or not, MUST be consolidated to a single character and set to the highest value defined by the Hexadecimal flag.  Examples may be found in the following section.  If period-as-number or hyphen-as-number flags are set whichever are used ("." or "-") would be treated as part of the number and consolidated where appropriate.</p>
+<p id="rfc.section.4.3.p.1">[ This section needs reworking still, and should perhaps be pulled out into a separate document.  Notably one of issues that is not really described well is that, as designed so far, at signing time the NPN record has to be associated with the matching BULK record, which is slightly problematic with regard to the idea that NPNs are suggested to be extended to be used in the future with other patterns-based record generation.  Once the appropriate BULK record is selected, the signer would then have to understand its semantics to fake up the exemplar to sign &#8211; raising the question as to why it doesn't also know the appropriate values for the Ignore fields, since it will have to understand what the static and variable parts are.</p>
+<p id="rfc.section.4.3.p.2">One way around all this is to just sign the BULK record itself and return it in the additional section along with the answer, so that the resolver could validate not only a signature but the resulting record based on the substitution algorithm.  It'd still be problematic for older DNSSEC validators that don't grok BULK, but no more so than not grokking NPN. Unfortunately to them in both cases the type-appropriate answer itself will be unsigned and thus fail validation. ]</p>
+<p id="rfc.section.4.3.p.3">This document provides a minor yet significant modification to DNSSEC regarding how RRsets will be signed or verified.  Specifically the Signature Field of <a href="#RFC4034" class="xref">[RFC4034]</a>, Section 3.1.8.  Prior to processing into canonical form, signed zones may contain associated RRs where; owner, class and type of a non NPN RR directly corresponds with an NPN RR matching owner, class and Match Type.  If this condition exists the NPN RR's RDATA defines details for processing the associated RDATA into a "Normalized" format.  Normalized data is based on pre-canonical formatting and zero padded for "A" and "AAAA" RR types for acceptable precision during the process.  This concept will become clearer in the NPN pseudocode and examples provided in the sections to follow.</p>
+<p id="rfc.section.4.3.p.4">The rules for this transformation are simple:</p>
+<p></p>
+
+<ul>
+<li>For RR's Owner field, characters from the beginning to the index of the Owner Ignore value or the final string of characters belonging to the zone's ORIGIN MUST NOT be modified by this algorithm.  While the Owner Ignore value is not used for BULK records but is included with the expectation other pattern-based resource records may emerge and leverage NPN records for their DNSSEC support requirements.</li>
+<li>For RR's RDATA field, character from beginning to the index of Left Ignore value or characters with index of Right Ignore value to the end MUST NOT be modified by this algorithm.</li>
+<li>In the remaining portion of both Owner and RDATA strings of numeric data, defined as character "0" through "f" or "0" through "9" depending on whether or not the Hexadecimal flag is set or not, MUST be consolidated to a single character and set to the highest value defined by the Hexadecimal flag.  Examples may be found in the following section.  If period-as-number or hyphen-as-number flags are set whichever are used ("." or "-") would be treated as part of the number and consolidated where appropriate.</li>
+</ul>
 <p id="rfc.section.4.3.p.6">Once the normalization has been performed the signature will continue processing into canonical form using the normalized RRs in the place of original ones.</p>
-<p id="rfc.section.4.3.p.7">One thing to keep in mind when calculating values for the Ignore fields is the Domain Name Pattern and Replacement Pattern fields are considered relative unless terminated by a period.  When processing NPN records the fully-qualified Patterns will be used for determining which characters should be ignored.</p>
-<p id="rfc.section.4.3.p.8">NPN RRs MAY be included in the "Additional" section to provide a hint for NPN processing required for verification path.</p>
-<p id="rfc.section.4.3.p.9">It is important to note, properly sizing the Ignore fields is critical to minimizing the risk of spoofed signatures.  Never intentionally set all Ignore values to zero in order to make validation easier as it places the validity of zone data at risk. Only accompany RRs which are pattern derived (such as BULK) with NPN records as doing so may unnecessarily reduce the confidence level of generated signatures.</p>
+<p id="rfc.section.4.3.p.7">NPN RRs MAY be included in the "Additional" section to provide a hint of the NPN processing required for the verification path.</p>
+<p id="rfc.section.4.3.p.8">It is important to note, properly sizing the Ignore fields is critical to minimizing the risk of spoofed signatures.  Never intentionally set all Ignore values to zero in order to make validation easier as it places the validity of zone data at risk. Only accompany RRs which are pattern derived (such as BULK) with NPN records as doing so may unnecessarily reduce the confidence level of generated signatures.</p>
 <h1 id="rfc.section.4.3.1">
 <a href="#rfc.section.4.3.1">4.3.1.</a> <a href="#pseudocode-for-npn-normalization-processing" id="pseudocode-for-npn-normalization-processing">Pseudocode for NPN Normalization Processing</a>
 </h1>
 <p id="rfc.section.4.3.1.p.1">This section provides a simple demonstration of process flow for NPN rdata normalization and DNSSEC signatures.</p>
-<p id="rfc.section.4.3.1.p.2">The pseudocode provided below assumes all associated RRs are valid members of a DNSSEC compatible RRset (including BULK generated ones).</p>
+<p id="rfc.section.4.3.1.p.2">The pseudocode provided below assumes all associated RRs are valid members of a DNSSEC-compatible RRset, including BULK generated ones.</p>
 <pre>
    for rr in rrset
        if (has_NPN&lt;rr.owner, rr.class, rr.type&gt;)
@@ -837,167 +832,64 @@ Bit    7: Hexadecimal (X) Flag
 
    dnssec_sign&lt;sigrrset&gt;
 </pre>
-<p id="rfc.section.4.3.1.p.3">Similar logic MUST be used for determining DNSSEC validity of RRsets in verification (validation) nameservers for signatures generated based on NPN normalization.</p>
-<h1 id="rfc.section.4.3.2">
-<a href="#rfc.section.4.3.2">4.3.2.</a> <a href="#npn-normalization-processing-examples" id="npn-normalization-processing-examples">NPN Normalization Processing examples</a>
+<p id="rfc.section.4.3.1.p.3">Similar logic MUST be used for determining DNSSEC validity of RRsets in validating nameservers for signatures generated based on NPN normalization.</p>
+<h1 id="rfc.section.4.4">
+<a href="#rfc.section.4.4">4.4.</a> <a href="#pattern-based-dnssec-support" id="pattern-based-dnssec-support">Pattern Based DNSSEC support</a>
 </h1>
-<p id="rfc.section.4.3.2.p.1">EXAMPLE 1 For this example the query is defined as a PTR record for "10.2.3.44" with an origin of "2.10.in-addr.arpa." and the evaluating BULK and NPN RR as:</p>
-<pre>
-   -.2.10.in-addr.arpa. 86400 IN BULK PTR (
-                                       [0-255].[0-10]
-                                       pool-A-${1}-${2}.example.com.
-                                       )
-   *.2.10.in-addr.arpa. 86400 IN NPN  PTR 9 0 7 13
-</pre>
-<p id="rfc.section.4.3.2.p.2">As shown previously in BULK RR examples the query would enter the nameserver with an owner of "44.3.2.10.in-addr.arpa." and a "PTR" RR with the RDATA of "pool-A-3-44.example.com." would be generated.</p>
-<p id="rfc.section.4.3.2.p.3">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "3-44" as illustrated below.</p>
-<pre>
-                              1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 
-          0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
-                        v---------
-            p o o l - A - 3 - 4 4 . e x a m p l e . c o m .
-                         ---------^
-        2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1                  
-        6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-</pre>
-<p id="rfc.section.4.3.2.p.4">Everything to the left of "3-44" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "9" as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become "pool-A-9-9.example.com." and its signature would be based on this "normalized" RDATA field.  This new "normalized" string would be used as an RDATA for the wildcard label of "*.2.10.in-addr.arpa." now encompassing all possible permutations of the "pool-A-${1}-${2}.example.com." pattern.</p>
-<p id="rfc.section.4.3.2.p.5">Since the verification (validation) nameserver would use the identical NPN record for processing and comparison, all RRs generated by the BULK record can now be verified with a single wildcard signature.</p>
-<p id="rfc.section.4.3.2.p.6">EXAMPLE 2</p>
-<p id="rfc.section.4.3.2.p.7">This example contains a classless IPv4 delegation on the /22 CIDR boundary as defined by <a href="#RFC2317" class="xref">[RFC2317]</a>.  The network for this example is "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs for this example are defined as:</p>
-<pre>
-$ORIGIN 2.10.in-addr.arpa.
-0-3 86400 IN      NS    ns1.sub.example.com.
--   86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
-*   86400 IN NPN  CNAME 9 0 0 23
-</pre>
-<p id="rfc.section.4.3.2.p.8">For this example, a query of "10.2.2.65" would enter the nameserver as "65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of "65.2.0-3.2.10.in-addr.arpa." would be generated.</p>
-<p id="rfc.section.4.3.2.p.9">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "65.2" as illustrated below.</p>
-<pre>
-                           1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2
-       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
-       v---------
-         6 5 . 2 . 0 - 3 . 2 . 1 0 . i n - a d d r . a r p a .
-        ---------^
-     2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1                  
-     9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-</pre>
-<p id="rfc.section.4.3.2.p.10">Everything to the left of "65.2" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "9" as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become "9.9.0-3.2.10.in-addr.arpa." and its signature would be based on this "normalized" RDATA field.  This new "normalized" string would be used as an RDATA for the wildcard label of "*.2.10.in-addr.arpa." now encompassing all possible permutations of the "${*|.}.0-3.2.10.in-addr.arpa." pattern.</p>
-<p id="rfc.section.4.3.2.p.11">As in example 1, the verification (validation) nameserver would use the same NPN record for comparison.</p>
-<p id="rfc.section.4.3.2.p.12">EXAMPLE 3 This example provides reverse logic for example 1 by providing an IPv4 "A" record for a requested hostname.  For this example the query is defined as an "A" record for "pool-A-3-44.example.com." with an origin of "example.com.".  RRs for this example are defined as:</p>
-<pre>
--.example.com. 86400 IN BULK A (
-                                   pool-A-[0-10]-[0-255]
-                                   10.2.${*}
-                                  )
-*.example.com. 86400 IN NPN  A 9 0 8 0
-</pre>
-<p id="rfc.section.4.3.2.p.13">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "003.044" as illustrated below.</p>
-<pre>
-                                    1 1 1 1 1 1 1 1 1
-                0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8
-                                v--------------
-                  0 1 0 . 0 0 2 . 0 0 3 . 0 4 4
-                                 ---------------^
-            1 1 1 1 1 1 1 1 1
-            8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-</pre>
-<p id="rfc.section.4.3.2.p.14">This example illustrates a key point about NPN records; since they are pre-canonical they MUST operate on a strict subset of WIRE formatted data.  For "A" and "AAAA" records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "010.002.003.044" (shown above) prior to processing.  After processing, wire format would become "0x0A02032C" (shown in hexadecimal).  This format would be too imprecise for normalization so padded decimal is used.</p>
-<p id="rfc.section.4.3.2.p.15">Everything to the left of "003.044" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "9" as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become "10.2.9.9" and its signature would be based on this "normalized" RDATA field. This new "normalized" "A" RR would be used as an RDATA for the wildcard label of "<em>.example.com." now encompassing all possible permutations of the "10.2.${</em>}" pattern.</p>
-<p id="rfc.section.4.3.2.p.16">EXAMPLE 4 This example provides similar logic for an IPv6 AAAA record.  For this example the query is defined as an "AAAA" record for "pool-A-ff-aa.example.com." with an origin of "example.com.".  RRs for this example are defined as:</p>
-<pre>
--.example.com. 86400 IN BULK AAAA (
-                                   pool-A-[0-ffff]-[0-ffff]
-                                   fc00::${1}:${2}
-                                  )
-*.example.com. 86400 IN NPN  AAAA X 0 30 0
-</pre>
-<p id="rfc.section.4.3.2.p.17">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "00ff:00aa" as illustrated below.</p>
-<pre>
-                      1 1 1 1 1 1 1 1 1 1 2 2
-  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-
-    f c 0 0 : 0 0 0 0 : 0 0 0 0 : 0 0 0 0 : -/-/
-
-  4 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 1
-  0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9
-   /-/-/- . . . . . . . . . . . . . . . . . . . . . . . . -/-/-/
-                          2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4
-                          1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
-                                            v------------------
-                     /-/- 0 0 0 0 : 0 0 0 0 : 0 0 f f : 0 0 a a
-                                             -------------------^
-                        2 1 1 1 1 1 1 1 1 1 1 
-                        0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-</pre>
-<p id="rfc.section.4.3.2.p.18">This example reinforces the point on pre-canonical processing of NPN records; they MUST operate on a strict subset of WIRE formatted data. For "A" and "AAAA" records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "fc00:0000:0000:0000:0000:0000:00ff:00aa" (shown above) prior to processing.  After processing, wire format would become "0xFC000000000000000000000000FF00AA" (shown in hexadecimal). This format is slightly misleading as it is truly only 16 bytes of WIRE data and would be too imprecise for normalization so padded hexadecimal is used.</p>
-<p id="rfc.section.4.3.2.p.19">Everything to the left of "00ff:00aa" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "f" as indicated by the NPN record's hexadecimal flag "X" and each run replaced by the single character "f".  The final Normalized RDATA would therefore become "fc00::f:f" and its signature would be based on this "normalized" RDATA field. This new "normalized" "AAAA" RR would be used as an RDATA for the wildcard label of "*.example.com." now encompassing all possible permutations of the "fc00::${1}:${2}" pattern.</p>
+<p id="rfc.section.4.4.p.1">The NPN resource record could be used to support other dynamic RR types which do not currently exist.</p>
 <h1 id="rfc.section.5">
-<a href="#rfc.section.5">5.</a> <a href="#positive-side-effects" id="positive-side-effects">Positive Side-Effects</a>
+<a href="#rfc.section.5">5.</a> <a href="#known-limitations" id="known-limitations">Known Limitations</a>
 </h1>
-<p id="rfc.section.5.p.1">This section highlights positive side effects of some architectural decisions regarding the BULK RR design.</p>
+<p id="rfc.section.5.p.1">This section defines known limitations of the BULK resource type.</p>
 <h1 id="rfc.section.5.1">
-<a href="#rfc.section.5.1">5.1.</a> <a href="#record-superimposition" id="record-superimposition">Record Superimposition</a>
+<a href="#rfc.section.5.1">5.1.</a> <a href="#unsupported-nameservers" id="unsupported-nameservers">Unsupported Nameservers</a>
 </h1>
-<p id="rfc.section.5.1.p.1">The main side-effect of the BULK RR design is superimposition.  RRs created by the BULK generation process generally rely on the logic of wildcard assignment.  This logic only provides answers where no others exist.  This means in the reverse DNS world (network assignment) HUGE blocks of addresses can be assigned a single BULK record and where delegated to another customer or SWIP will be automatically overridden.</p>
-<p id="rfc.section.5.1.p.2">When compared with BIND's $GENERATE statement, if a singleton record such as CNAME appears within a $GENERATE range, either the CNAME or $GENERATE becomes invalid.  While a BULK record range would automatically notch out the CNAME without user intervention or creating a potential management problem for the future when two $GENERATES create a hole where the CNAME no longer exists.  BULK RRs would again automatically reassign the missing record to one of its own.</p>
-<h1 id="rfc.section.5.2">
-<a href="#rfc.section.5.2">5.2.</a> <a href="#pattern-based-dnssec-support" id="pattern-based-dnssec-support">Pattern Based DNSSEC support</a>
-</h1>
-<p id="rfc.section.5.2.p.1">The NPN resource record can be used to support other dynamic RR types which do not currently exist.</p>
+<p id="rfc.section.5.1.p.1">Authoritative nameservers that do not understand the semantics of the new record type will not be able to deliver the intended answers even when the type appears in their zone data This significantly affects the interoperability of primary versus secondary authorities that are not all running the same software.  Adding new RRs which affect handling by authoritative servers, or being unable to add them, is an issue that needs to be explored more thoroughly within dnsop.</p>
+<p id="rfc.section.5.1.p.2">On the resolver side, rolling out a new semantics in DNSSEC has also proven to be difficult in the past.  Lacking NPN support effectively means that operators using BULK will have to forego DNSSEC signing of the affected zones, or do online signing of the dynamically generated records.</p>
 <h1 id="rfc.section.6">
-<a href="#rfc.section.6">6.</a> <a href="#known-limitations" id="known-limitations">Known Limitations</a>
+<a href="#rfc.section.6">6.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
-<p id="rfc.section.6.p.1">This section defines known limitations of the BULK resource type.</p>
+<p id="rfc.section.6.p.1">Two known security considerations exist for the BULK resource record, DNSSEC and DDOS attack vectors.</p>
 <h1 id="rfc.section.6.1">
-<a href="#rfc.section.6.1">6.1.</a> <a href="#increased-cpu-utilization-for-nxdomain-rrs" id="increased-cpu-utilization-for-nxdomain-rrs">Increased CPU utilization for NXDOMAIN RRs</a>
+<a href="#rfc.section.6.1">6.1.</a> <a href="#dnssec-signature-strategies" id="dnssec-signature-strategies">DNSSEC Signature Strategies</a>
 </h1>
-<p id="rfc.section.6.1.p.1">Nameserver requirements to support BULK RRs will minimally increase CPU utilization requirements compared to most RR types.  However, since the inception of DNSSEC more is expected of DNS servers at a system resource level and it is the authors' belief the benefit outweighs the sacrifice.</p>
-<p id="rfc.section.6.1.p.2">A quick comparison of BULK versus bind's $GENERATE expansion reveals much more memory would be sacrificed with $GENERATES to save the CPU cycles required to support BULK records.  Additionally, $GENERATES cannot be transferred (i.e. AXFR) without expansion and an IPv6 CIDR even as small as /96 would be simply impossible.  BULK on the other hand can easily support IPv6 CIDRs of /64 and much larger with very little effort.</p>
+<p id="rfc.section.6.1.p.1">DNSSEC was designed to provide validation for DNS resource records.  In a nutshell this requires each (owner, class, type) tuple to have its own signature.  This essentially defeats the purpose of providing large generated blocks of RRs in a single RR as each generated RR would require its own legitimate RRSIG record.</p>
+<p id="rfc.section.6.1.p.2">In the following sections several options are discussed to address this issue.  Of the options, on-the-fly provides the most secure solution and NPN provides the most flexible.</p>
+<h1 id="rfc.section.6.1.1">
+<a href="#rfc.section.6.1.1">6.1.1.</a> <a href="#on-the-fly-signatures" id="on-the-fly-signatures">On-the-fly Signatures</a>
+</h1>
+<p id="rfc.section.6.1.1.p.1">This solution requires authoritative nameservers to sign generated records as they are created.  Not all authoritative nameserver implementations offer on-the-fly signatures, and even with those that do not all operators will want to keep signing keys online, so this solution would either require all implementations to support on-the-fly signing or be ignored by implementations which can not or will not comply.</p>
+<p id="rfc.section.6.1.1.p.2">No changes to validating resolvers is required to support this solution.</p>
+<h1 id="rfc.section.6.1.2">
+<a href="#rfc.section.6.1.2">6.1.2.</a> <a href="#normalized-npn-based-signatures" id="normalized-npn-based-signatures">Normalized (NPN-Based) Signatures</a>
+</h1>
+<p id="rfc.section.6.1.2.p.1">This solution provides the most flexible solution as nameservers without on-the-fly signing capabilities can still support signatures for BULK records.  The down side to this solution is it requires additional DNSSEC-aware resolver support.</p>
+<p id="rfc.section.6.1.2.p.2">It has been pointed out that due to this limitation, creation of DNSSEC-signed BULK RRs requiring NPN support SHOULD be formally discouraged until such time a respectable percentage (&gt;80%) of validating resolvers in-the-wild possess NPN processing capabilities.  Until that time, on-the-fly signing and unsigned records offer the intended capabilities of the BULK specification, while requiring zero new features to support RR resolution. The authors would like to encourage opening this door for pattern based technologies such as NPN records as a solution to BULK RRs as well as other pattern based RRs to come. Given enough time, enough nameservers will be patched and upgraded for unrelated reasons and by means of simple attrition can supply a level of inertia and eventually widespread adoption can be assumed.</p>
+<p id="rfc.section.6.1.2.p.3">NPN records are likely to be a topic of great debate as to their own security limitations.  It is, however, the authors' belief that while any logic which limits the input of digital signatures lessens the validity of those signatures, the limitation is minimal and the gain is significant.  The main reason for this is as a general rule, RRs used in a generic manner such as conventional $GENERATE RRs or scripted mass pattern generated RRs have a lesser importance than other RRs in managed zones.  These therefore inherently pose less risk by means of attack and have a much less reward by defeating security measures.</p>
+<p id="rfc.section.6.1.2.p.4">This being said, care must still be taken to set the Ignore fields appropriately to minimize exposure and only use NPN RRs to secure pattern-based records such as BULK.</p>
+<h1 id="rfc.section.6.1.3">
+<a href="#rfc.section.6.1.3">6.1.3.</a> <a href="#non-dnssec-zone-support-only" id="non-dnssec-zone-support-only">Non-DNSSEC Zone Support Only</a>
+</h1>
+<p id="rfc.section.6.1.3.p.1">As a final option zones which wish to remain entirely without DNSSEC support may serve such zones without either of the above solutions and records generated based on BULK RRs will require zero support from recursive (resolving) nameservers.</p>
 <h1 id="rfc.section.6.2">
-<a href="#rfc.section.6.2">6.2.</a> <a href="#pre-adoption-nameserver-implications" id="pre-adoption-nameserver-implications">Pre-Adoption Nameserver Implications</a>
+<a href="#rfc.section.6.2">6.2.</a> <a href="#dnssec-validator-details" id="dnssec-validator-details">DNSSEC Validator Details</a>
 </h1>
-<p id="rfc.section.6.2.p.1">While there is an added demand on authoritative nameservers, there are no new requirements to recursive (caching) resolvers for non-DNSSEC record handling.  Even authoritative nameservers are able to transfer to and from supporting nameservers with no requirement (although would be unable to return BULK generated records without support).</p>
-<p id="rfc.section.6.2.p.2">Prior to widespread adoption on the authoritative side all generated records would be invisible if served on nameservers lacking support. Since generated records are generally NOT service impacting records this should be understood but not of great concern.</p>
-<p id="rfc.section.6.2.p.3">Once adoption has reached an appreciable level on the producer (authoritative) side only DNSSEC requirements remain for the consumer (resolver) side.  This behavior is fully expected.</p>
+<p id="rfc.section.6.2.p.1">Verification of DNSSEC signed BULK generated RRs may be performed against on-the-fly signatures with zero modification to their behavior.  However, verification using NPN records would require changes to the logic to incorporate processing RDATA generated by BULK logic as described above so the results will be compatible.</p>
+<h1 id="rfc.section.6.3">
+<a href="#rfc.section.6.3">6.3.</a> <a href="#ddos-attack-vectors-and-mitigation" id="ddos-attack-vectors-and-mitigation">DDOS Attack Vectors and Mitigation</a>
+</h1>
+<p id="rfc.section.6.3.p.1">As an additional defense against Distributed Denial Of Service (DDOS) attacks against recursive (resolving) nameservers it is highly recommended shorter TTLs be used for BULK RRs than others.  While disabling caching with a zero TTL is not recommended, as this would only result in a shift of the attack target, a balance will need to be found.  While this document uses 24 hours (86400 seconds) in its examples, values between 300 to 900 seconds are likely more appropriate and is RECOMMENDED.  What is ultimately deemed appropriate may differ from zone to zone and administrator to administrator.</p>
+<p id="rfc.section.6.3.p.2">[ I am unclear how this helps DDOS mitigation against anyone at all. ]</p>
+<h1 id="rfc.section.6.4">
+<a href="#rfc.section.6.4">6.4.</a> <a href="#implications-of-large-scale-dns-records" id="implications-of-large-scale-dns-records">Implications of Large-Scale DNS Records</a>
+</h1>
+<p id="rfc.section.6.4.p.1">The production of such large-scale records in the wild may have some unintended side-effects.  These side-effects could be of concern or add unexpected complications to DNS based security offerings or forensic and anti-spam measures.  While outside the scope of this document, implementers of technology relying on DNS resource records for critical decision making must take into consideration how the existence of such a volume of records might impact their technology.</p>
+<p id="rfc.section.6.4.p.2">Solutions to the magnitude problem for BULK generated RRs are expected be similar if not identical to that of existing wildcard records, the core difference being the resultant RDATA will be unique for each requested Domain Name within its scope.</p>
+<p id="rfc.section.6.4.p.3">The authors of this document are confident that by careful consideration, negative_side-effects produced by implementing the features described in this document can be eliminated from any such service or product.</p>
 <h1 id="rfc.section.7">
-<a href="#rfc.section.7">7.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
+<a href="#rfc.section.7">7.</a> <a href="#privacy-considerations" id="privacy-considerations">Privacy Considerations</a>
 </h1>
-<p id="rfc.section.7.p.1">Two known security considerations exist for the BULK resource record, DNSSEC and DDOS attack vectors.  Both are addressed in the following sections.</p>
-<h1 id="rfc.section.7.1">
-<a href="#rfc.section.7.1">7.1.</a> <a href="#dnssec-signature-strategies" id="dnssec-signature-strategies">DNSSEC Signature Strategies</a>
-</h1>
-<p id="rfc.section.7.1.p.1">DNSSEC was designed to provide verification (validation) for DNS resource records.  In a nutshell this requires each (owner, class, type) tuple to have its own signature.  This essentially defeats the purpose of providing large generated blocks of RRs in a single RR as each generated RR would require its own legitimate RRSIG record.</p>
-<p id="rfc.section.7.1.p.2">In the following sections several options are discussed to address this issue.  Of the options, on-the-fly provides the most secure solution and NPN provides the most flexible.</p>
-<h1 id="rfc.section.7.1.1">
-<a href="#rfc.section.7.1.1">7.1.1.</a> <a href="#on-the-fly-live-signatures" id="on-the-fly-live-signatures">On-the-fly (Live) Signatures</a>
-</h1>
-<p id="rfc.section.7.1.1.p.1">This solution requires authoritative nameservers to sign generated records <em>as_they_are_generated</em>.  Not all authoritative nameserver implementations offer on-the-fly (realtime) signatures so this solution would either require all implementations to support on-the-fly signing or be ignored by implementations which can not or will not comply.</p>
-<p id="rfc.section.7.1.1.p.2">No changes to recursive (resolving) nameservers is required to support this solution.</p>
-<h1 id="rfc.section.7.1.2">
-<a href="#rfc.section.7.1.2">7.1.2.</a> <a href="#normalized-npn-based-signatures" id="normalized-npn-based-signatures">Normalized (NPN Based) Signatures</a>
-</h1>
-<p id="rfc.section.7.1.2.p.1">This solution provides the most flexible solution as nameservers without on-the-fly signing capabilities can still support signatures for BULK records.  The down side to this solution is it requires DNSSEC aware recursive (resolving) nameserver support.  Unless a recursive nameserver can verify the signature it is <em>unverifiable</em>.</p>
-<p id="rfc.section.7.1.2.p.2">It has been pointed out due to this limitation creation of DNSSEC signed BULK RRs requiring NPN support SHOULD be formally discouraged until such time a respectable percentage (&gt;80) of DNSSEC verification (validation) nameservers "in-the-wild" possess NPN processing capabilities.  Until that time, on-the-fly signing and unsigned BULK records offer the intended capabilities of this document while requiring zero new features to support RR resolution. The authors would like to encourage opening this door for pattern based technologies such as NPN records as a solution to BULK RRs as well as other pattern based RRs to come. Given enough time, enough nameservers will be patched and upgraded for unrelated reasons and by means of simple attrition can supply a level of "inertia" and eventually widespread adoption can be assumed.</p>
-<p id="rfc.section.7.1.2.p.3">NPN records are likely to be a topic of great debate as to their own security limitations.  It is, however, the authors' belief; while any logic which limits the input of digital signatures, lessens the validity of such signatures, the limitation is minimal and the gain is significant.  The main reason for this is as a general rule, RRs used in a generic manner such as conventional $GENERATE RRs or scripted mass pattern generated RRs have a lesser importance than other RRs in managed zones.  These therefore inherently pose less risk by means of attack and have a much less reward by defeating security measures.</p>
-<p id="rfc.section.7.1.2.p.4">This being said, care must still be taken to set the Ignore fields appropriately to minimize exposure and only use NPN RRs to secure pattern-based records such as BULK.</p>
-<h1 id="rfc.section.7.1.3">
-<a href="#rfc.section.7.1.3">7.1.3.</a> <a href="#non-dnssec-zone-support-only" id="non-dnssec-zone-support-only">Non-DNSSEC Zone Support Only</a>
-</h1>
-<p id="rfc.section.7.1.3.p.1">As a final option zones which wish to remain entirely without DNSSEC support may serve such zones without either of the above solutions and records generated based on BULK RRs will require zero support from recursive (resolving) nameservers.</p>
-<h1 id="rfc.section.7.2">
-<a href="#rfc.section.7.2">7.2.</a> <a href="#dnssec-verifier-details" id="dnssec-verifier-details">DNSSEC Verifier Details</a>
-</h1>
-<p id="rfc.section.7.2.p.1">Verification of DNSSEC signed BULK generated RRs may be performed against on-the-fly signatures with zero modification to their behavior.  However, verification against NPN records would require changes to the logic to incorporate processing RDATA generated by BULK logic as described above so the results will be compatible.</p>
-<h1 id="rfc.section.7.3">
-<a href="#rfc.section.7.3">7.3.</a> <a href="#ddos-attack-vectors-and-mitigation" id="ddos-attack-vectors-and-mitigation">DDOS Attack Vectors and Mitigation</a>
-</h1>
-<p id="rfc.section.7.3.p.1">As an additional defense against Distributed Denial Of Service (DDOS) attacks against recursive (resolving) nameservers it is highly recommended shorter TTLs be used for BULK RRs than others.  While disabling caching with a zero TTL is not recommended (as this would only result in a shift of the attack target) a balance will need to be found.  While this document uses 24 hours (86400) in its examples values between 300 to 900 are likely more appropriate and is RECOMMENDED.  What is ultimately deemed appropriate may differ from zone to zone and administrator to administrator.</p>
-<h1 id="rfc.section.7.4">
-<a href="#rfc.section.7.4">7.4.</a> <a href="#implications-of-large-scale-dns-records" id="implications-of-large-scale-dns-records">Implications of Large Scale DNS Records</a>
-</h1>
-<p id="rfc.section.7.4.p.1">The production of such large scale "records in the wild" may have some unintended side-effects.  These side-effects could be of concern or add unexpected complications to DNS based security offerings or forensic and anti-spam measures.  While outside the scope of this document, implementers of technology relying on DNS resource records for critical decision making must take into consideration how the existence of such a volume of records might impact their technology.</p>
-<p id="rfc.section.7.4.p.2">Solutions to the "magnitude" problem for BULK generated RRs are expected be similar if not identical to that of existing wildcard records, the core difference being the resultant RDATA will be unique for each requested Domain Name within its scope.</p>
-<p id="rfc.section.7.4.p.3">The authors of this document are confident that by careful consideration, <em>negative_side-effects</em> produced by implementing the features described in this document <em>can_be_eliminated</em> from any such service or product.</p>
+<p id="rfc.section.7.p.1">Neither the BULK nor NPN records introduce any new privacy concerns to DNS data.</p>
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
 </h1>
@@ -1130,6 +1022,105 @@ $ORIGIN 2.10.in-addr.arpa.
 25.2.2.10.in-addr.arpa 7200 IN CNAME 25.2.0-3.2.10.in-addr.arpa.
 </pre>
 <p id="rfc.section.A.3.p.3">[ Without $* and options complexity, the pattern to get the same result is just ${1}.{$2}.0-3 which is not really significantly onerous to enter, and slightly less arcane looking to comprehend. ]</p>
+<h1 id="rfc.appendix.B">
+<a href="#rfc.appendix.B">Appendix B.</a> <a href="#npn-examples" id="npn-examples">NPN Examples</a>
+</h1>
+<h1 id="rfc.appendix.B.1">
+<a href="#rfc.appendix.B.1">B.1.</a> <a href="#example-1-1" id="example-1-1">EXAMPLE 1</a>
+</h1>
+<pre>
+2.10.in-addr.arpa. 86400 IN BULK PTR (
+                                 [0-255].[0-10].2.10.in-addr.arpa.
+                                 pool-A-${1}-${2}.example.com.
+                            )
+2.10.in-addr.arpa. 86400 IN NPN  PTR 9 0 7 13
+</pre>
+<p id="rfc.section.B.1.p.1">A query for the PTR of address 10.2.3.44 would match As shown previously in BULK RR examples the query would match the BULK record for the query name 44.3.2.10.in-addr.arpa, generating a PTR to pool-A-3-44.example.com as the answer.</p>
+<p id="rfc.section.B.1.p.2">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "3-44" as illustrated below.</p>
+<pre>
+  0 1 2 3 4 5 6 7
+                v---------
+    p o o l - A - 3 - 4 4 . e x a m p l e . c o m .
+                 ---------^
+                          1 1 1 1                  
+                          3 2 1 0 9 8 7 6 5 4 3 2 1 0
+</pre>
+<p id="rfc.section.B.1.p.3">Everything to the left of "3-44" will remain intact, as will everything to its right.  The remaining characters will be processed for digits between 0 and 9 as indicated by the NPN record's hexadecimal flag 9, and each run of digits replaced by the single character "9".  The final Normalized RDATA for *.2.10.in-addr.arpa would therefore become pool-A-9-9.example.com., and its signature would be based on this value to cover all possible permutations of the pool-A-${1}-${2}.example.com replacement pattern.</p>
+<p id="rfc.section.B.1.p.4">Since the validating nameserver would use the identical NPN record for processing and comparison, all RRs generated by the BULK record can now be verified with a single signature.</p>
+<h1 id="rfc.appendix.B.2">
+<a href="#rfc.appendix.B.2">B.2.</a> <a href="#example-2-1" id="example-2-1">EXAMPLE 2</a>
+</h1>
+<p id="rfc.section.B.2.p.1">This example contains a classless IPv4 delegation on the /22 CIDR boundary as defined by <a href="#RFC2317" class="xref">[RFC2317]</a>.  The network for this example is "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs for this example are defined as:</p>
+<pre>
+$ORIGIN 2.10.in-addr.arpa.
+0-3 86400 IN      NS    ns1.sub.example.com.
+    86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
+    86400 IN NPN  CNAME 9 0 0 23
+</pre>
+<p id="rfc.section.B.2.p.2">For this example, a query of "10.2.2.65" would enter the nameserver as "65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of "65.2.0-3.2.10.in-addr.arpa." would be generated.</p>
+<p id="rfc.section.B.2.p.3">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "65.2" as illustrated below.</p>
+<pre>
+       0
+       v---------
+         6 5 . 2 . 0 - 3 . 2 . 1 0 . i n - a d d r . a r p a .
+        ---------^
+                 2 2 2 2 1 1 1 1 1 1 1 1 1 1                  
+                 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+</pre>
+<p id="rfc.section.B.2.p.4">Everything to the left of "65.2" will remain intact as will everything to its right.  The remaining characters will be processed for digits from 0 through 9 as indicated by the NPN record's hexadecimal flag "9", with each run replaced by the single character "9".  The final normalized RDATA would therefore become 9.9.0-3.2.10.in-addr.arpa and its signature would be based on this normalized RDATA field.  This new normalized string would be used as an RDATA for the wildcard label of 2.10.in-addr.arpa now encompassing all possible permutations of the ${*|.}.0-3.2.10.in-addr.arpa. pattern.</p>
+<p id="rfc.section.B.2.p.5">As in example 1, the validatating resolver would use the same NPN record for comparison.</p>
+<h1 id="rfc.appendix.B.3">
+<a href="#rfc.appendix.B.3">B.3.</a> <a href="#example-3-1" id="example-3-1">EXAMPLE 3</a>
+</h1>
+<p id="rfc.section.B.3.p.1">This example provides reverse logic for example 1 by providing an IPv4 address record for a requested hostname.  For this example the query is defined as an A record for pool-A-3-44.example.com, with an origin of example.com.  RRs for this example are defined as:</p>
+<pre>
+example.com. 86400 IN BULK A (
+                                   pool-A-[0-10]-[0-255]
+                                   10.2.${*}
+                                  )
+example.com. 86400 IN NPN  A 9 0 8 0
+</pre>
+<p id="rfc.section.B.3.p.2">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "003.044" as illustrated below.</p>
+<pre>
+                0 1 2 3 4 5 6 7 8
+                                v--------------
+                  0 1 0 . 0 0 2 . 0 0 3 . 0 4 4
+                                 ---------------^
+                                                0
+</pre>
+<p id="rfc.section.B.3.p.3">This example illustrates a key point about NPN records; since they are pre-canonical they MUST operate on a strict subset of WIRE formatted data.  For A and AAAA records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "010.002.003.044" (shown above) prior to processing.  After processing, wire format would become "0x0A02032C" (shown in hexadecimal).  This format would be too imprecise for normalization so padded decimal is used.</p>
+<p id="rfc.section.B.3.p.4">Everything to the left of "003.044" will remain intact as will everything to its right.  The remaining characters will be processed for digits between 0 and 9 as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become 10.2.9.9 and its signature would be based on this normalized RDATA field. This new normalized A RR would be used as an RDATA for the wildcard label of "<em>.example.com." now encompassing all possible permutations of the 10.2.${</em>} pattern.</p>
+<h1 id="rfc.appendix.B.4">
+<a href="#rfc.appendix.B.4">B.4.</a> <a href="#example-4" id="example-4">EXAMPLE 4</a>
+</h1>
+<p id="rfc.section.B.4.p.1">This example provides similar logic for an IPv6 AAAA record.  For this example the query is defined as an AAAA record for pool-A-ff-aa.example.com with an origin of example.com..  RRs for this example are defined as:</p>
+<pre>
+example.com. 86400 IN BULK AAAA (
+                                   pool-A-[0-ffff]-[0-ffff]
+                                   fc00::${1}:${2}
+                                )
+example.com. 86400 IN NPN  AAAA X 0 30 0
+</pre>
+<p id="rfc.section.B.4.p.2">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "00ff:00aa" as illustrated below.</p>
+<pre>
+                      1 1 1 1 1 1 1 1 1 1 2 2
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+
+    f c 0 0 : 0 0 0 0 : 0 0 0 0 : 0 0 0 0 : -/-/
+
+  4 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 1
+  0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9
+   /-/-/- . . . . . . . . . . . . . . . . . . . . . . . . -/-/-/
+                          2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4
+                          1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+                                            v------------------
+                     /-/- 0 0 0 0 : 0 0 0 0 : 0 0 f f : 0 0 a a
+                                             -------------------^
+                        2 1 1 1 1 1 1 1 1 1 1 
+                        0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+</pre>
+<p id="rfc.section.B.4.p.3">This example reinforces the point on pre-canonical processing of NPN records; they MUST operate on a strict subset of WIRE formatted data. For A and AAAA records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "fc00:0000:0000:0000:0000:0000:00ff:00aa" (shown above) prior to processing.  After processing, wire format would become "0xFC000000000000000000000000FF00AA" (shown in hexadecimal). This format is slightly misleading as it is truly only 16 bytes of WIRE data and would be too imprecise for normalization so padded hexadecimal is used.</p>
+<p id="rfc.section.B.4.p.4">Everything to the left of "00ff:00aa" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "f" as indicated by the NPN record's hexadecimal flag "X" and each run replaced by the single character "f".  The final Normalized RDATA would therefore become "fc00::f:f" and its signature would be based on this "normalized" RDATA field. This new "normalized" "AAAA" RR would be used as an RDATA for the wildcard label of *.example.com now encompassing all possible permutations of the "fc00::${1}:${2}" pattern.</p>
 <h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
 <div class="avoidbreak">
   <address class="vcard">
