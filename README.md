@@ -146,7 +146,7 @@ Table of Contents
 
 1.1.  Background and Terminology
 
-   ppThe reader is assumed to be familiar with the basic DNS and DNSSEC
+   The reader is assumed to be familiar with the basic DNS and DNSSEC
    concepts described in [RFC1034], [RFC1035], [RFC4033], [RFC4034], and
    [RFC4035]; subsequent RFCs that update them in [RFC2181] and
    [RFC2308]; and DNS terms in [RFC7719].
@@ -198,6 +198,7 @@ Table of Contents
    range         =  "[" decnum "-" decnum "]" /
                      "<" hexnum "-" hexnum ">"
                          ; create references for substitution
+                         ; limit of 32 references
 
    string        =  1*(ctext / quoted-char)
 
@@ -211,7 +212,7 @@ Table of Contents
 
    decdigit      =  %x30-39
                          ; 0-9
-   hexdigit      =  DIGIT / 0x41-0x46 / 0x61-66
+   hexdigit      =  decdigit / 0x41-0x46 / 0x61-66
                          ; 0-9, A-F, a-f
 
    ctext         =  <any octet excepting "\">
@@ -223,6 +224,11 @@ Table of Contents
 
    Interpretation of the Domain Name Pattern is described in detail in
    the "BULK Replacement" section.
+
+   The limit of 32 references is meant to simplify implementation
+   details.  It is largely but not entirely arbitrary, as it could
+   capture every individual character of the text representation of a
+   full IPv6 address.
 
    Replacement Pattern describes how the answer RRset MUST be generated
    for the matching query.  It needs no length indicator because its end
@@ -241,13 +247,13 @@ Table of Contents
 
    options       =   delimiter [interval [padding]]
 
-   delimiter     =   "|" *1(ctext | quoted-char)
+   delimiter     =   "|" 0*(ctext | quoted-char)
                            ; "\|" to use "|" as delimiter
                            ; "\\" to use "\" as delimiter
 
-   interval      =   "|" *2DIGIT
+   interval      =   "|" *2decdigit
 
-   padding       =   "|" *2DIGIT
+   padding       =   "|" *2decdigit
 
 
    [ Is this complexity beyond simple ${1}, ${2}, etc, really worth it?
@@ -256,10 +262,6 @@ Table of Contents
 
    The Replacement Pattern MUST end in a period if it is intended to
    represent a fully qualified domain name.
-
-   [ Should there be a defined limit on the number of references?  Even
-   every hex character of an IPv6 address is only 32 references, and
-   knowing a reasonable maximum can possibly simplify implementations. ]
 
 2.2.  The BULK RR Presentation Format
 
@@ -321,8 +323,8 @@ Table of Contents
    the braces, "{" and "}".  The value of the reference is simply copied
    directly from the matching position of the query name.
 
-   The next form of reference notation uses the asterisk, "_".  With
-   ${_}, all captured values in order of ascending position, delimited
+   The next form of reference notation uses the asterisk, "*".  With
+   ${*}, all captured values in order of ascending position, delimited
    by its default delimiter (described below), are placed in the answer.
 
    Numeric range references, such as ${1-4}, replaces all values
@@ -340,15 +342,11 @@ Table of Contents
 
 3.2.1.  Delimiters
 
-   A reference can specify a delimiter to use between copied position
-   values by following a vertical bar, "|", with either zero or one
-   characters.  [ Why not any length? ]?  Zero characters, such as in
-   ${1-3|}, means no delimiter is used.  The default delimiter is the
-   hyphen, "-". [ Earlier drafts attempted to make the default delimiter
-   context-dependent, such as by using a period for A requests and a
-   colon for AAAA requests.  This increases implementation complexity as
-   an attempt to make things more intuitive for zone administrators.
-   However it isn't clear that this is a net gain for ease of use. ]
+   A reference can specify a delimiter to use by following a vertical
+   bar, "|", with zero or more characters.  Zero characters, such as in
+   ${1-3|}, means no delimiter is used, while other characters up to an
+   unescaped vertical bar or closing brace are copied between position
+   values in the replacement.  The default delimiter is the hyphen, "-".
 
 3.2.2.  Delimiter intervals
 
@@ -1020,8 +1018,8 @@ B.3.  EXAMPLE 3
    "9".  The final Normalized RDATA would therefore become 10.2.9.9 and
    its signature would be based on this normalized RDATA field.  This
    new normalized A RR would be used as an RDATA for the wildcard label
-   of "_.example.com." now encompassing all possible permutations of the
-   10.2.${_} pattern.
+   of "*.example.com." now encompassing all possible permutations of the
+   10.2.${*} pattern.
 
 B.4.  EXAMPLE 4
 
