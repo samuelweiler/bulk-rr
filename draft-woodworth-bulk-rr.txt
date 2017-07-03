@@ -8,12 +8,12 @@ Obsoletes: 222 (if approved)                           CenturyLink, Inc.
 Updates: 2308, 4033, 4034, 4035 (if           S. Bindinganaveli Raghavan
          approved)                                Hughes Network Systems
 Intended status: Standards Track                             D. Lawrence
-Expires: August 19, 2017                             Akamai Technologies
-                                                       February 15, 2017
+Expires: January 4, 2018                             Akamai Technologies
+                                                            July 3, 2017
 
 
                        BULK DNS Resource Records
-                       draft-woodworth-bulk-rr-05
+                       draft-woodworth-bulk-rr-06
 
 Abstract
 
@@ -48,14 +48,14 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 19, 2017.
+   This Internet-Draft will expire on January 4, 2018.
 
 
 
 
-Woodworth, et al.        Expires August 19, 2017                [Page 1]
+Woodworth, et al.        Expires January 4, 2018                [Page 1]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
 Copyright Notice
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Woodworth, et al.        Expires August 19, 2017                [Page 2]
+Woodworth, et al.        Expires January 4, 2018                [Page 2]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    10. References  . . . . . . . . . . . . . . . . . . . . . . . . .  17
@@ -165,9 +165,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017                [Page 3]
+Woodworth, et al.        Expires January 4, 2018                [Page 3]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
 1.1.  Background and Terminology
@@ -221,9 +221,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017                [Page 4]
+Woodworth, et al.        Expires January 4, 2018                [Page 4]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    match         =  1*(range / string)
@@ -277,9 +277,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017                [Page 5]
+Woodworth, et al.        Expires January 4, 2018                [Page 5]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    replace       =   1*(reference / string)
@@ -333,9 +333,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017                [Page 6]
+Woodworth, et al.        Expires January 4, 2018                [Page 6]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
 3.  BULK Replacement
@@ -389,9 +389,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017                [Page 7]
+Woodworth, et al.        Expires January 4, 2018                [Page 7]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    Numeric range references, such as ${1-4}, replaces all values
@@ -445,9 +445,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017                [Page 8]
+Woodworth, et al.        Expires January 4, 2018                [Page 8]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    If a delimiter interval greater than 1 is used, captured values
@@ -501,9 +501,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017                [Page 9]
+Woodworth, et al.        Expires January 4, 2018                [Page 9]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    The NPN RR is class independent and has no special TTL requirements.
@@ -557,9 +557,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 10]
+Woodworth, et al.        Expires January 4, 2018               [Page 10]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    leftmost characters defined by this value, ultimately the length of
@@ -613,9 +613,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 11]
+Woodworth, et al.        Expires January 4, 2018               [Page 11]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    One way around all this is to just sign the BULK record itself and
@@ -669,9 +669,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 12]
+Woodworth, et al.        Expires January 4, 2018               [Page 12]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    NPN RRs MAY be included in the "Additional" section to provide a hint
@@ -725,9 +725,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 13]
+Woodworth, et al.        Expires January 4, 2018               [Page 13]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
 5.1.  Unsupported Nameservers
@@ -781,9 +781,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 14]
+Woodworth, et al.        Expires January 4, 2018               [Page 14]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
 6.1.2.  Normalized (NPN-Based) Signatures
@@ -837,9 +837,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 15]
+Woodworth, et al.        Expires January 4, 2018               [Page 15]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    changes to the logic to incorporate processing RDATA generated by
@@ -893,9 +893,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 16]
+Woodworth, et al.        Expires January 4, 2018               [Page 16]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
 8.  IANA Considerations
@@ -949,9 +949,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 17]
+Woodworth, et al.        Expires January 4, 2018               [Page 17]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    [RFC3597]  Gustafsson, A., "Handling of Unknown DNS Resource Record
@@ -1005,9 +1005,9 @@ A.1.  Example 1
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 18]
+Woodworth, et al.        Expires January 4, 2018               [Page 18]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    name.  The ${4-1} reference in the replacement pattern will then
@@ -1061,9 +1061,9 @@ A.3.  Example 3
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 19]
+Woodworth, et al.        Expires January 4, 2018               [Page 19]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    A query for the PTR of 25.2.2.10.in-addr.arpa is received and the
@@ -1117,9 +1117,9 @@ B.1.  EXAMPLE 1
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 20]
+Woodworth, et al.        Expires January 4, 2018               [Page 20]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    Since the validating nameserver would use the identical NPN record
@@ -1173,9 +1173,9 @@ B.2.  EXAMPLE 2
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 21]
+Woodworth, et al.        Expires January 4, 2018               [Page 21]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
 B.3.  EXAMPLE 3
@@ -1229,9 +1229,9 @@ B.4.  EXAMPLE 4
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 22]
+Woodworth, et al.        Expires January 4, 2018               [Page 22]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
    example.com. 86400 IN BULK AAAA (
@@ -1285,9 +1285,9 @@ Internet-Draft                   BULK RR                   February 2017
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 23]
+Woodworth, et al.        Expires January 4, 2018               [Page 23]
 
-Internet-Draft                   BULK RR                   February 2017
+Internet-Draft                   BULK RR                       July 2017
 
 
 Authors' Addresses
@@ -1341,4 +1341,4 @@ Authors' Addresses
 
 
 
-Woodworth, et al.        Expires August 19, 2017               [Page 24]
+Woodworth, et al.        Expires January 4, 2018               [Page 24]

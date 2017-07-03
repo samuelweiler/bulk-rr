@@ -1,8 +1,8 @@
 ---
 title: BULK DNS Resource Records
 abbrev: BULK RR
-docname: draft-woodworth-bulk-rr-05
-date: 2017-02-15
+docname: draft-woodworth-bulk-rr-06
+date: 2017-07
 
 ipr: trust200902
 area: Internet

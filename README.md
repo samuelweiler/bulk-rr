@@ -10,12 +10,12 @@ Obsoletes: 222 (if approved)                           CenturyLink, Inc.
 Updates: 2308, 4033, 4034, 4035 (if           S. Bindinganaveli Raghavan
          approved)                                Hughes Network Systems
 Intended status: Standards Track                             D. Lawrence
-Expires: August 19, 2017                             Akamai Technologies
-                                                       February 15, 2017
+Expires: January 4, 2018                             Akamai Technologies
+                                                            July 3, 2017
 
 
                        BULK DNS Resource Records
-                       draft-woodworth-bulk-rr-05
+                       draft-woodworth-bulk-rr-06
 
 Abstract
 
@@ -50,7 +50,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on August 19, 2017.
+   This Internet-Draft will expire on January 4, 2018.
 
 Copyright Notice
 
