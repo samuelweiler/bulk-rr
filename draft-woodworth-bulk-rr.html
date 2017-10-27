@@ -391,7 +391,7 @@
 <link href="#rfc.section.5" rel="Chapter" title="5 Security Considerations">
 <link href="#rfc.section.5.1" rel="Chapter" title="5.1 DNSSEC Signature Strategies">
 <link href="#rfc.section.5.1.1" rel="Chapter" title="5.1.1 On-the-fly Signatures">
-<link href="#rfc.section.5.1.2" rel="Chapter" title="5.1.2 Normalized (NPN-Based) Signatures">
+<link href="#rfc.section.5.1.2" rel="Chapter" title="5.1.2 Alternative Signature Scheme">
 <link href="#rfc.section.5.1.3" rel="Chapter" title="5.1.3 Non-DNSSEC Zone Support Only">
 <link href="#rfc.section.5.2" rel="Chapter" title="5.2 DNSSEC Validator Details">
 <link href="#rfc.section.5.3" rel="Chapter" title="5.3 DDOS Attack Vectors and Mitigation">
@@ -406,11 +406,6 @@
 <link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Example 1">
 <link href="#rfc.appendix.A.2" rel="Chapter" title="A.2 Example 2">
 <link href="#rfc.appendix.A.3" rel="Chapter" title="A.3 Example 3">
-<link href="#rfc.appendix.B" rel="Chapter" title="B NPN Examples">
-<link href="#rfc.appendix.B.1" rel="Chapter" title="B.1 EXAMPLE 1">
-<link href="#rfc.appendix.B.2" rel="Chapter" title="B.2 EXAMPLE 2">
-<link href="#rfc.appendix.B.3" rel="Chapter" title="B.3 EXAMPLE 3">
-<link href="#rfc.appendix.B.4" rel="Chapter" title="B.4 EXAMPLE 4">
 <link href="#rfc.authors" rel="Chapter">
 
 
@@ -522,7 +517,7 @@
 </li>
 <ul><li>5.1.1.   <a href="#rfc.section.5.1.1">On-the-fly Signatures</a>
 </li>
-<li>5.1.2.   <a href="#rfc.section.5.1.2">Normalized (NPN-Based) Signatures</a>
+<li>5.1.2.   <a href="#rfc.section.5.1.2">Alternative Signature Scheme</a>
 </li>
 <li>5.1.3.   <a href="#rfc.section.5.1.3">Non-DNSSEC Zone Support Only</a>
 </li>
@@ -552,16 +547,6 @@
 </li>
 <li>A.3.   <a href="#rfc.appendix.A.3">Example 3</a>
 </li>
-</ul><li>Appendix B.   <a href="#rfc.appendix.B">NPN Examples</a>
-</li>
-<ul><li>B.1.   <a href="#rfc.appendix.B.1">EXAMPLE 1</a>
-</li>
-<li>B.2.   <a href="#rfc.appendix.B.2">EXAMPLE 2</a>
-</li>
-<li>B.3.   <a href="#rfc.appendix.B.3">EXAMPLE 3</a>
-</li>
-<li>B.4.   <a href="#rfc.appendix.B.4">EXAMPLE 4</a>
-</li>
 </ul><li><a href="#rfc.authors">Authors' Addresses</a>
 </li>
 
@@ -581,7 +566,14 @@ example.com. 86400 IN BULK A (
 </pre>
 <p id="rfc.section.1.p.3">It will answer requests for pool-A-0-0.example.com through pool-A-255-255.example.com with the IPv4 addresses 10.55.0.0 through 10.55.255.255.</p>
 <p id="rfc.section.1.p.4">Much larger record sets can be defined while minimizing the associated requirements for server memory and zone transfer network bandwidth.</p>
-<p id="rfc.section.1.p.5">DNSSEC support is also described.  The Numeric Pattern Normalization (NPN) resource record provides a way of generating pattern-based DNSSEC signatures, and securely performing DNSSEC validation on such signatures.</p>
+<p id="rfc.section.1.p.5">This record addresses a number of real-world operational problems that authoritative DNS service providers experience.  For example, operators who host many large reverse lookup zones, even for only IPv4 space in in-addr.arpa, benefit from the disk space, memory size, and zone transfer efficiencies that are gained by encapsulating a simple record-generating algorithm versus enumerating all of the individual records to cover the same space.</p>
+<p id="rfc.section.1.p.6">Continuing to prose-up this message from John &#8230;</p>
+<p id="rfc.section.1.p.7">1) Minimize operational costs by &#8230; a) Eliminating tickets where singletons force a generate to be split in order to properly function b) Broken SWIP scripts - Due to its scarceness, IPv4 is quickly becoming a very valuable commodity.  One which can't even be purchased without justification.  Reverse records must exist for all assigned v4 IP space whether a service exists on them or not.</p>
+<p id="rfc.section.1.p.8">2) Reduce blind-spots -  Many customers rely on secondary DNS services and as more and more $GENERATES are used, the WIRE version silently increases exponentially.  We've seen zones which live on the primary quietly (safely) as a couple MB only to expand to 65M and even 110M over the WIRE.  These legitimate zonefiles fail to transfer reliably or even at all.</p>
+<p id="rfc.section.1.p.9">3) Reduce start-up times -  Another issue with large expanded zones is the increase in start-up times.  A relatively small zone can take longer and longer to deploy to memory, taking automated deployments take longer to complete, even leading to timeouts and redeployment.</p>
+<p id="rfc.section.1.p.10">4) Transfer intact -  Many customers want 'copies' of zonefiles for their records and local processing.  These copies should ideally look similar but they can deviate significantly where methods like $GENERATE are concerned.</p>
+<p id="rfc.section.1.p.11">5) More Efficient Management services -  Many companies leverage DNS and IP management services.  By implementing bulk-rr aware services, these systems can be more efficient in search synthesis with bulk-rr's multi-level features.</p>
+<p id="rfc.section.1.p.12">6) Compatibility for IPv6 generics -  Just not to leave IPv6 completely out of the picture.  I understand this horse is on its side and cool to the touch but just because we don't do it doesn't mean it won't happen.  In fact it is already happening.  My understanding is Knot-DNS is already touting this capability and several closed-source implementations exist as well.</p>
 <h1 id="rfc.section.1.1">
 <a href="#rfc.section.1.1">1.1.</a> <a href="#background-and-terminology" id="background-and-terminology">Background and Terminology</a>
 </h1>
@@ -643,7 +635,7 @@ ctext         =  &lt;any octet excepting "\"&gt;
 quoted-char   = "\" octet
                        ; to allow special characters as literals
 </pre>
-<p id="rfc.section.2.1.p.5">Interpretation of the Domain Name Pattern is described in detail in the "BULK Replacement" section.</p>
+<p id="rfc.section.2.1.p.5">Interpretation of the Domain Name Pattern is described in detail in the "BULK Replacement" section.  Note that quoted-char must be stored in the wire format to preserve its semantics when the BULK RR is interpreted by nameservers.</p>
 <p id="rfc.section.2.1.p.6">The limit of 32 references is meant to simplify implementation details.  It is largely but not entirely arbitrary, as it could capture every individual character of the text representation of a full IPv6 address.</p>
 <p id="rfc.section.2.1.p.7">Replacement Pattern describes how the answer RRset MUST be generated for the matching query.  It needs no length indicator because its end can be derived from the RDATA length minus Match Type and Domain Name Pattern lengths.  It uses the following additional ABNF elements:</p>
 <pre>
@@ -713,9 +705,10 @@ padding       =   "|" *2decdigit
 <h1 id="rfc.section.3.2.4">
 <a href="#rfc.section.3.2.4">3.2.4.</a> <a href="#final-processing" id="final-processing">Final processing</a>
 </h1>
-<p id="rfc.section.3.2.4.p.1">The string that results from all replacements is converted to the appropriate RDATA format for the record type.  If the conversion fails, the SERVFAIL rcode MUST be set on the response.  [ This would cause a resolver to try another auth for the name, which presumably is just going to fail too.  Should it NXDOMAIN instead to stop the resolver? That might have implications for aggressive subtree denial though. Extended error could be useful here. ]</p>
+<p id="rfc.section.3.2.4.p.1">The string that results from all replacements is converted to the appropriate RDATA format for the record type.  If the conversion fails, the SERVFAIL rcode MUST be set on the response, representing a misconfiguration that the server was unable to perform. [ The EDNS extended-error code would be useful here. ]</p>
 <p id="rfc.section.3.2.4.p.2">The TTL of each RR generated by a BULK RR is the TTL of the corresponding BULK record itself.  [ BULK should probably have its own TTL field because using that of the record itself feels like bad design.  On the other hand, if BULK is never meant to be queried for directly and only appears in authoritative data, its own TTL is pretty useless normally. ]</p>
-<p id="rfc.section.3.2.4.p.3">If the generated record type is one that uses domain names in its resource record data, such as CNAME, a relative domain names MUST be fully qualified with the origin domain of the BULK RR.</p>
+<p id="rfc.section.3.2.4.p.3">The class for the RRSet is the class of the BULK RR.</p>
+<p id="rfc.section.3.2.4.p.4">If the generated record type is one that uses domain names in its resource record data, such as CNAME, a relative domain names MUST be fully qualified with the origin domain of the BULK RR.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#known-limitations" id="known-limitations">Known Limitations</a>
 </h1>
@@ -742,12 +735,10 @@ padding       =   "|" *2decdigit
 <p id="rfc.section.5.1.1.p.3">One possibly mitigation for addressing the risk of keeping the zone signing key online would be to continue to keep the key for signing positive answers offline and introduce a second key for online signing of negative answers.</p>
 <p id="rfc.section.5.1.1.p.4">No changes to validating resolvers is required to support this solution.</p>
 <h1 id="rfc.section.5.1.2">
-<a href="#rfc.section.5.1.2">5.1.2.</a> <a href="#normalized-npn-based-signatures" id="normalized-npn-based-signatures">Normalized (NPN-Based) Signatures</a>
+<a href="#rfc.section.5.1.2">5.1.2.</a> <a href="#alternative-signature-scheme" id="alternative-signature-scheme">Alternative Signature Scheme</a>
 </h1>
-<p id="rfc.section.5.1.2.p.1">This solution provides the most flexible solution as nameservers without on-the-fly signing capabilities can still support signatures for BULK records.  The down side to this solution is it requires additional DNSSEC-aware resolver support.</p>
-<p id="rfc.section.5.1.2.p.2">It has been pointed out that due to this limitation, creation of DNSSEC-signed BULK RRs requiring NPN support SHOULD be formally discouraged until such time a respectable percentage (&gt;80%) of validating resolvers in-the-wild possess NPN processing capabilities.  Until that time, on-the-fly signing and unsigned records offer the intended capabilities of the BULK specification, while requiring zero new features to support RR resolution. The authors would like to encourage opening this door for pattern based technologies such as NPN records as a solution to BULK RRs as well as other pattern based RRs to come. Given enough time, enough nameservers will be patched and upgraded for unrelated reasons and by means of simple attrition can supply a level of inertia and eventually widespread adoption can be assumed.</p>
-<p id="rfc.section.5.1.2.p.3">NPN records are likely to be a topic of great debate as to their own security limitations.  It is, however, the authors' belief that while any logic which limits the input of digital signatures lessens the validity of those signatures, the limitation is minimal and the gain is significant.  The main reason for this is as a general rule, RRs used in a generic manner such as conventional $GENERATE RRs or scripted mass pattern generated RRs have a lesser importance than other RRs in managed zones.  These therefore inherently pose less risk by means of attack and have a much less reward by defeating security measures.</p>
-<p id="rfc.section.5.1.2.p.4">This being said, care must still be taken to set the Ignore fields appropriately to minimize exposure and only use NPN RRs to secure pattern-based records such as BULK.</p>
+<p id="rfc.section.5.1.2.p.1">Previous versions of this draft proposed a new signature scheme using a Numeric Pattern Normalization (NPN) RR.  It was a method to support offline signatures for BULK records, with the drawback that is required updates to DNSSEC-aware resolvers.</p>
+<p id="rfc.section.5.1.2.p.2">That mechanism is not specific to BULK and has been removed from the current draft.  If there is further interest in pursuing it, it can be reopened as a separate draft.</p>
 <h1 id="rfc.section.5.1.3">
 <a href="#rfc.section.5.1.3">5.1.3.</a> <a href="#non-dnssec-zone-support-only" id="non-dnssec-zone-support-only">Non-DNSSEC Zone Support Only</a>
 </h1>
@@ -903,105 +894,6 @@ $ORIGIN 2.10.in-addr.arpa.
 25.2.2.10.in-addr.arpa 7200 IN CNAME 25.2.0-3.2.10.in-addr.arpa.
 </pre>
 <p id="rfc.section.A.3.p.3">[ Without $* and options complexity, the pattern to get the same result is just ${1}.{$2}.0-3 which is not really significantly onerous to enter, and slightly less arcane looking to comprehend. ]</p>
-<h1 id="rfc.appendix.B">
-<a href="#rfc.appendix.B">Appendix B.</a> <a href="#npn-examples" id="npn-examples">NPN Examples</a>
-</h1>
-<h1 id="rfc.appendix.B.1">
-<a href="#rfc.appendix.B.1">B.1.</a> <a href="#example-1-1" id="example-1-1">EXAMPLE 1</a>
-</h1>
-<pre>
-2.10.in-addr.arpa. 86400 IN BULK PTR (
-                                 [0-255].[0-10].2.10.in-addr.arpa.
-                                 pool-A-${1}-${2}.example.com.
-                            )
-2.10.in-addr.arpa. 86400 IN NPN  PTR 9 0 7 13
-</pre>
-<p id="rfc.section.B.1.p.1">A query for the PTR of address 10.2.3.44 would match As shown previously in BULK RR examples the query would match the BULK record for the query name 44.3.2.10.in-addr.arpa, generating a PTR to pool-A-3-44.example.com as the answer.</p>
-<p id="rfc.section.B.1.p.2">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "3-44" as illustrated below.</p>
-<pre>
-  0 1 2 3 4 5 6 7
-                v---------
-    p o o l - A - 3 - 4 4 . e x a m p l e . c o m .
-                 ---------^
-                          1 1 1 1                  
-                          3 2 1 0 9 8 7 6 5 4 3 2 1 0
-</pre>
-<p id="rfc.section.B.1.p.3">Everything to the left of "3-44" will remain intact, as will everything to its right.  The remaining characters will be processed for digits between 0 and 9 as indicated by the NPN record's hexadecimal flag 9, and each run of digits replaced by the single character "9".  The final Normalized RDATA for *.2.10.in-addr.arpa would therefore become pool-A-9-9.example.com., and its signature would be based on this value to cover all possible permutations of the pool-A-${1}-${2}.example.com replacement pattern.</p>
-<p id="rfc.section.B.1.p.4">Since the validating nameserver would use the identical NPN record for processing and comparison, all RRs generated by the BULK record can now be verified with a single signature.</p>
-<h1 id="rfc.appendix.B.2">
-<a href="#rfc.appendix.B.2">B.2.</a> <a href="#example-2-1" id="example-2-1">EXAMPLE 2</a>
-</h1>
-<p id="rfc.section.B.2.p.1">This example contains a classless IPv4 delegation on the /22 CIDR boundary as defined by <a href="#RFC2317" class="xref">[RFC2317]</a>.  The network for this example is "10.2.0/22" delegated to a nameserver "ns1.sub.example.com.".  RRs for this example are defined as:</p>
-<pre>
-$ORIGIN 2.10.in-addr.arpa.
-0-3 86400 IN      NS    ns1.sub.example.com.
-    86400 IN BULK CNAME [0-255].[0-3] ${*|.}.0-3
-    86400 IN NPN  CNAME 9 0 0 23
-</pre>
-<p id="rfc.section.B.2.p.2">For this example, a query of "10.2.2.65" would enter the nameserver as "65.2.2.10.in-addr.arpa." and a "CNAME" RR with the RDATA of "65.2.0-3.2.10.in-addr.arpa." would be generated.</p>
-<p id="rfc.section.B.2.p.3">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "65.2" as illustrated below.</p>
-<pre>
-       0
-       v---------
-         6 5 . 2 . 0 - 3 . 2 . 1 0 . i n - a d d r . a r p a .
-        ---------^
-                 2 2 2 2 1 1 1 1 1 1 1 1 1 1                  
-                 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-</pre>
-<p id="rfc.section.B.2.p.4">Everything to the left of "65.2" will remain intact as will everything to its right.  The remaining characters will be processed for digits from 0 through 9 as indicated by the NPN record's hexadecimal flag "9", with each run replaced by the single character "9".  The final normalized RDATA would therefore become 9.9.0-3.2.10.in-addr.arpa and its signature would be based on this normalized RDATA field.  This new normalized string would be used as an RDATA for the wildcard label of 2.10.in-addr.arpa now encompassing all possible permutations of the ${*|.}.0-3.2.10.in-addr.arpa. pattern.</p>
-<p id="rfc.section.B.2.p.5">As in example 1, the validatating resolver would use the same NPN record for comparison.</p>
-<h1 id="rfc.appendix.B.3">
-<a href="#rfc.appendix.B.3">B.3.</a> <a href="#example-3-1" id="example-3-1">EXAMPLE 3</a>
-</h1>
-<p id="rfc.section.B.3.p.1">This example provides reverse logic for example 1 by providing an IPv4 address record for a requested hostname.  For this example the query is defined as an A record for pool-A-3-44.example.com, with an origin of example.com.  RRs for this example are defined as:</p>
-<pre>
-example.com. 86400 IN BULK A (
-                                   pool-A-[0-10]-[0-255]
-                                   10.2.${*}
-                                  )
-example.com. 86400 IN NPN  A 9 0 8 0
-</pre>
-<p id="rfc.section.B.3.p.2">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "003.044" as illustrated below.</p>
-<pre>
-                0 1 2 3 4 5 6 7 8
-                                v--------------
-                  0 1 0 . 0 0 2 . 0 0 3 . 0 4 4
-                                 ---------------^
-                                                0
-</pre>
-<p id="rfc.section.B.3.p.3">This example illustrates a key point about NPN records; since they are pre-canonical they MUST operate on a strict subset of WIRE formatted data.  For A and AAAA records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "010.002.003.044" (shown above) prior to processing.  After processing, wire format would become "0x0A02032C" (shown in hexadecimal).  This format would be too imprecise for normalization so padded decimal is used.</p>
-<p id="rfc.section.B.3.p.4">Everything to the left of "003.044" will remain intact as will everything to its right.  The remaining characters will be processed for digits between 0 and 9 as indicated by the NPN record's hexadecimal flag "9" and each run replaced by the single character "9".  The final Normalized RDATA would therefore become 10.2.9.9 and its signature would be based on this normalized RDATA field. This new normalized A RR would be used as an RDATA for the wildcard label of "*.example.com." now encompassing all possible permutations of the 10.2.${*} pattern.</p>
-<h1 id="rfc.appendix.B.4">
-<a href="#rfc.appendix.B.4">B.4.</a> <a href="#example-4" id="example-4">EXAMPLE 4</a>
-</h1>
-<p id="rfc.section.B.4.p.1">This example provides similar logic for an IPv6 AAAA record.  For this example the query is defined as an AAAA record for pool-A-ff-aa.example.com with an origin of example.com..  RRs for this example are defined as:</p>
-<pre>
-example.com. 86400 IN BULK AAAA (
-                                   pool-A-[0-ffff]-[0-ffff]
-                                   fc00::${1}:${2}
-                                )
-example.com. 86400 IN NPN  AAAA X 0 30 0
-</pre>
-<p id="rfc.section.B.4.p.2">By protecting the "Ignore" characters from the generated RR's RDATA the focus for normalization becomes "00ff:00aa" as illustrated below.</p>
-<pre>
-                      1 1 1 1 1 1 1 1 1 1 2 2
-  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-
-    f c 0 0 : 0 0 0 0 : 0 0 0 0 : 0 0 0 0 : -/-/
-
-  4 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 1
-  0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9
-   /-/-/- . . . . . . . . . . . . . . . . . . . . . . . . -/-/-/
-                          2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 4
-                          1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
-                                            v------------------
-                     /-/- 0 0 0 0 : 0 0 0 0 : 0 0 f f : 0 0 a a
-                                             -------------------^
-                        2 1 1 1 1 1 1 1 1 1 1 
-                        0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-</pre>
-<p id="rfc.section.B.4.p.3">This example reinforces the point on pre-canonical processing of NPN records; they MUST operate on a strict subset of WIRE formatted data. For A and AAAA records this means the "Ignore" fields are based on zero padded data.  In this example our generated record MUST be converted into "fc00:0000:0000:0000:0000:0000:00ff:00aa" (shown above) prior to processing.  After processing, wire format would become "0xFC000000000000000000000000FF00AA" (shown in hexadecimal). This format is slightly misleading as it is truly only 16 bytes of WIRE data and would be too imprecise for normalization so padded hexadecimal is used.</p>
-<p id="rfc.section.B.4.p.4">Everything to the left of "00ff:00aa" will remain intact as will everything to its right.  The remaining characters will be processed for numbers between "0" and "f" as indicated by the NPN record's hexadecimal flag "X" and each run replaced by the single character "f".  The final Normalized RDATA would therefore become "fc00::f:f" and its signature would be based on this "normalized" RDATA field. This new "normalized" "AAAA" RR would be used as an RDATA for the wildcard label of *.example.com now encompassing all possible permutations of the "fc00::${1}:${2}" pattern.</p>
 <h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
 <div class="avoidbreak">
   <address class="vcard">
