@@ -393,9 +393,8 @@
 <link href="#rfc.section.5.1.1" rel="Chapter" title="5.1.1 On-the-fly Signatures">
 <link href="#rfc.section.5.1.2" rel="Chapter" title="5.1.2 Alternative Signature Scheme">
 <link href="#rfc.section.5.1.3" rel="Chapter" title="5.1.3 Non-DNSSEC Zone Support Only">
-<link href="#rfc.section.5.2" rel="Chapter" title="5.2 DNSSEC Validator Details">
-<link href="#rfc.section.5.3" rel="Chapter" title="5.3 DDOS Attack Vectors and Mitigation">
-<link href="#rfc.section.5.4" rel="Chapter" title="5.4 Implications of Large-Scale DNS Records">
+<link href="#rfc.section.5.2" rel="Chapter" title="5.2 DDOS Attack Vectors and Mitigation">
+<link href="#rfc.section.5.3" rel="Chapter" title="5.3 Implications of Large-Scale DNS Records">
 <link href="#rfc.section.6" rel="Chapter" title="6 Privacy Considerations">
 <link href="#rfc.section.7" rel="Chapter" title="7 IANA Considerations">
 <link href="#rfc.section.8" rel="Chapter" title="8 Acknowledgments">
@@ -414,7 +413,7 @@
 
   <meta name="dct.creator" content="Woodworth, J., Ballew, D., Bindinganaveli Raghavan, S., and D. Lawrence" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-woodworth-bulk-rr-07" />
-  <meta name="dct.issued" scheme="ISO8601" content="2017-10-27" />
+  <meta name="dct.issued" scheme="ISO8601" content="2017-10-28" />
   <meta name="dct.abstract" content="The BULK DNS resource record type defines a method of pattern-based creation of DNS resource records based on numeric substrings of query names.  The intent of BULK is to simplify generic assignments in a memory-efficient way that can be easily shared between the primary and secondary nameservers for a zone." />
   <meta name="description" content="The BULK DNS resource record type defines a method of pattern-based creation of DNS resource records based on numeric substrings of query names.  The intent of BULK is to simplify generic assignments in a memory-efficient way that can be easily shared between the primary and secondary nameservers for a zone." />
 
@@ -446,7 +445,7 @@
 <td class="right">Hughes Network Systems</td>
 </tr>
 <tr>
-<td class="left">Expires: April 30, 2018</td>
+<td class="left">Expires: May 1, 2018</td>
 <td class="right">D. Lawrence</td>
 </tr>
 <tr>
@@ -455,7 +454,7 @@
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">October 27, 2017</td>
+<td class="right">October 28, 2017</td>
 </tr>
 
     	
@@ -473,7 +472,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on April 30, 2018.</p>
+<p>This Internet-Draft will expire on May 1, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2017 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (http://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -521,11 +520,9 @@
 </li>
 <li>5.1.3.   <a href="#rfc.section.5.1.3">Non-DNSSEC Zone Support Only</a>
 </li>
-</ul><li>5.2.   <a href="#rfc.section.5.2">DNSSEC Validator Details</a>
+</ul><li>5.2.   <a href="#rfc.section.5.2">DDOS Attack Vectors and Mitigation</a>
 </li>
-<li>5.3.   <a href="#rfc.section.5.3">DDOS Attack Vectors and Mitigation</a>
-</li>
-<li>5.4.   <a href="#rfc.section.5.4">Implications of Large-Scale DNS Records</a>
+<li>5.3.   <a href="#rfc.section.5.3">Implications of Large-Scale DNS Records</a>
 </li>
 </ul><li>6.   <a href="#rfc.section.6">Privacy Considerations</a>
 </li>
@@ -566,14 +563,10 @@ example.com. 86400 IN BULK A (
 </pre>
 <p id="rfc.section.1.p.3">It will answer requests for pool-A-0-0.example.com through pool-A-255-255.example.com with the IPv4 addresses 10.55.0.0 through 10.55.255.255.</p>
 <p id="rfc.section.1.p.4">Much larger record sets can be defined while minimizing the associated requirements for server memory and zone transfer network bandwidth.</p>
-<p id="rfc.section.1.p.5">This record addresses a number of real-world operational problems that authoritative DNS service providers experience.  For example, operators who host many large reverse lookup zones, even for only IPv4 space in in-addr.arpa, benefit from the disk space, memory size, and zone transfer efficiencies that are gained by encapsulating a simple record-generating algorithm versus enumerating all of the individual records to cover the same space.</p>
-<p id="rfc.section.1.p.6">Continuing to prose-up this message from John &#8230;</p>
-<p id="rfc.section.1.p.7">1) Minimize operational costs by &#8230; a) Eliminating tickets where singletons force a generate to be split in order to properly function b) Broken SWIP scripts - Due to its scarceness, IPv4 is quickly becoming a very valuable commodity.  One which can't even be purchased without justification.  Reverse records must exist for all assigned v4 IP space whether a service exists on them or not.</p>
-<p id="rfc.section.1.p.8">2) Reduce blind-spots -  Many customers rely on secondary DNS services and as more and more $GENERATES are used, the WIRE version silently increases exponentially.  We've seen zones which live on the primary quietly (safely) as a couple MB only to expand to 65M and even 110M over the WIRE.  These legitimate zonefiles fail to transfer reliably or even at all.</p>
-<p id="rfc.section.1.p.9">3) Reduce start-up times -  Another issue with large expanded zones is the increase in start-up times.  A relatively small zone can take longer and longer to deploy to memory, taking automated deployments take longer to complete, even leading to timeouts and redeployment.</p>
-<p id="rfc.section.1.p.10">4) Transfer intact -  Many customers want 'copies' of zonefiles for their records and local processing.  These copies should ideally look similar but they can deviate significantly where methods like $GENERATE are concerned.</p>
-<p id="rfc.section.1.p.11">5) More Efficient Management services -  Many companies leverage DNS and IP management services.  By implementing bulk-rr aware services, these systems can be more efficient in search synthesis with bulk-rr's multi-level features.</p>
-<p id="rfc.section.1.p.12">6) Compatibility for IPv6 generics -  Just not to leave IPv6 completely out of the picture.  I understand this horse is on its side and cool to the touch but just because we don't do it doesn't mean it won't happen.  In fact it is already happening.  My understanding is Knot-DNS is already touting this capability and several closed-source implementations exist as well.</p>
+<p id="rfc.section.1.p.5">This record addresses a number of real-world operational problems that authoritative DNS service providers experience.  For example, operators who host many large reverse lookup zones, even for only IPv4 space in in-addr.arpa, would benefit from the disk space, memory size, and zone transfer efficiencies that are gained by encapsulating a simple record-generating algorithm versus enumerating all of the individual records to cover the same space.</p>
+<p id="rfc.section.1.p.6">Production zones of tens of thousands of pattern-generated records currently exist, that could be reduced to just one BULK RR.  These zones can look deceptively small on the primary nameserver and balloon to 100MB or more when expanded,</p>
+<p id="rfc.section.1.p.7">BULK also allows administrators to more easily deal with singletons, records in the pattern space that are an exception to the normal data generation rules.  Whereas a mechanism like $GENERATE may need to be adjusted to account for these individual records, the processing rules for BULK have explicit records more naturally override the dynamically generated ones.  This collision problem is not just a theoretical concern, but a real source of support calls for providers.</p>
+<p id="rfc.section.1.p.8">Pattern-generated records are also not only for the reverse DNS space.  Forward zones also occasionally have entries that follow patterns that would be well-addressed by the BULK RR.</p>
 <h1 id="rfc.section.1.1">
 <a href="#rfc.section.1.1">1.1.</a> <a href="#background-and-terminology" id="background-and-terminology">Background and Terminology</a>
 </h1>
@@ -660,8 +653,8 @@ interval      =   "|" *2decdigit
 padding       =   "|" *2decdigit
 
 </pre>
-<p id="rfc.section.2.1.p.8">[ Is this complexity beyond simple ${1}, ${2}, etc, really worth it?  I definitely see how it could make for shorter replacement patterns, but does it enhance their clarity and usability? ]</p>
-<p id="rfc.section.2.1.p.9">The Replacement Pattern MUST end in a period if it is intended to represent a fully qualified domain name.</p>
+<p id="rfc.section.2.1.p.8">[ Is the formatting complexity beyond simple ${1}, ${2}, etc, really worth it?  I definitely see how it could make for shorter replacement patterns, but does it enhance their clarity and usability, adding a feature someone really wants? ]</p>
+<p id="rfc.section.2.1.p.9">The Replacement Pattern MUST end in the root label if it is intended to represent a fully qualified domain name.</p>
 <h1 id="rfc.section.2.2">
 <a href="#rfc.section.2.2">2.2.</a> <a href="#the-bulk-rr-presentation-format" id="the-bulk-rr-presentation-format">The BULK RR Presentation Format</a>
 </h1>
@@ -717,7 +710,6 @@ padding       =   "|" *2decdigit
 <a href="#rfc.section.4.1">4.1.</a> <a href="#unsupported-nameservers" id="unsupported-nameservers">Unsupported Nameservers</a>
 </h1>
 <p id="rfc.section.4.1.p.1">Authoritative nameservers that do not understand the semantics of the new record type will not be able to deliver the intended answers even when the type appears in their zone data This significantly affects the interoperability of primary versus secondary authorities that are not all running the same software.  Adding new RRs which affect handling by authoritative servers, or being unable to add them, is an issue that needs to be explored more thoroughly within dnsop.</p>
-<p id="rfc.section.4.1.p.2">On the resolver side, rolling out a new semantics in DNSSEC has also proven to be difficult in the past.  Lacking NPN support effectively means that operators using BULK will have to forego DNSSEC signing of the affected zones, or do online signing of the dynamically generated records.</p>
 <h1 id="rfc.section.5">
 <a href="#rfc.section.5">5.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
 </h1>
@@ -742,30 +734,26 @@ padding       =   "|" *2decdigit
 <h1 id="rfc.section.5.1.3">
 <a href="#rfc.section.5.1.3">5.1.3.</a> <a href="#non-dnssec-zone-support-only" id="non-dnssec-zone-support-only">Non-DNSSEC Zone Support Only</a>
 </h1>
-<p id="rfc.section.5.1.3.p.1">As a final option zones which wish to remain entirely without DNSSEC support may serve such zones without either of the above solutions and records generated based on BULK RRs will require zero support from recursive (resolving) nameservers.</p>
+<p id="rfc.section.5.1.3.p.1">As a final option zones which wish to remain entirely without DNSSEC support may serve such zones without either of the above solutions and records generated based on BULK RRs will require zero support from recursive resolvers.</p>
 <h1 id="rfc.section.5.2">
-<a href="#rfc.section.5.2">5.2.</a> <a href="#dnssec-validator-details" id="dnssec-validator-details">DNSSEC Validator Details</a>
+<a href="#rfc.section.5.2">5.2.</a> <a href="#ddos-attack-vectors-and-mitigation" id="ddos-attack-vectors-and-mitigation">DDOS Attack Vectors and Mitigation</a>
 </h1>
-<p id="rfc.section.5.2.p.1">Verification of DNSSEC signed BULK generated RRs may be performed against on-the-fly signatures with zero modification to their behavior.  However, verification using NPN records would require changes to the logic to incorporate processing RDATA generated by BULK logic as described above so the results will be compatible.</p>
+<p id="rfc.section.5.2.p.1">As an additional defense against Distributed Denial Of Service (DDOS) attacks against recursive (resolving) nameservers it is highly recommended shorter TTLs be used for BULK RRs than others.  While disabling caching with a zero TTL is not recommended, as this would only result in a shift of the attack target, a balance will need to be found.  While this document uses 24 hours (86400 seconds) in its examples, values between 300 to 900 seconds are likely more appropriate and is RECOMMENDED.  What is ultimately deemed appropriate may differ from zone to zone and administrator to administrator.</p>
+<p id="rfc.section.5.2.p.2">[ I am unclear how this helps DDOS mitigation against anyone at all, and suspect this section should be removed.. ]</p>
 <h1 id="rfc.section.5.3">
-<a href="#rfc.section.5.3">5.3.</a> <a href="#ddos-attack-vectors-and-mitigation" id="ddos-attack-vectors-and-mitigation">DDOS Attack Vectors and Mitigation</a>
+<a href="#rfc.section.5.3">5.3.</a> <a href="#implications-of-large-scale-dns-records" id="implications-of-large-scale-dns-records">Implications of Large-Scale DNS Records</a>
 </h1>
-<p id="rfc.section.5.3.p.1">As an additional defense against Distributed Denial Of Service (DDOS) attacks against recursive (resolving) nameservers it is highly recommended shorter TTLs be used for BULK RRs than others.  While disabling caching with a zero TTL is not recommended, as this would only result in a shift of the attack target, a balance will need to be found.  While this document uses 24 hours (86400 seconds) in its examples, values between 300 to 900 seconds are likely more appropriate and is RECOMMENDED.  What is ultimately deemed appropriate may differ from zone to zone and administrator to administrator.</p>
-<p id="rfc.section.5.3.p.2">[ I am unclear how this helps DDOS mitigation against anyone at all. ]</p>
-<h1 id="rfc.section.5.4">
-<a href="#rfc.section.5.4">5.4.</a> <a href="#implications-of-large-scale-dns-records" id="implications-of-large-scale-dns-records">Implications of Large-Scale DNS Records</a>
-</h1>
-<p id="rfc.section.5.4.p.1">The production of such large-scale records in the wild may have some unintended side-effects.  These side-effects could be of concern or add unexpected complications to DNS based security offerings or forensic and anti-spam measures.  While outside the scope of this document, implementers of technology relying on DNS resource records for critical decision making must take into consideration how the existence of such a volume of records might impact their technology.</p>
-<p id="rfc.section.5.4.p.2">Solutions to the magnitude problem for BULK generated RRs are expected be similar if not identical to that of existing wildcard records, the core difference being the resultant RDATA will be unique for each requested Domain Name within its scope.</p>
-<p id="rfc.section.5.4.p.3">The authors of this document are confident that by careful consideration, negative_side-effects produced by implementing the features described in this document can be eliminated from any such service or product.</p>
+<p id="rfc.section.5.3.p.1">The production of such large-scale records in the wild may have some unintended side-effects.  These side-effects could be of concern or add unexpected complications to DNS based security offerings or forensic and anti-spam measures.  While outside the scope of this document, implementers of technology relying on DNS resource records for critical decision making must take into consideration how the existence of such a volume of records might impact their technology.</p>
+<p id="rfc.section.5.3.p.2">Solutions to the magnitude problem for BULK generated RRs are expected be similar if not identical to that of existing wildcard records, the core difference being the resultant RDATA will be unique for each requested Domain Name within its scope.</p>
+<p id="rfc.section.5.3.p.3">The authors of this document are confident that by careful consideration, negative_side-effects produced by implementing the features described in this document can be eliminated from any such service or product.</p>
 <h1 id="rfc.section.6">
 <a href="#rfc.section.6">6.</a> <a href="#privacy-considerations" id="privacy-considerations">Privacy Considerations</a>
 </h1>
-<p id="rfc.section.6.p.1">Neither the BULK nor NPN records introduce any new privacy concerns to DNS data.</p>
+<p id="rfc.section.6.p.1">The BULK record does not introduce any new privacy concerns to DNS data.</p>
 <h1 id="rfc.section.7">
 <a href="#rfc.section.7">7.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
 </h1>
-<p id="rfc.section.7.p.1">IANA is requested to assign numbers for two DNS resource record types identified in this document: BULK and NPN.</p>
+<p id="rfc.section.7.p.1">IANA is requested to assign numbers for the BULK RR.</p>
 <h1 id="rfc.section.8">
 <a href="#rfc.section.8">8.</a> <a href="#acknowledgments" id="acknowledgments">Acknowledgments</a>
 </h1>

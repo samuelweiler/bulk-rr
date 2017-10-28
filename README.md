@@ -9,9 +9,9 @@ Internet-Draft                                                 D. Ballew
 Updates: 2308, 4033, 4034, 4035 (if                    CenturyLink, Inc.
          approved)                            S. Bindinganaveli Raghavan
 Intended status: Standards Track                  Hughes Network Systems
-Expires: April 30, 2018                                      D. Lawrence
+Expires: May 1, 2018                                         D. Lawrence
                                                      Akamai Technologies
-                                                        October 27, 2017
+                                                        October 28, 2017
 
 
                        BULK DNS Resource Records
@@ -50,7 +50,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 30, 2018.
+   This Internet-Draft will expire on May 1, 2018.
 
 Copyright Notice
 
@@ -88,9 +88,8 @@ Table of Contents
        5.1.1.  On-the-fly Signatures
        5.1.2.  Alternative Signature Scheme
        5.1.3.  Non-DNSSEC Zone Support Only
-     5.2.  DNSSEC Validator Details
-     5.3.  DDOS Attack Vectors and Mitigation
-     5.4.  Implications of Large-Scale DNS Records
+     5.2.  DDOS Attack Vectors and Mitigation
+     5.3.  Implications of Large-Scale DNS Records
    6.  Privacy Considerations
    7.  IANA Considerations
    8.  Acknowledgments
@@ -131,48 +130,28 @@ Table of Contents
    This record addresses a number of real-world operational problems
    that authoritative DNS service providers experience.  For example,
    operators who host many large reverse lookup zones, even for only
-   IPv4 space in in-addr.arpa, benefit from the disk space, memory size,
-   and zone transfer efficiencies that are gained by encapsulating a
-   simple record-generating algorithm versus enumerating all of the
+   IPv4 space in in-addr.arpa, would benefit from the disk space, memory
+   size, and zone transfer efficiencies that are gained by encapsulating
+   a simple record-generating algorithm versus enumerating all of the
    individual records to cover the same space.
 
-   Continuing to prose-up this message from John ...
+   Production zones of tens of thousands of pattern-generated records
+   currently exist, that could be reduced to just one BULK RR.  These
+   zones can look deceptively small on the primary nameserver and
+   balloon to 100MB or more when expanded,
 
-   1) Minimize operational costs by ... a) Eliminating tickets where
-   singletons force a generate to be split in order to properly function
-   b) Broken SWIP scripts - Due to its scarceness, IPv4 is quickly
-   becoming a very valuable commodity.  One which can't even be
-   purchased without justification.  Reverse records must exist for all
-   assigned v4 IP space whether a service exists on them or not.
+   BULK also allows administrators to more easily deal with singletons,
+   records in the pattern space that are an exception to the normal data
+   generation rules.  Whereas a mechanism like $GENERATE may need to be
+   adjusted to account for these individual records, the processing
+   rules for BULK have explicit records more naturally override the
+   dynamically generated ones.  This collision problem is not just a
+   theoretical concern, but a real source of support calls for
+   providers.
 
-   2) Reduce blind-spots - Many customers rely on secondary DNS services
-   and as more and more $GENERATES are used, the WIRE version silently
-   increases exponentially.  We've seen zones which live on the primary
-   quietly (safely) as a couple MB only to expand to 65M and even 110M
-   over the WIRE.  These legitimate zonefiles fail to transfer reliably
-   or even at all.
-
-   3) Reduce start-up times - Another issue with large expanded zones is
-   the increase in start-up times.  A relatively small zone can take
-   longer and longer to deploy to memory, taking automated deployments
-   take longer to complete, even leading to timeouts and redeployment.
-
-   4) Transfer intact - Many customers want 'copies' of zonefiles for
-   their records and local processing.  These copies should ideally look
-   similar but they can deviate significantly where methods like
-   $GENERATE are concerned.
-
-   5) More Efficient Management services - Many companies leverage DNS
-   and IP management services.  By implementing bulk-rr aware services,
-   these systems can be more efficient in search synthesis with bulk-
-   rr's multi-level features.
-
-   6) Compatibility for IPv6 generics - Just not to leave IPv6
-   completely out of the picture.  I understand this horse is on its
-   side and cool to the touch but just because we don't do it doesn't
-   mean it won't happen.  In fact it is already happening.  My
-   understanding is Knot-DNS is already touting this capability and
-   several closed-source implementations exist as well.
+   Pattern-generated records are also not only for the reverse DNS
+   space.  Forward zones also occasionally have entries that follow
+   patterns that would be well-addressed by the BULK RR.
 
 1.1.  Background and Terminology
 
@@ -290,12 +269,13 @@ Table of Contents
    padding       =   "|" *2decdigit
 
 
-   [ Is this complexity beyond simple ${1}, ${2}, etc, really worth it?
-   I definitely see how it could make for shorter replacement patterns,
-   but does it enhance their clarity and usability? ]
+   [ Is the formatting complexity beyond simple ${1}, ${2}, etc, really
+   worth it?  I definitely see how it could make for shorter replacement
+   patterns, but does it enhance their clarity and usability, adding a
+   feature someone really wants? ]
 
-   The Replacement Pattern MUST end in a period if it is intended to
-   represent a fully qualified domain name.
+   The Replacement Pattern MUST end in the root label if it is intended
+   to represent a fully qualified domain name.
 
 2.2.  The BULK RR Presentation Format
 
@@ -453,12 +433,6 @@ Table of Contents
    handling by authoritative servers, or being unable to add them, is an
    issue that needs to be explored more thoroughly within dnsop.
 
-   On the resolver side, rolling out a new semantics in DNSSEC has also
-   proven to be difficult in the past.  Lacking NPN support effectively
-   means that operators using BULK will have to forego DNSSEC signing of
-   the affected zones, or do online signing of the dynamically generated
-   records.
-
 5.  Security Considerations
 
    Two known security considerations exist for the BULK resource record,
@@ -514,17 +488,9 @@ Table of Contents
    As a final option zones which wish to remain entirely without DNSSEC
    support may serve such zones without either of the above solutions
    and records generated based on BULK RRs will require zero support
-   from recursive (resolving) nameservers.
+   from recursive resolvers.
 
-5.2.  DNSSEC Validator Details
-
-   Verification of DNSSEC signed BULK generated RRs may be performed
-   against on-the-fly signatures with zero modification to their
-   behavior.  However, verification using NPN records would require
-   changes to the logic to incorporate processing RDATA generated by
-   BULK logic as described above so the results will be compatible.
-
-5.3.  DDOS Attack Vectors and Mitigation
+5.2.  DDOS Attack Vectors and Mitigation
 
    As an additional defense against Distributed Denial Of Service (DDOS)
    attacks against recursive (resolving) nameservers it is highly
@@ -537,10 +503,10 @@ Table of Contents
    appropriate may differ from zone to zone and administrator to
    administrator.
 
-   [ I am unclear how this helps DDOS mitigation against anyone at all.
-   ]
+   [ I am unclear how this helps DDOS mitigation against anyone at all,
+   and suspect this section should be removed.. ]
 
-5.4.  Implications of Large-Scale DNS Records
+5.3.  Implications of Large-Scale DNS Records
 
    The production of such large-scale records in the wild may have some
    unintended side-effects.  These side-effects could be of concern or
@@ -562,13 +528,12 @@ Table of Contents
 
 6.  Privacy Considerations
 
-   Neither the BULK nor NPN records introduce any new privacy concerns
-   to DNS data.
+   The BULK record does not introduce any new privacy concerns to DNS
+   data.
 
 7.  IANA Considerations
 
-   IANA is requested to assign numbers for two DNS resource record types
-   identified in this document: BULK and NPN.
+   IANA is requested to assign numbers for the BULK RR.
 
 8.  Acknowledgments
 

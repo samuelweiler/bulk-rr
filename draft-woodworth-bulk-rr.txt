@@ -7,9 +7,9 @@ Internet-Draft                                                 D. Ballew
 Updates: 2308, 4033, 4034, 4035 (if                    CenturyLink, Inc.
          approved)                            S. Bindinganaveli Raghavan
 Intended status: Standards Track                  Hughes Network Systems
-Expires: April 30, 2018                                      D. Lawrence
+Expires: May 1, 2018                                         D. Lawrence
                                                      Akamai Technologies
-                                                        October 27, 2017
+                                                        October 28, 2017
 
 
                        BULK DNS Resource Records
@@ -48,12 +48,12 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 30, 2018.
+   This Internet-Draft will expire on May 1, 2018.
 
 
 
 
-Woodworth, et al.        Expires April 30, 2018                 [Page 1]
+Woodworth, et al.          Expires May 1, 2018                  [Page 1]
 
 Internet-Draft                   BULK RR                    October 2017
 
@@ -78,44 +78,43 @@ Table of Contents
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
      1.1.  Background and Terminology  . . . . . . . . . . . . . . .   4
    2.  The BULK Resource Record  . . . . . . . . . . . . . . . . . .   4
-     2.1.  BULK RDATA Wire Format  . . . . . . . . . . . . . . . . .   5
-     2.2.  The BULK RR Presentation Format . . . . . . . . . . . . .   7
-   3.  BULK Replacement  . . . . . . . . . . . . . . . . . . . . . .   8
-     3.1.  Matching the Domain Name Pattern  . . . . . . . . . . . .   8
-     3.2.  Record Generation using Replacement Pattern . . . . . . .   8
-       3.2.1.  Delimiters  . . . . . . . . . . . . . . . . . . . . .   9
-       3.2.2.  Delimiter intervals . . . . . . . . . . . . . . . . .   9
-       3.2.3.  Padding length  . . . . . . . . . . . . . . . . . . .   9
-       3.2.4.  Final processing  . . . . . . . . . . . . . . . . . .  10
-   4.  Known Limitations . . . . . . . . . . . . . . . . . . . . . .  10
-     4.1.  Unsupported Nameservers . . . . . . . . . . . . . . . . .  10
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  11
-     5.1.  DNSSEC Signature Strategies . . . . . . . . . . . . . . .  11
-       5.1.1.  On-the-fly Signatures . . . . . . . . . . . . . . . .  11
-       5.1.2.  Alternative Signature Scheme  . . . . . . . . . . . .  11
-       5.1.3.  Non-DNSSEC Zone Support Only  . . . . . . . . . . . .  12
-     5.2.  DNSSEC Validator Details  . . . . . . . . . . . . . . . .  12
-     5.3.  DDOS Attack Vectors and Mitigation  . . . . . . . . . . .  12
-     5.4.  Implications of Large-Scale DNS Records . . . . . . . . .  12
-   6.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  13
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  13
-   8.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  13
-   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  13
-     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  13
-     9.2.  Informative References  . . . . . . . . . . . . . . . . .  14
-   Appendix A.  BULK Examples  . . . . . . . . . . . . . . . . . . .  15
-     A.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  15
-     A.2.  Example 2 . . . . . . . . . . . . . . . . . . . . . . . .  15
+     2.1.  BULK RDATA Wire Format  . . . . . . . . . . . . . . . . .   4
+     2.2.  The BULK RR Presentation Format . . . . . . . . . . . . .   6
+   3.  BULK Replacement  . . . . . . . . . . . . . . . . . . . . . .   7
+     3.1.  Matching the Domain Name Pattern  . . . . . . . . . . . .   7
+     3.2.  Record Generation using Replacement Pattern . . . . . . .   7
+       3.2.1.  Delimiters  . . . . . . . . . . . . . . . . . . . . .   8
+       3.2.2.  Delimiter intervals . . . . . . . . . . . . . . . . .   8
+       3.2.3.  Padding length  . . . . . . . . . . . . . . . . . . .   8
+       3.2.4.  Final processing  . . . . . . . . . . . . . . . . . .   9
+   4.  Known Limitations . . . . . . . . . . . . . . . . . . . . . .   9
+     4.1.  Unsupported Nameservers . . . . . . . . . . . . . . . . .   9
+   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
+     5.1.  DNSSEC Signature Strategies . . . . . . . . . . . . . . .  10
+       5.1.1.  On-the-fly Signatures . . . . . . . . . . . . . . . .  10
+       5.1.2.  Alternative Signature Scheme  . . . . . . . . . . . .  10
+       5.1.3.  Non-DNSSEC Zone Support Only  . . . . . . . . . . . .  11
+     5.2.  DDOS Attack Vectors and Mitigation  . . . . . . . . . . .  11
+     5.3.  Implications of Large-Scale DNS Records . . . . . . . . .  11
+   6.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  12
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  12
+   8.  Acknowledgments . . . . . . . . . . . . . . . . . . . . . . .  12
+   9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  12
+     9.1.  Normative References  . . . . . . . . . . . . . . . . . .  12
+     9.2.  Informative References  . . . . . . . . . . . . . . . . .  13
+   Appendix A.  BULK Examples  . . . . . . . . . . . . . . . . . . .  13
+     A.1.  Example 1 . . . . . . . . . . . . . . . . . . . . . . . .  13
+     A.2.  Example 2 . . . . . . . . . . . . . . . . . . . . . . . .  14
+     A.3.  Example 3 . . . . . . . . . . . . . . . . . . . . . . . .  15
 
 
 
-Woodworth, et al.        Expires April 30, 2018                 [Page 2]
+Woodworth, et al.          Expires May 1, 2018                  [Page 2]
 
 Internet-Draft                   BULK RR                    October 2017
 
 
-     A.3.  Example 3 . . . . . . . . . . . . . . . . . . . . . . . .  16
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  15
 
 1.  Introduction
 
@@ -145,56 +144,35 @@ Internet-Draft                   BULK RR                    October 2017
    This record addresses a number of real-world operational problems
    that authoritative DNS service providers experience.  For example,
    operators who host many large reverse lookup zones, even for only
-   IPv4 space in in-addr.arpa, benefit from the disk space, memory size,
-   and zone transfer efficiencies that are gained by encapsulating a
-   simple record-generating algorithm versus enumerating all of the
+   IPv4 space in in-addr.arpa, would benefit from the disk space, memory
+   size, and zone transfer efficiencies that are gained by encapsulating
+   a simple record-generating algorithm versus enumerating all of the
    individual records to cover the same space.
 
-   Continuing to prose-up this message from John ...
+   Production zones of tens of thousands of pattern-generated records
+   currently exist, that could be reduced to just one BULK RR.  These
+   zones can look deceptively small on the primary nameserver and
+   balloon to 100MB or more when expanded,
 
-   1) Minimize operational costs by ... a) Eliminating tickets where
-   singletons force a generate to be split in order to properly function
-   b) Broken SWIP scripts - Due to its scarceness, IPv4 is quickly
-   becoming a very valuable commodity.  One which can't even be
-   purchased without justification.  Reverse records must exist for all
-   assigned v4 IP space whether a service exists on them or not.
-
-   2) Reduce blind-spots - Many customers rely on secondary DNS services
-   and as more and more $GENERATES are used, the WIRE version silently
-   increases exponentially.  We've seen zones which live on the primary
+   BULK also allows administrators to more easily deal with singletons,
+   records in the pattern space that are an exception to the normal data
+   generation rules.  Whereas a mechanism like $GENERATE may need to be
+   adjusted to account for these individual records, the processing
+   rules for BULK have explicit records more naturally override the
+   dynamically generated ones.  This collision problem is not just a
+   theoretical concern, but a real source of support calls for
+   providers.
 
 
 
-Woodworth, et al.        Expires April 30, 2018                 [Page 3]
+Woodworth, et al.          Expires May 1, 2018                  [Page 3]
 
 Internet-Draft                   BULK RR                    October 2017
 
 
-   quietly (safely) as a couple MB only to expand to 65M and even 110M
-   over the WIRE.  These legitimate zonefiles fail to transfer reliably
-   or even at all.
-
-   3) Reduce start-up times - Another issue with large expanded zones is
-   the increase in start-up times.  A relatively small zone can take
-   longer and longer to deploy to memory, taking automated deployments
-   take longer to complete, even leading to timeouts and redeployment.
-
-   4) Transfer intact - Many customers want 'copies' of zonefiles for
-   their records and local processing.  These copies should ideally look
-   similar but they can deviate significantly where methods like
-   $GENERATE are concerned.
-
-   5) More Efficient Management services - Many companies leverage DNS
-   and IP management services.  By implementing bulk-rr aware services,
-   these systems can be more efficient in search synthesis with bulk-
-   rr's multi-level features.
-
-   6) Compatibility for IPv6 generics - Just not to leave IPv6
-   completely out of the picture.  I understand this horse is on its
-   side and cool to the touch but just because we don't do it doesn't
-   mean it won't happen.  In fact it is already happening.  My
-   understanding is Knot-DNS is already touting this capability and
-   several closed-source implementations exist as well.
+   Pattern-generated records are also not only for the reverse DNS
+   space.  Forward zones also occasionally have entries that follow
+   patterns that would be well-addressed by the BULK RR.
 
 1.1.  Background and Terminology
 
@@ -218,14 +196,6 @@ Internet-Draft                   BULK RR                    October 2017
 
    The BULK RR is class-independent.
 
-
-
-
-Woodworth, et al.        Expires April 30, 2018                 [Page 4]
-
-Internet-Draft                   BULK RR                    October 2017
-
-
 2.1.  BULK RDATA Wire Format
 
    The RDATA for a BULK RR is as follows:
@@ -248,39 +218,20 @@ Internet-Draft                   BULK RR                    October 2017
 
    Domain Name Pattern consists of a pattern encoded as a wire-format
    fully qualified domain name.  The full name is used so that numeric
+
+
+
+Woodworth, et al.          Expires May 1, 2018                  [Page 4]
+
+Internet-Draft                   BULK RR                    October 2017
+
+
    substrings above the zone cut can be captured in addition to those in
    the zone.  It needs no length indicator for the entire field because
    the root label marks its end.
 
    Special characters are interpreted as per the following Augmented
    Backus-Naur Form (ABNF) notation from [RFC5234].
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Woodworth, et al.        Expires April 30, 2018                 [Page 5]
-
-Internet-Draft                   BULK RR                    October 2017
-
 
    match         =  1*(range / string)
 
@@ -323,20 +274,16 @@ Internet-Draft                   BULK RR                    October 2017
 
    Replacement Pattern describes how the answer RRset MUST be generated
    for the matching query.  It needs no length indicator because its end
-   can be derived from the RDATA length minus Match Type and Domain Name
-   Pattern lengths.  It uses the following additional ABNF elements:
 
 
 
-
-
-
-
-
-Woodworth, et al.        Expires April 30, 2018                 [Page 6]
+Woodworth, et al.          Expires May 1, 2018                  [Page 5]
 
 Internet-Draft                   BULK RR                    October 2017
 
+
+   can be derived from the RDATA length minus Match Type and Domain Name
+   Pattern lengths.  It uses the following additional ABNF elements:
 
    replace       =   1*(reference / string)
 
@@ -359,12 +306,13 @@ Internet-Draft                   BULK RR                    October 2017
    padding       =   "|" *2decdigit
 
 
-   [ Is this complexity beyond simple ${1}, ${2}, etc, really worth it?
-   I definitely see how it could make for shorter replacement patterns,
-   but does it enhance their clarity and usability? ]
+   [ Is the formatting complexity beyond simple ${1}, ${2}, etc, really
+   worth it?  I definitely see how it could make for shorter replacement
+   patterns, but does it enhance their clarity and usability, adding a
+   feature someone really wants? ]
 
-   The Replacement Pattern MUST end in a period if it is intended to
-   represent a fully qualified domain name.
+   The Replacement Pattern MUST end in the root label if it is intended
+   to represent a fully qualified domain name.
 
 2.2.  The BULK RR Presentation Format
 
@@ -385,11 +333,7 @@ Internet-Draft                   BULK RR                    October 2017
 
 
 
-
-
-
-
-Woodworth, et al.        Expires April 30, 2018                 [Page 7]
+Woodworth, et al.          Expires May 1, 2018                  [Page 6]
 
 Internet-Draft                   BULK RR                    October 2017
 
@@ -445,7 +389,7 @@ Internet-Draft                   BULK RR                    October 2017
 
 
 
-Woodworth, et al.        Expires April 30, 2018                 [Page 8]
+Woodworth, et al.          Expires May 1, 2018                  [Page 7]
 
 Internet-Draft                   BULK RR                    October 2017
 
@@ -501,7 +445,7 @@ Internet-Draft                   BULK RR                    October 2017
 
 
 
-Woodworth, et al.        Expires April 30, 2018                 [Page 9]
+Woodworth, et al.          Expires May 1, 2018                  [Page 8]
 
 Internet-Draft                   BULK RR                    October 2017
 
@@ -550,20 +494,17 @@ Internet-Draft                   BULK RR                    October 2017
    handling by authoritative servers, or being unable to add them, is an
    issue that needs to be explored more thoroughly within dnsop.
 
-   On the resolver side, rolling out a new semantics in DNSSEC has also
-   proven to be difficult in the past.  Lacking NPN support effectively
-   means that operators using BULK will have to forego DNSSEC signing of
 
 
 
 
-Woodworth, et al.        Expires April 30, 2018                [Page 10]
+
+
+
+Woodworth, et al.          Expires May 1, 2018                  [Page 9]
 
 Internet-Draft                   BULK RR                    October 2017
 
-
-   the affected zones, or do online signing of the dynamically generated
-   records.
 
 5.  Security Considerations
 
@@ -613,7 +554,10 @@ Internet-Draft                   BULK RR                    October 2017
 
 
 
-Woodworth, et al.        Expires April 30, 2018                [Page 11]
+
+
+
+Woodworth, et al.          Expires May 1, 2018                 [Page 10]
 
 Internet-Draft                   BULK RR                    October 2017
 
@@ -627,17 +571,9 @@ Internet-Draft                   BULK RR                    October 2017
    As a final option zones which wish to remain entirely without DNSSEC
    support may serve such zones without either of the above solutions
    and records generated based on BULK RRs will require zero support
-   from recursive (resolving) nameservers.
+   from recursive resolvers.
 
-5.2.  DNSSEC Validator Details
-
-   Verification of DNSSEC signed BULK generated RRs may be performed
-   against on-the-fly signatures with zero modification to their
-   behavior.  However, verification using NPN records would require
-   changes to the logic to incorporate processing RDATA generated by
-   BULK logic as described above so the results will be compatible.
-
-5.3.  DDOS Attack Vectors and Mitigation
+5.2.  DDOS Attack Vectors and Mitigation
 
    As an additional defense against Distributed Denial Of Service (DDOS)
    attacks against recursive (resolving) nameservers it is highly
@@ -650,10 +586,10 @@ Internet-Draft                   BULK RR                    October 2017
    appropriate may differ from zone to zone and administrator to
    administrator.
 
-   [ I am unclear how this helps DDOS mitigation against anyone at all.
-   ]
+   [ I am unclear how this helps DDOS mitigation against anyone at all,
+   and suspect this section should be removed.. ]
 
-5.4.  Implications of Large-Scale DNS Records
+5.3.  Implications of Large-Scale DNS Records
 
    The production of such large-scale records in the wild may have some
    unintended side-effects.  These side-effects could be of concern or
@@ -665,15 +601,6 @@ Internet-Draft                   BULK RR                    October 2017
 
    Solutions to the magnitude problem for BULK generated RRs are
    expected be similar if not identical to that of existing wildcard
-
-
-
-
-Woodworth, et al.        Expires April 30, 2018                [Page 12]
-
-Internet-Draft                   BULK RR                    October 2017
-
-
    records, the core difference being the resultant RDATA will be unique
    for each requested Domain Name within its scope.
 
@@ -682,15 +609,23 @@ Internet-Draft                   BULK RR                    October 2017
    features described in this document can be eliminated from any such
    service or product.
 
+
+
+
+
+Woodworth, et al.          Expires May 1, 2018                 [Page 11]
+
+Internet-Draft                   BULK RR                    October 2017
+
+
 6.  Privacy Considerations
 
-   Neither the BULK nor NPN records introduce any new privacy concerns
-   to DNS data.
+   The BULK record does not introduce any new privacy concerns to DNS
+   data.
 
 7.  IANA Considerations
 
-   IANA is requested to assign numbers for two DNS resource record types
-   identified in this document: BULK and NPN.
+   IANA is requested to assign numbers for the BULK RR.
 
 8.  Acknowledgments
 
@@ -720,16 +655,6 @@ Internet-Draft                   BULK RR                    October 2017
               DOI 10.17487/RFC2119, March 1997, <https://www.rfc-
               editor.org/info/rfc2119>.
 
-
-
-
-
-
-Woodworth, et al.        Expires April 30, 2018                [Page 13]
-
-Internet-Draft                   BULK RR                    October 2017
-
-
    [RFC2181]  Elz, R. and R. Bush, "Clarifications to the DNS
               Specification", RFC 2181, DOI 10.17487/RFC2181, July 1997,
               <https://www.rfc-editor.org/info/rfc2181>.
@@ -737,6 +662,17 @@ Internet-Draft                   BULK RR                    October 2017
    [RFC2308]  Andrews, M., "Negative Caching of DNS Queries (DNS
               NCACHE)", RFC 2308, DOI 10.17487/RFC2308, March 1998,
               <https://www.rfc-editor.org/info/rfc2308>.
+
+
+
+
+
+
+
+Woodworth, et al.          Expires May 1, 2018                 [Page 12]
+
+Internet-Draft                   BULK RR                    October 2017
+
 
    [RFC2317]  Eidnes, H., de Groot, G., and P. Vixie, "Classless IN-
               ADDR.ARPA delegation", BCP 20, RFC 2317,
@@ -779,16 +715,20 @@ Internet-Draft                   BULK RR                    October 2017
               Terminology", RFC 7719, DOI 10.17487/RFC7719, December
               2015, <https://www.rfc-editor.org/info/rfc7719>.
 
-
-
-Woodworth, et al.        Expires April 30, 2018                [Page 14]
-
-Internet-Draft                   BULK RR                    October 2017
-
-
 Appendix A.  BULK Examples
 
 A.1.  Example 1
+
+
+
+
+
+
+
+Woodworth, et al.          Expires May 1, 2018                 [Page 13]
+
+Internet-Draft                   BULK RR                    October 2017
+
 
    $ORIGIN 2.10.in-addr.arpa.
    @ 86400 IN BULK PTR (
@@ -837,7 +777,11 @@ A.2.  Example 2
 
 
 
-Woodworth, et al.        Expires April 30, 2018                [Page 15]
+
+
+
+
+Woodworth, et al.          Expires May 1, 2018                 [Page 14]
 
 Internet-Draft                   BULK RR                    October 2017
 
@@ -893,7 +837,7 @@ Authors' Addresses
 
 
 
-Woodworth, et al.        Expires April 30, 2018                [Page 16]
+Woodworth, et al.          Expires May 1, 2018                 [Page 15]
 
 Internet-Draft                   BULK RR                    October 2017
 
@@ -949,4 +893,4 @@ Internet-Draft                   BULK RR                    October 2017
 
 
 
-Woodworth, et al.        Expires April 30, 2018                [Page 17]
+Woodworth, et al.          Expires May 1, 2018                 [Page 16]
